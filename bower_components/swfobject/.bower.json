@@ -1,0 +1,13 @@
+{
+  "name": "swfobject",
+  "homepage": "https://github.com/swfobject/swfobject",
+  "_release": "2.2",
+  "_resolution": {
+    "type": "tag",
+    "tag": "2.2",
+    "commit": "0def175b66a15fa40e857b232ff1e18902de2389"
+  },
+  "_source": "git://github.com/swfobject/swfobject.git",
+  "_target": "2.2",
+  "_originalSource": "swfobject"
+}

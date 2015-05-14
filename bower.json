@@ -1,0 +1,21 @@
+{
+  "name": "mol-flash-vpaid",
+  "version": "0.0.0",
+  "authors": [
+    "Luis Silva <luis.dasilva@mailonline.co.uk>"
+  ],
+  "description": "",
+  "main": [
+  ],
+  "license": "",
+  "ignore": [
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests",
+    "demo"
+  ],
+  "dependencies": {
+    "swfobject": "2.2"
+  }
+}
