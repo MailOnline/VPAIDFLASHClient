@@ -2,6 +2,10 @@ About
 ===============
 JS + Flash wrapper for [VPAID](http://www.iab.net/vpaid).
 
+[VPAID](http://www.iab.net/vpaid) or Video Player Ad-Serving Interface Definition, establishes a common interface between video players and ad units, enabling a rich interactive in-stream ad experience.
+
+Because some of the ad's are in flash, this projects will allow to expose the api to be used by js.
+
 JS is reponsible of:
   - create a **uniqueid** for the vpaid and request swfobject to load the swf
   - to do the bridge between vpaid api between flash and js using [ExternalInterface](http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/external/ExternalInterface.html)
@@ -10,12 +14,14 @@ JS is reponsible of:
 Flash is reponsible of:
   - load the ad Unit
   - expose ad Unit interface to outside
+  - using the **uniqueid** to identify the swf
 
 TODO
 ===============
-  - handle the swfobject with different id's
-  - make js create the swfobject to load the flash vpaid
-  - create externalinterface so flash/js can communicate
+  - expose all the API
+  - try to implement flex unit tests
+  - fix issue of copying in gulp
+  - make unit test to js api
 
 JS
 ==
