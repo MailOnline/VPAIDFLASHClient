@@ -83,4 +83,6 @@ var flashVPAID = new FlashVPAID(myContent, function (error, result) {
 
 ````
 
+for the api of flashVPAID check [IVAPAID](js/IVPAID.js).
+
 
