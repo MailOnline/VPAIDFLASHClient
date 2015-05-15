@@ -1,4 +1,5 @@
 //if this code already run once don't do anything
+(function () {
 if (window.FlashVPAID) return;
 
 let IVPAID = require('./IVPAID').IVPAID;
@@ -25,7 +26,7 @@ class FlashVPAID extends IVPAID {
         this.vpaidWrapper = vpaidWrapper;
         this.flashID = uniqueVPAID();
         this.load =  callback || noop;
-        this._uniqueMethodIdentifier = unique(flashID);
+        this._uniqueMethodIdentifier = unique(this.flashID);
         createElementWithID(vpaidWrapper, this.flashID);
 
         //because flash externalInterface will call
@@ -136,16 +137,41 @@ class FlashVPAID extends IVPAID {
     }
 
     //properties that will be treat as async methods
-    adLinear() {}
-    adWidth() {}
-    adHeight() {}
-    adExpanded() {}
-    adSkippableState() {}
-    adRemainingTime() {}
-    adDuration() {}
-    adVolume() {}
-    adCompanions() {}
-    adIcons() {}
+    adLinear(callback) {
+        _safeFlashMethod('adLinear', [], callback);
+    }
+    adWidth(callback) {
+        _safeFlashMethod('adWidth', [], callback);
+    }
+    adHeight(callback) {
+        _safeFlashMethod('adHeight', [], callback);
+    }
+    adExpanded(callback) {
+        _safeFlashMethod('adExpanded', [], callback);
+    }
+    adSkippableState(callback) {
+        _safeFlashMethod('adSkippableState', [], callback);
+    }
+    adRemainingTime(callback) {
+        _safeFlashMethod('adRemainingTime', [], callback);
+    }
+    adDuration(callback) {
+        _safeFlashMethod('adDuration', [], callback);
+    }
+    //TODO: in flash we need to convert setAdVolume to a setter
+    setAdVolume(volume) {
+        _safeFlashMethod('setAdVolume', [volume]);
+    }
+    //TODO: in flash we need to convert getAdVolume to a getter
+    getAdVolume(callback) {
+        _safeFlashMethod('getAdVolume', [], callback);
+    }
+    adCompanions(callback) {
+        _safeFlashMethod('adCompanions', [], callback);
+    }
+    adIcons(callback) {
+        _safeFlashMethod('adIcons', [], callback);
+    }
 
     _flash_handShake (message) {
         console.log('handShake:', message);
@@ -162,4 +188,6 @@ window[VPAID_FLASH_HANDLER] = function (flashID, event, message) {
     instances[flashID]['_flash_' + event](message);
 }
 window.FlashVPAID = FlashVPAID;
+
+})();
 
