@@ -16,6 +16,9 @@ var sourcemaps = require('gulp-sourcemaps');
 var buffer = require('vinyl-buffer');
 var assign = require('lodash').assign;
 
+//test
+var karma = require('karma').server;
+
 var jsBuild = watchify(
     browserify(
         assign(
@@ -46,6 +49,14 @@ function bundle() {
 }
 
 gulp.task('browserify', bundle);
+
+gulp.task('test', function (done) {
+    karma.start({
+        configFile: __dirname + '/karma.conf.js'
+    }, function () {
+        done();
+    });
+});
 
 //copy swf files and update demo
 gulp.task('copy:flash', function () {
