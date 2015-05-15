@@ -96,7 +96,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== 'function' 
                 try {
                     //methods are created by ExternalInterface.addCallback in as3 code, if for some reason it failed
                     //this code will throw an error
-                    this.el[methodName]([this._flashID, methodName, callbackID].concat(args));
+                    this.el[methodName]([callbackID].concat(args));
                 } catch (e) {
                     if (callback) {
                         delete this.callback[callbackID];
@@ -342,14 +342,15 @@ function _inherits(subClass, superClass) { if (typeof superClass !== 'function' 
         }
 
         console.log('flashID:', flashID, 'type:', type, 'eventOrMethod:', event, 'message:', message);
-        if (type !== 'event') {
-            if (event === 'handShake') {
-                instances[flashID]._flash_handShake(message[0]);
-            } else {
-                instances[flashID]._flash_methodAnswer(event, message);
-            }
+        if (event === 'handShake') {
+            instances[flashID]._flash_handShake(message[0]);
         } else {
-            instances[flashID]._fireEvent(event, message);
+            var callID = message.shift();
+            if (type !== 'event') {
+                instances[flashID]._flash_methodAnswer(event, callID, message);
+            } else {
+                instances[flashID]._fireEvent(event, callID, message);
+            }
         }
     };
     window.FlashVPAID = FlashVPAID;

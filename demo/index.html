@@ -17,6 +17,9 @@
                 console.log('lets load ad unit');
                 flashVPaid.loadAdUnit('TestAd.swf', function () {
                     console.log('adUnitLoaded');
+                    flashVPaid.adIcons(function (result) {
+                        console.log('adIcons', result);
+                    });
                 });
             }
         </script>
