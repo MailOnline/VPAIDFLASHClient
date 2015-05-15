@@ -2,22 +2,26 @@
 export class IVPAID {
 
     //custom implementation, sync methods
+    getSize() {}
+    setSize(width, height) {}
     getWidth() {}
     setWidth(w) {}
-
     getHeight() {}
     setHeight(h) {}
 
-    getSize() {}
-    setSize(width, height) {}
+    getFlashID() {}
 
+    on(eventName, callback) {}
+
+    loadAdUnit(callback, adURL) {}
+    unloadAdUnit(callback) {}
 
     //all methods below
     //are async methods
-    handshakeVersion(callback, playerVPAIDVersion = '2.0') {}
+    handshakeVersion(playerVPAIDVersion = '2.0', callback=undefined) {}
 
     //width and height is not in the beginning because we will use the default width/height used in the constructor
-    initAd ( viewMode : String, desiredBitrate : Number, width = 0, height = 0, creativeData = '', environmentVars = '') {}
+    initAd (viewMode, desiredBitrate, width = 0, height = 0, creativeData = '', environmentVars = '') {}
     resizeAd(width, height, viewMode) {}
 
     startAd() {}
@@ -29,17 +33,17 @@ export class IVPAID {
     skipAd() {}
 
     //properties that will be treat as async methods
-    adLinear() {}
-    adWidth() {}
-    adHeight() {}
-    adExpanded() {}
-    adSkippableState() {}
-    adRemainingTime() {}
-    adDuration() {}
+    adLinear(callback) {}
+    adWidth(callback) {}
+    adHeight(callback) {}
+    adExpanded(callback) {}
+    adSkippableState(callback) {}
+    adRemainingTime(callback) {}
+    adDuration(callback) {}
     setAdVolume(soundVolume) {}
-    getAdVolume() {}
-    adCompanions() {}
-    adIcons() {}
+    getAdVolume(callback) {}
+    adCompanions(callback) {}
+    adIcons(callback) {}
 }
 
 /*

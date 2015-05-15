@@ -13,13 +13,11 @@
         </div>
         <script>
             var flashVPaid = new FlashVPAID(myContent, loadAdUnit);
-            if (!flashVPaid.el) {
-                console.log('noFlash');
-            }else {
-                console.log('helloFlash', flashVPaid.el);
-            }
             function loadAdUnit() {
-                flashVPaid.el.loadAdUnit('TestAd.swf');
+                console.log('lets load ad unit');
+                flashVPaid.loadAdUnit('TestAd.swf', function () {
+                    console.log('adUnitLoaded');
+                });
             }
         </script>
 	</body>

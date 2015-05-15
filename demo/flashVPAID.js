@@ -3,9 +3,9 @@
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-var _get = function get(_x12, _x13, _x14) { var _again = true; _function: while (_again) { desc = parent = getter = undefined; _again = false; var object = _x12,
-    property = _x13,
-    receiver = _x14; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x12 = parent; _x13 = property; _x14 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+var _get = function get(_x13, _x14, _x15) { var _again = true; _function: while (_again) { desc = parent = getter = undefined; _again = false; var object = _x13,
+    property = _x14,
+    receiver = _x15; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x13 = parent; _x14 = property; _x15 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
@@ -30,6 +30,10 @@ function _inherits(subClass, superClass) { if (typeof superClass !== 'function' 
         return nEl;
     }
 
+    function isPositiveInt(newVal, oldVal) {
+        return Number.isSafeInteger(newVal) && newVal > 0 ? newVal : oldVal;
+    }
+
     var FlashVPAID = (function (_IVPAID) {
         function FlashVPAID(vpaidWrapper, callback) {
             var swfConfig = arguments[2] === undefined ? { data: 'VPAIDFlash.swf', width: 800, height: 400 } : arguments[2];
@@ -40,23 +44,32 @@ function _inherits(subClass, superClass) { if (typeof superClass !== 'function' 
             _classCallCheck(this, FlashVPAID);
 
             _get(Object.getPrototypeOf(FlashVPAID.prototype), 'constructor', this).call(this);
+
             this._handlers = {};
             this._callbacks = {};
+            this._vpaidWrapper = vpaidWrapper;
+            this._flashID = uniqueVPAID();
+            this._load = callback || noop;
 
-            this.vpaidWrapper = vpaidWrapper;
-            this.flashID = uniqueVPAID();
-            this.load = callback || noop;
-            this._uniqueMethodIdentifier = unique(this.flashID);
-            createElementWithID(vpaidWrapper, this.flashID);
+            //validate the height
+            swfConfig.width = isPositiveInt(swfConfig.width, 800);
+            swfConfig.height = isPositiveInt(swfConfig.height, 400);
+
+            //cache sizes
+            this._width = swfConfig.width;
+            this._height = swfConfig.height;
+
+            this._uniqueMethodIdentifier = unique(this._flashID);
+            createElementWithID(vpaidWrapper, this._flashID);
 
             //because flash externalInterface will call
-            instances[this.flashID] = this;
+            instances[this._flashID] = this;
 
             params.movie = swfConfig.data;
-            params.FlashVars = 'flashid=' + this.flashID + '&handler=' + VPAID_FLASH_HANDLER + '&debug=' + debug;
+            params.FlashVars = 'flashid=' + this._flashID + '&handler=' + VPAID_FLASH_HANDLER + '&debug=' + debug;
 
             if (swfobject.hasFlashPlayerVersion(version)) {
-                this.el = swfobject.createSWF(swfConfig, params, this.flashID);
+                this.el = swfobject.createSWF(swfConfig, params, this._flashID);
             }
 
             //if this.el is undefined means swfobject failed to create the swfobject
@@ -67,19 +80,23 @@ function _inherits(subClass, superClass) { if (typeof superClass !== 'function' 
 
         _createClass(FlashVPAID, [{
             key: '_safeFlashMethod',
+
+            //internal methods don't call outside of FlashVPAID
             value: function _safeFlashMethod(methodName) {
                 var args = arguments[1] === undefined ? [] : arguments[1];
-                var callbacks = arguments[2] === undefined ? undefined : arguments[2];
+                var callback = arguments[2] === undefined ? undefined : arguments[2];
 
                 var callbackID = '';
                 // if no callback, some methods the return is void so they don't need callback
                 if (callback) {
-                    var callbackID = this.uniqueMethodIdentifier();
+                    var callbackID = this._uniqueMethodIdentifier();
                     this._callbacks[callbackID] = callback;
                 }
 
                 try {
-                    this.el[methodName].call(this, [this.flashID, methodName, callbackID].concat(args));
+                    //methods are created by ExternalInterface.addCallback in as3 code, if for some reason it failed
+                    //this code will throw an error
+                    this.el[methodName]([callbackID].concat(args));
                 } catch (e) {
                     if (callback) {
                         delete this.callback[callbackID];
@@ -87,25 +104,10 @@ function _inherits(subClass, superClass) { if (typeof superClass !== 'function' 
                     } else {
 
                         //if there isn't any callback to return error use error event handler
-                        _fireEvent('error', [e]);
+                        this._fireEvent('error', [e]);
                     }
+                    console.log(e);
                 }
-            }
-        }, {
-            key: '_flashMethodAnswer',
-            value: function _flashMethodAnswer(methodName, callbackID, args) {
-
-                //method's that return void will not have callbacks
-                if (callbackID === '') return;
-
-                if (!this._callbacks[callbackID]) {
-                    //TODO: something is wrong, this should never happens if it happens fire an error
-                    return;
-                }
-
-                //TODO: check with carlos if we need to use apply instead
-                this._callbacks[callbackID](args);
-                delete this._callbacks[callbackID];
             }
         }, {
             key: '_fireEvent',
@@ -120,7 +122,74 @@ function _inherits(subClass, superClass) { if (typeof superClass !== 'function' 
                 }
             }
         }, {
+            key: '_flash_handShake',
+            value: function _flash_handShake(message) {
+                //this code will be executed if flash is prepared to be
+                //executed
+                if (message == 'prepared') {
+                    this._load();
+                }
+            }
+        }, {
+            key: '_flash_methodAnswer',
+            value: function _flash_methodAnswer(methodName, callbackID, args) {
+
+                //method's that return void will not have callbacks
+                if (callbackID === '') return;
+
+                if (!this._callbacks[callbackID]) {
+                    //TODO: something is wrong, this should never happens if it happens fire an error
+                    return;
+                }
+
+                //TODO: check with carlos if we need to use apply instead
+                this._callbacks[callbackID](args);
+                delete this._callbacks[callbackID];
+            }
+        }, {
+            key: 'getSize',
+
+            //methods like properties specific to this implementation of VPAID
+            value: function getSize() {
+                return { width: this._width, height: this._height };
+            }
+        }, {
+            key: 'setSize',
+            value: function setSize(newWidth, newHeight) {
+                this._width = isPositiveInt(newWidth, this._width);
+                this._height = isPositiveInt(newHeight, this._height);
+                this._el.setAttribute('width', this._width);
+                this._el.setAttribute('height', this._height);
+            }
+        }, {
+            key: 'getWidth',
+            value: function getWidth() {
+                return this._width;
+            }
+        }, {
+            key: 'setWidth',
+            value: function setWidth(newWidth) {
+                this.setSize(newWidth, this._height);
+            }
+        }, {
+            key: 'getHeight',
+            value: function getHeight() {
+                return this._height;
+            }
+        }, {
+            key: 'setHeight',
+            value: function setHeight(newHeight) {
+                this.setSize(this._width, newHeight);
+            }
+        }, {
+            key: 'getFlashID',
+            value: function getFlashID() {
+                return this._flashID;
+            }
+        }, {
             key: 'on',
+
+            //methods specific to this implementation of VPAID
             value: function on(eventName, callback) {
                 if (!this._handlers[eventName]) {
                     this._handlers[eventName] = [];
@@ -128,13 +197,25 @@ function _inherits(subClass, superClass) { if (typeof superClass !== 'function' 
                 this._handlers[eventName].push(callback);
             }
         }, {
+            key: 'loadAdUnit',
+            value: function loadAdUnit(adURL, callback) {
+                this._safeFlashMethod('loadAdUnit', [adURL], callback);
+            }
+        }, {
+            key: 'unloadAdUnit',
+            value: function unloadAdUnit(callback) {
+                this._safeFlashMethod('unloadAdUnit', [], callback);
+            }
+        }, {
             key: 'handshakeVersion',
 
+            //VPAID methods and properties of VPAID spec
             //async methods
-            value: function handshakeVersion(callback) {
-                var playerVPAIDVersion = arguments[1] === undefined ? '2.0' : arguments[1];
+            value: function handshakeVersion() {
+                var playerVPAIDVersion = arguments[0] === undefined ? '2.0' : arguments[0];
+                var callback = arguments[1] === undefined ? undefined : arguments[1];
 
-                _safeFlashMethod('handshakeVersion', [playerVPAIDVersion], callback);
+                this._safeFlashMethod('handshakeVersion', [playerVPAIDVersion], callback);
             }
         }, {
             key: 'initAd',
@@ -144,128 +225,133 @@ function _inherits(subClass, superClass) { if (typeof superClass !== 'function' 
                 var creativeData = arguments[4] === undefined ? '' : arguments[4];
                 var environmentVars = arguments[5] === undefined ? '' : arguments[5];
 
+                //resize element that has the flash object
                 this.size(width, height);
-                _safeFlashMethod('initAd', [this.getWidth(), this.getHeight(), viewMode, desiredBitrate, creativeData, environmentVars]);
+
+                this._safeFlashMethod('initAd', [this.getWidth(), this.getHeight(), viewMode, desiredBitrate, creativeData, environmentVars]);
             }
         }, {
             key: 'resizeAd',
             value: function resizeAd(width, height, viewMode) {
+                //resize element that has the flash object
                 this.size(width, height);
-                _safeFlashMethod('resizeAd', [this.getWidth(), this.getHeight(), viewMode]);
+
+                //resize ad inside the flash
+                this._safeFlashMethod('resizeAd', [this.getWidth(), this.getHeight(), viewMode]);
             }
         }, {
             key: 'startAd',
             value: function startAd() {
-                _safeFlashMethod('startAd');
+                this._safeFlashMethod('startAd');
             }
         }, {
             key: 'stopAd',
             value: function stopAd() {
-                _safeFlashMethod('stopAd');
+                this._safeFlashMethod('stopAd');
             }
         }, {
             key: 'pauseAd',
             value: function pauseAd() {
-                _safeFlashMethod('pauseAd');
+                this._safeFlashMethod('pauseAd');
             }
         }, {
             key: 'resumeAd',
             value: function resumeAd() {
-                _safeFlashMethod('resumeAd');
+                this._safeFlashMethod('resumeAd');
             }
         }, {
             key: 'expandAd',
             value: function expandAd() {
-                _safeFlashMethod('expandAd');
+                this._safeFlashMethod('expandAd');
             }
         }, {
             key: 'collapseAd',
             value: function collapseAd() {
-                _safeFlashMethod('collapseAd');
+                this._safeFlashMethod('collapseAd');
             }
         }, {
             key: 'skipAd',
             value: function skipAd() {
-                _safeFlashMethod('skipAd');
+                this._safeFlashMethod('skipAd');
             }
         }, {
             key: 'adLinear',
 
             //properties that will be treat as async methods
             value: function adLinear(callback) {
-                _safeFlashMethod('adLinear', [], callback);
+                this._safeFlashMethod('adLinear', [], callback);
             }
         }, {
             key: 'adWidth',
             value: function adWidth(callback) {
-                _safeFlashMethod('adWidth', [], callback);
+                this._safeFlashMethod('adWidth', [], callback);
             }
         }, {
             key: 'adHeight',
             value: function adHeight(callback) {
-                _safeFlashMethod('adHeight', [], callback);
+                this._safeFlashMethod('adHeight', [], callback);
             }
         }, {
             key: 'adExpanded',
             value: function adExpanded(callback) {
-                _safeFlashMethod('adExpanded', [], callback);
+                this._safeFlashMethod('adExpanded', [], callback);
             }
         }, {
             key: 'adSkippableState',
             value: function adSkippableState(callback) {
-                _safeFlashMethod('adSkippableState', [], callback);
+                this._safeFlashMethod('adSkippableState', [], callback);
             }
         }, {
             key: 'adRemainingTime',
             value: function adRemainingTime(callback) {
-                _safeFlashMethod('adRemainingTime', [], callback);
+                this._safeFlashMethod('adRemainingTime', [], callback);
             }
         }, {
             key: 'adDuration',
             value: function adDuration(callback) {
-                _safeFlashMethod('adDuration', [], callback);
+                this._safeFlashMethod('adDuration', [], callback);
             }
         }, {
             key: 'setAdVolume',
-
-            //TODO: in flash we need to convert setAdVolume to a setter
             value: function setAdVolume(volume) {
-                _safeFlashMethod('setAdVolume', [volume]);
+                this._safeFlashMethod('setAdVolume', [volume]);
             }
         }, {
             key: 'getAdVolume',
-
-            //TODO: in flash we need to convert getAdVolume to a getter
             value: function getAdVolume(callback) {
-                _safeFlashMethod('getAdVolume', [], callback);
+                this._safeFlashMethod('getAdVolume', [], callback);
             }
         }, {
             key: 'adCompanions',
             value: function adCompanions(callback) {
-                _safeFlashMethod('adCompanions', [], callback);
+                this._safeFlashMethod('adCompanions', [], callback);
             }
         }, {
             key: 'adIcons',
             value: function adIcons(callback) {
-                _safeFlashMethod('adIcons', [], callback);
-            }
-        }, {
-            key: '_flash_handShake',
-            value: function _flash_handShake(message) {
-                console.log('handShake:', message);
-                if (message == 'prepared') {
-                    this.load();
-                }
+                this._safeFlashMethod('adIcons', [], callback);
             }
         }]);
 
         return FlashVPAID;
     })(IVPAID);
 
-    window[VPAID_FLASH_HANDLER] = function (flashID, event, message) {
-        console.log('flashID', flashID, 'event', event, 'message', message);
-        //console.log(instances[flashID], instances[flashID]['_flash_']);
-        instances[flashID]['_flash_' + event](message);
+    window[VPAID_FLASH_HANDLER] = function (flashID, type, event) {
+        for (var _len = arguments.length, message = Array(_len > 3 ? _len - 3 : 0), _key = 3; _key < _len; _key++) {
+            message[_key - 3] = arguments[_key];
+        }
+
+        console.log('flashID:', flashID, 'type:', type, 'eventOrMethod:', event, 'message:', message);
+        if (event === 'handShake') {
+            instances[flashID]._flash_handShake(message[0]);
+        } else {
+            var callID = message.shift();
+            if (type !== 'event') {
+                instances[flashID]._flash_methodAnswer(event, callID, message);
+            } else {
+                instances[flashID]._fireEvent(event, callID, message);
+            }
+        }
     };
     window.FlashVPAID = FlashVPAID;
 })();
@@ -289,9 +375,15 @@ var IVPAID = (function () {
     }
 
     _createClass(IVPAID, [{
-        key: 'getWidth',
+        key: 'getSize',
 
         //custom implementation, sync methods
+        value: function getSize() {}
+    }, {
+        key: 'setSize',
+        value: function setSize(width, height) {}
+    }, {
+        key: 'getWidth',
         value: function getWidth() {}
     }, {
         key: 'setWidth',
@@ -303,18 +395,25 @@ var IVPAID = (function () {
         key: 'setHeight',
         value: function setHeight(h) {}
     }, {
-        key: 'getSize',
-        value: function getSize() {}
+        key: 'getFlashID',
+        value: function getFlashID() {}
     }, {
-        key: 'setSize',
-        value: function setSize(width, height) {}
+        key: 'on',
+        value: function on(eventName, callback) {}
+    }, {
+        key: 'loadAdUnit',
+        value: function loadAdUnit(callback, adURL) {}
+    }, {
+        key: 'unloadAdUnit',
+        value: function unloadAdUnit(callback) {}
     }, {
         key: 'handshakeVersion',
 
         //all methods below
         //are async methods
-        value: function handshakeVersion(callback) {
-            var playerVPAIDVersion = arguments[1] === undefined ? '2.0' : arguments[1];
+        value: function handshakeVersion() {
+            var playerVPAIDVersion = arguments[0] === undefined ? '2.0' : arguments[0];
+            var callback = arguments[1] === undefined ? undefined : arguments[1];
         }
     }, {
         key: 'initAd',
@@ -354,37 +453,37 @@ var IVPAID = (function () {
         key: 'adLinear',
 
         //properties that will be treat as async methods
-        value: function adLinear() {}
+        value: function adLinear(callback) {}
     }, {
         key: 'adWidth',
-        value: function adWidth() {}
+        value: function adWidth(callback) {}
     }, {
         key: 'adHeight',
-        value: function adHeight() {}
+        value: function adHeight(callback) {}
     }, {
         key: 'adExpanded',
-        value: function adExpanded() {}
+        value: function adExpanded(callback) {}
     }, {
         key: 'adSkippableState',
-        value: function adSkippableState() {}
+        value: function adSkippableState(callback) {}
     }, {
         key: 'adRemainingTime',
-        value: function adRemainingTime() {}
+        value: function adRemainingTime(callback) {}
     }, {
         key: 'adDuration',
-        value: function adDuration() {}
+        value: function adDuration(callback) {}
     }, {
         key: 'setAdVolume',
         value: function setAdVolume(soundVolume) {}
     }, {
         key: 'getAdVolume',
-        value: function getAdVolume() {}
+        value: function getAdVolume(callback) {}
     }, {
         key: 'adCompanions',
-        value: function adCompanions() {}
+        value: function adCompanions(callback) {}
     }, {
         key: 'adIcons',
-        value: function adIcons() {}
+        value: function adIcons(callback) {}
     }]);
 
     return IVPAID;

@@ -17,42 +17,61 @@ function createElementWithID(parent, id) {
     return nEl;
 }
 
+function isPositiveInt(newVal, oldVal) {
+    return Number.isSafeInteger(newVal) && newVal > 0 ? newVal : oldVal;
+}
+
 class FlashVPAID extends IVPAID {
     constructor (vpaidWrapper, callback, swfConfig = {data: 'VPAIDFlash.swf', width: 800, height: 400}, version = '9', params = { wmode: 'transparent', salign: 'tl', allowScriptAccess: 'always'}, debug = false) {
         super();
+
         this._handlers = {};
         this._callbacks = {};
+        this._vpaidWrapper = vpaidWrapper;
+        this._flashID = uniqueVPAID();
+        this._load =  callback || noop;
 
-        this.vpaidWrapper = vpaidWrapper;
-        this.flashID = uniqueVPAID();
-        this.load =  callback || noop;
-        this._uniqueMethodIdentifier = unique(this.flashID);
-        createElementWithID(vpaidWrapper, this.flashID);
+
+        //validate the height
+        swfConfig.width = isPositiveInt(swfConfig.width, 800);
+        swfConfig.height = isPositiveInt(swfConfig.height, 400);
+
+        //cache sizes
+        this._width = swfConfig.width;
+        this._height = swfConfig.height;
+
+
+        this._uniqueMethodIdentifier = unique(this._flashID);
+        createElementWithID(vpaidWrapper, this._flashID);
 
         //because flash externalInterface will call
-        instances[this.flashID] = this;
+        instances[this._flashID] = this;
 
         params.movie = swfConfig.data;
-        params.FlashVars = `flashid=${this.flashID}&handler=${VPAID_FLASH_HANDLER}&debug=${debug}`;
+        params.FlashVars = `flashid=${this._flashID}&handler=${VPAID_FLASH_HANDLER}&debug=${debug}`;
 
         if (swfobject.hasFlashPlayerVersion(version)) {
-            this.el = swfobject.createSWF(swfConfig, params, this.flashID);
+            this.el = swfobject.createSWF(swfConfig, params, this._flashID);
         }
 
         //if this.el is undefined means swfobject failed to create the swfobject
         if (!this.el) return this;
     }
 
-    _safeFlashMethod(methodName, args = [], callbacks = undefined) {
+    //internal methods don't call outside of FlashVPAID
+    _safeFlashMethod(methodName, args = [], callback = undefined) {
         var callbackID = '';
         // if no callback, some methods the return is void so they don't need callback
         if (callback) {
-            var callbackID = this.uniqueMethodIdentifier();
+            var callbackID = this._uniqueMethodIdentifier();
             this._callbacks[callbackID] = callback;
         }
 
+
         try {
-            this.el[methodName].call(this, [this.flashID, methodName, callbackID].concat(args));
+            //methods are created by ExternalInterface.addCallback in as3 code, if for some reason it failed
+            //this code will throw an error
+            this.el[methodName]([callbackID].concat(args));
 
         } catch (e) {
             if (callback) {
@@ -61,12 +80,32 @@ class FlashVPAID extends IVPAID {
             } else {
 
                 //if there isn't any callback to return error use error event handler
-                _fireEvent('error', [e]);
+                this._fireEvent('error', [e]);
             }
+            console.log(e);
         }
     }
 
-    _flashMethodAnswer(methodName, callbackID, args) {
+    _fireEvent(eventName, args) {
+        //TODO: check if forEach and isArray is added to the browser with babeljs
+        if (Array.isArray(this._handlers[eventName])) {
+            this._handlers[eventName].forEach(function (callback) {
+                setTimeout(function () {
+                    callback(args);
+                }, 0);
+            });
+        }
+    }
+
+    _flash_handShake (message) {
+        //this code will be executed if flash is prepared to be
+        //executed
+        if (message == 'prepared') {
+            this._load();
+        }
+    }
+
+    _flash_methodAnswer(methodName, callbackID, args) {
 
         //method's that return void will not have callbacks
         if (callbackID === '') return;
@@ -81,17 +120,33 @@ class FlashVPAID extends IVPAID {
         delete this._callbacks[callbackID];
     }
 
-    _fireEvent(eventName, args) {
-        //TODO: check if forEach and isArray is added to the browser with babeljs
-        if (Array.isArray(this._handlers[eventName])) {
-            this._handlers[eventName].forEach(function (callback) {
-                setTimeout(function () {
-                    callback(args);
-                }, 0);
-            });
-        }
+    //methods like properties specific to this implementation of VPAID
+    getSize() {
+        return {width: this._width, height: this._height};
+    }
+    setSize(newWidth, newHeight) {
+        this._width = isPositiveInt(newWidth, this._width);
+        this._height = isPositiveInt(newHeight, this._height);
+        this._el.setAttribute('width', this._width);
+        this._el.setAttribute('height', this._height);
+    }
+    getWidth() {
+        return this._width;
+    }
+    setWidth(newWidth) {
+        this.setSize(newWidth, this._height);
+    }
+    getHeight() {
+        return this._height;
+    }
+    setHeight(newHeight) {
+        this.setSize(this._width, newHeight);
+    }
+    getFlashID() {
+        return this._flashID;
     }
 
+    //methods specific to this implementation of VPAID
     on(eventName, callback) {
         if (!this._handlers[eventName]) {
             this._handlers[eventName] = [];
@@ -99,93 +154,103 @@ class FlashVPAID extends IVPAID {
         this._handlers[eventName].push(callback);
     }
 
+    loadAdUnit(adURL, callback) {
+        this._safeFlashMethod('loadAdUnit', [adURL], callback);
+    }
+    unloadAdUnit(callback) {
+        this._safeFlashMethod('unloadAdUnit', [], callback);
+    }
+
+    //VPAID methods and properties of VPAID spec
     //async methods
-    handshakeVersion(callback, playerVPAIDVersion = '2.0') {
-        _safeFlashMethod('handshakeVersion', [playerVPAIDVersion], callback);
+    handshakeVersion(playerVPAIDVersion = '2.0', callback = undefined) {
+        this._safeFlashMethod('handshakeVersion', [playerVPAIDVersion], callback);
     }
-
     initAd (viewMode, desiredBitrate, width = 0, height = 0, creativeData = '', environmentVars = '') {
+        //resize element that has the flash object
         this.size(width, height);
-        _safeFlashMethod('initAd', [this.getWidth(), this.getHeight(), viewMode, desiredBitrate, creativeData, environmentVars]);
-    }
 
+        this._safeFlashMethod('initAd', [this.getWidth(), this.getHeight(), viewMode, desiredBitrate, creativeData, environmentVars]);
+    }
     resizeAd(width, height, viewMode) {
+        //resize element that has the flash object
         this.size(width, height);
-        _safeFlashMethod('resizeAd', [this.getWidth(), this.getHeight(), viewMode]);
-    }
 
+        //resize ad inside the flash
+        this._safeFlashMethod('resizeAd', [this.getWidth(), this.getHeight(), viewMode]);
+    }
     startAd() {
-        _safeFlashMethod('startAd');
+        this._safeFlashMethod('startAd');
     }
     stopAd() {
-        _safeFlashMethod('stopAd');
+        this._safeFlashMethod('stopAd');
     }
     pauseAd() {
-        _safeFlashMethod('pauseAd');
+        this._safeFlashMethod('pauseAd');
     }
     resumeAd() {
-        _safeFlashMethod('resumeAd');
+        this._safeFlashMethod('resumeAd');
     }
     expandAd() {
-        _safeFlashMethod('expandAd');
+        this._safeFlashMethod('expandAd');
     }
     collapseAd() {
-        _safeFlashMethod('collapseAd');
+        this._safeFlashMethod('collapseAd');
     }
     skipAd() {
-        _safeFlashMethod('skipAd');
+        this._safeFlashMethod('skipAd');
     }
 
     //properties that will be treat as async methods
     adLinear(callback) {
-        _safeFlashMethod('adLinear', [], callback);
+        this._safeFlashMethod('adLinear', [], callback);
     }
     adWidth(callback) {
-        _safeFlashMethod('adWidth', [], callback);
+        this._safeFlashMethod('adWidth', [], callback);
     }
     adHeight(callback) {
-        _safeFlashMethod('adHeight', [], callback);
+        this._safeFlashMethod('adHeight', [], callback);
     }
     adExpanded(callback) {
-        _safeFlashMethod('adExpanded', [], callback);
+        this._safeFlashMethod('adExpanded', [], callback);
     }
     adSkippableState(callback) {
-        _safeFlashMethod('adSkippableState', [], callback);
+        this._safeFlashMethod('adSkippableState', [], callback);
     }
     adRemainingTime(callback) {
-        _safeFlashMethod('adRemainingTime', [], callback);
+        this._safeFlashMethod('adRemainingTime', [], callback);
     }
     adDuration(callback) {
-        _safeFlashMethod('adDuration', [], callback);
+        this._safeFlashMethod('adDuration', [], callback);
     }
-    //TODO: in flash we need to convert setAdVolume to a setter
+
     setAdVolume(volume) {
-        _safeFlashMethod('setAdVolume', [volume]);
+        this._safeFlashMethod('setAdVolume', [volume]);
     }
-    //TODO: in flash we need to convert getAdVolume to a getter
     getAdVolume(callback) {
-        _safeFlashMethod('getAdVolume', [], callback);
+        this._safeFlashMethod('getAdVolume', [], callback);
     }
+
     adCompanions(callback) {
-        _safeFlashMethod('adCompanions', [], callback);
+        this._safeFlashMethod('adCompanions', [], callback);
     }
     adIcons(callback) {
-        _safeFlashMethod('adIcons', [], callback);
+        this._safeFlashMethod('adIcons', [], callback);
     }
-
-    _flash_handShake (message) {
-        console.log('handShake:', message);
-        if (message == 'prepared') {
-            this.load();
-        }
-    }
-
 }
 
-window[VPAID_FLASH_HANDLER] = function (flashID, event, message) {
-    console.log('flashID', flashID, 'event', event, 'message', message);
-    //console.log(instances[flashID], instances[flashID]['_flash_']);
-    instances[flashID]['_flash_' + event](message);
+window[VPAID_FLASH_HANDLER] = function (flashID, type, event, ...message) {
+    console.log('flashID:', flashID, 'type:', type, 'eventOrMethod:', event, 'message:', message);
+    if (event === 'handShake') {
+        instances[flashID]._flash_handShake(message[0]);
+    } else {
+        let callID = message.shift();
+        if (type !== 'event') {
+            instances[flashID]._flash_methodAnswer(event, callID, message);
+        } else {
+            instances[flashID]._fireEvent(event, callID, message);
+        }
+    }
 }
 window.FlashVPAID = FlashVPAID;
 
