@@ -1,6 +1,7 @@
 'use strict';
 
 var gulp = require('gulp');
+var del = require('del');
 var watchify = require('watchify');
 var gutil = require('gulp-util');
 
@@ -58,17 +59,28 @@ gulp.task('test', function (done) {
     });
 });
 
-//copy swf files and update demo
-gulp.task('copy:flash', function () {
-    return gulp.src(['flash/bind-debug/VPAIDFlash.swf'/*, 'flash/bind-debug/TestAd.swf'*/])
-        .pipe(gulp.dest('demo/'));
-});
+var flashFilesToMove = { files: ['VPAIDFlash.swf', 'TestAd.swf'], pathFrom: 'flash/bin-debug/', pathTo: 'demo/'};
+var demoFilesToMove = { files: ['index.html', '*.js'], pathTo: 'demo/', pathFrom: 'flash/bin-debug/'};
 
+//copy swf files and update demo
+gulp.task('copy:flash', mvFiles.bind(null, flashFilesToMove));
 //update html template
-gulp.task('copy:static', function () {
-    return gulp.src(['demo/index.html', 'demo/*.js'])
-        .pipe(gulp.dest('flash/bin-debug/'));
-});
+gulp.task('copy:static', mvFiles.bind(null, demoFilesToMove));
+
+function mvFiles(cfg, done) {
+    var filesToMv = cfg.files.map(function (file) {
+        return cfg.pathFrom + file;
+    });
+    var filesToDel = cfg.files.map(function (file) {
+        return cfg.pathTo + file;
+    });
+    del(filesToDel, function () {
+        gulp.src(filesToMv)
+            .pipe(gulp.dest(cfg.pathTo))
+            .on('end', done);
+    });
+}
+
 
 //watch file changes
 gulp.task('watch', function() {
@@ -76,6 +88,7 @@ gulp.task('watch', function() {
     gulp.watch(['demo/*.html', 'demo/*.css', 'demo/*.js/'], ['copy:static'], reload);
     gulp.watch(['flash/bin-debug/*.swf'], ['copy:flash'], reload);
 });
+
 
 //create the static server
 gulp.task('serve', ['browserify', 'copy:flash', 'copy:static', 'watch'], function () {
