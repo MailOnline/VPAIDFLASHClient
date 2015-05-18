@@ -16,6 +16,8 @@ package com.dailymail.vpaid
 		function get adCompanions():String;
 		function get adIcons():Boolean;
 		
+		function set adVolume(volume:Number):void;
+		
 		// Methods
 		function handshakeVersion(playerVPAIDVersion : String):String;
 		function initAd(width : Number, height : Number, viewMode : String, desiredBitrate : Number, creativeData : String='', environmentVars : String=''):void;

@@ -6,6 +6,8 @@ package
 	
 	public class TestAd extends Sprite implements IVPAID
 	{
+		private var volume:Number = 0;
+		
 		public function TestAd()
 		{
 			super();
@@ -48,12 +50,17 @@ package
 		
 		public function get adVolume():Number
 		{
-			return 0;
+			return volume;
+		}
+		
+		public function set adVolume(volume:Number):void
+		{
+			this.volume = volume;
 		}
 		
 		public function get adCompanions():String
 		{
-			return null;
+			return '';
 		}
 		
 		public function get adIcons():Boolean
@@ -63,7 +70,7 @@ package
 		
 		public function handshakeVersion(playerVPAIDVersion:String):String
 		{
-			return null;
+			return '';
 		}
 		
 		public function initAd(width:Number, height:Number, viewMode:String, desiredBitrate:Number, creativeData:String='', environmentVars:String=''):void

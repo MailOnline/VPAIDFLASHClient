@@ -1,5 +1,6 @@
 package com.dailymail.vpaid
 {
+	import flash.events.Event;
 	import flash.events.EventDispatcher;
 	
 	public class VPAIDWrapper extends EventDispatcher implements IVPAID
@@ -48,77 +49,97 @@ package com.dailymail.vpaid
 		
 		public function get adDuration():Number
 		{
-			//TODO: implement function
-			return 0;
+			return ad.adDuration;
 		}
 		
 		public function get adVolume():Number
 		{
-			//TODO: implement function
-			return 0;
+			return ad.adVolume;
+		}
+		
+		public function set adVolume(volume:Number):void
+		{
+			ad.adVolume = volume;
 		}
 		
 		public function get adCompanions():String
 		{
-			//TODO: implement function
-			return null;
+			return ad.adCompanions;
 		}
 		
 		public function get adIcons():Boolean
 		{
-			//TODO: implement function
-			return false;
+			return ad.adIcons;
 		}
 		
 		public function handshakeVersion(playerVPAIDVersion:String):String
 		{
-			//TODO: implement function
-			return null;
+			return ad.handshakeVersion(playerVPAIDVersion);
 		}
 		
 		public function initAd(width:Number, height:Number, viewMode:String, desiredBitrate:Number, creativeData:String='', environmentVars:String=''):void
 		{
-			//TODO: implement function
+			ad.initAd(width, height, viewMode, desiredBitrate, creativeData, environmentVars);
 		}
 		
 		public function resizeAd(width:Number, height:Number, viewMode:String):void
 		{
-			//TODO: implement function
+			ad.resizeAd(width, height, viewMode);
 		}
 		
 		public function startAd():void
 		{
-			//TODO: implement function
+			ad.startAd();
 		}
 		
 		public function stopAd():void
 		{
-			//TODO: implement function
+			ad.stopAd();
 		}
 		
 		public function pauseAd():void
 		{
-			//TODO: implement function
+			ad.pauseAd();
 		}
 		
 		public function resumeAd():void
 		{
-			//TODO: implement function
+			ad.resumeAd();
 		}
 		
 		public function expandAd():void
 		{
-			//TODO: implement function
+			ad.expandAd();
 		}
 		
 		public function collapseAd():void
 		{
-			//TODO: implement function
+			ad.collapseAd();
 		}
 		
 		public function skipAd():void
 		{
-			//TODO: implement function
+			ad.skipAd();
+		}
+		
+		override public function addEventListener(type:String, listener:Function, useCapture:Boolean=false, priority:int=0, useWeakReference:Boolean=false):void {
+			ad.addEventListener(type, listener, useCapture, priority, useWeakReference);
+		}
+		
+		override public function removeEventListener(type:String, listener:Function, useCapture:Boolean=false):void {
+			ad.removeEventListener(type, listener, useCapture);
+		}
+		
+		override public function dispatchEvent(event:Event):Boolean {
+			return ad.dispatchEvent(event);
+		}
+		
+		override public function hasEventListener(type:String):Boolean {
+			return ad.hasEventListener(type);
+		}
+		
+		override public function willTrigger(type:String):Boolean {
+			return ad.willTrigger(type);
 		}
 	}
 }
