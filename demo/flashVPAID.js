@@ -18,21 +18,11 @@ function _inherits(subClass, superClass) { if (typeof superClass !== 'function' 
     var IVPAID = require('./IVPAID').IVPAID;
     var noop = require('./utils').noop;
     var unique = require('./utils').unique;
+    var isPositiveInt = require('./utils').isPositiveInt;
+    var createElementWithID = require('./utils').createElementWithID;
     var uniqueVPAID = unique('vpaid');
     var instances = {};
     var VPAID_FLASH_HANDLER = 'vpaid_video_flash_handler';
-
-    function createElementWithID(parent, id) {
-        var nEl = document.createElement('div');
-        nEl.id = id;
-        parent.innerHTML = '';
-        parent.appendChild(nEl);
-        return nEl;
-    }
-
-    function isPositiveInt(newVal, oldVal) {
-        return Number.isSafeInteger(newVal) && newVal > 0 ? newVal : oldVal;
-    }
 
     var FlashVPAID = (function (_IVPAID) {
         function FlashVPAID(vpaidWrapper, callback) {
@@ -516,22 +506,37 @@ AdError
 */
 
 },{}],3:[function(require,module,exports){
-"use strict";
+'use strict';
 
-Object.defineProperty(exports, "__esModule", {
+Object.defineProperty(exports, '__esModule', {
     value: true
 });
 exports.unique = unique;
 exports.noop = noop;
+exports.createElementWithID = createElementWithID;
+exports.isPositiveInt = isPositiveInt;
+'use strict';
 
 function unique(prefix) {
     var count = -1;
     return function (f) {
-        return "" + prefix + "_" + ++count;
+        return '' + prefix + '_' + ++count;
     };
 }
 
 function noop() {}
+
+function createElementWithID(parent, id) {
+    var nEl = document.createElement('div');
+    nEl.id = id;
+    parent.innerHTML = '';
+    parent.appendChild(nEl);
+    return nEl;
+}
+
+function isPositiveInt(newVal, oldVal) {
+    return Number.isSafeInteger(newVal) && newVal > 0 ? newVal : oldVal;
+}
 
 },{}]},{},[1])
 

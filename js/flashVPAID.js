@@ -5,21 +5,12 @@ if (window.FlashVPAID) return;
 let IVPAID = require('./IVPAID').IVPAID;
 let noop = require('./utils').noop;
 let unique = require('./utils').unique;
+let isPositiveInt = require('./utils').isPositiveInt;
+let createElementWithID = require('./utils').createElementWithID;
 let uniqueVPAID = unique('vpaid');
 let instances = {};
 const VPAID_FLASH_HANDLER = 'vpaid_video_flash_handler';
 
-function createElementWithID(parent, id) {
-    var nEl = document.createElement('div');
-    nEl.id = id;
-    parent.innerHTML = '';
-    parent.appendChild(nEl);
-    return nEl;
-}
-
-function isPositiveInt(newVal, oldVal) {
-    return Number.isSafeInteger(newVal) && newVal > 0 ? newVal : oldVal;
-}
 
 class FlashVPAID extends IVPAID {
     constructor (vpaidWrapper, callback, swfConfig = {data: 'VPAIDFlash.swf', width: 800, height: 400}, version = '9', params = { wmode: 'transparent', salign: 'tl', allowScriptAccess: 'always'}, debug = false) {

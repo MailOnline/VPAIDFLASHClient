@@ -60,7 +60,7 @@ gulp.task('test', function (done) {
 });
 
 var flashFilesToMove = { files: ['VPAIDFlash.swf', 'TestAd.swf'], pathFrom: 'flash/bin-debug/', pathTo: 'demo/'};
-var demoFilesToMove = { files: ['index.html', '*.js'], pathTo: 'demo/', pathFrom: 'flash/bin-debug/'};
+var demoFilesToMove = { files: ['index.html', '*.js'], pathFrom: 'demo/', pathTo: 'flash/bin-debug/'};
 
 //copy swf files and update demo
 gulp.task('copy:flash', mvFiles.bind(null, flashFilesToMove));
@@ -85,7 +85,8 @@ function mvFiles(cfg, done) {
 //watch file changes
 gulp.task('watch', function() {
     jsBuild.on('update', bundle);
-    gulp.watch(['demo/*.html', 'demo/*.css', 'demo/*.js/'], ['copy:static'], reload);
+    gulp.watch(['demo/*.html', 'demo/*.css'], ['copy:static'], reload);
+    gulp.watch(['demo/*.js'], ['test'], reload);
     gulp.watch(['flash/bin-debug/*.swf'], ['copy:flash'], reload);
 });
 
