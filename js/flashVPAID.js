@@ -226,7 +226,6 @@ class FlashVPAID extends IVPAID {
 }
 
 window[VPAID_FLASH_HANDLER] = function (flashID, type, event, callID, error, data) {
-    console.log('flashID:', flashID, 'action:', event, 'data:', data);
     if (event === 'handShake') {
         instances[flashID]._flash_handShake(error, data);
     } else {

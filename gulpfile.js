@@ -18,7 +18,7 @@ var buffer = require('vinyl-buffer');
 var assign = require('lodash').assign;
 
 //test
-var karma = require('karma').server;
+var karma = require('gulp-karma');
 
 var jsBuild = watchify(
     browserify(
@@ -51,12 +51,11 @@ function bundle() {
 
 gulp.task('browserify', bundle);
 
-gulp.task('test', function (done) {
-    karma.start({
-        configFile: __dirname + '/karma.conf.js'
-    }, function () {
-        done();
-    });
+gulp.task('test', function () {
+    return gulp.src( ['js/**/*.js', 'test/*.js'] )
+        .pipe(karma({
+            configFile: __dirname + '/karma.conf.js'
+        }));
 });
 
 var flashFilesToMove = { files: ['VPAIDFlash.swf', 'TestAd.swf'], pathFrom: 'flash/bin-debug/', pathTo: 'demo/'};
