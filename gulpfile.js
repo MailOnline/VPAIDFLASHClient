@@ -89,7 +89,7 @@ gulp.task('watch', function() {
 
 
 //create the static server
-gulp.task('serve', ['browserify', 'copy:flash', 'copy:static', 'watch'], function () {
+gulp.task('serve', ['browserify', 'copy:flash', 'watch'], function () {
     browserSync({
         server: {
             baseDir: 'demo'
