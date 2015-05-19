@@ -45,20 +45,20 @@ function bundle() {
         .pipe(buffer())
         .pipe(sourcemaps.init({loadMaps: true}))
         .pipe(sourcemaps.write('./'))
-        .pipe(gulp.dest('./demo/'))
+        .pipe(gulp.dest('./build/'))
         .pipe(reload({stream: true, once: true}));
 }
 
 gulp.task('browserify', bundle);
 
 gulp.task('test', function () {
-    return gulp.src( ['js/**/*.js', 'test/*.js'] )
+    return gulp.src( ['bower_components/swfobject/swfobject/src/swfobject.js', 'js/**/*.js', 'test/*.js'] )
         .pipe(karma({
             configFile: __dirname + '/karma.conf.js'
         }));
 });
 
-var flashFilesToMove = { files: ['VPAIDFlash.swf', 'TestAd.swf'], pathFrom: 'flash/bin-debug/', pathTo: 'demo/'};
+var flashFilesToMove = { files: ['VPAIDFlash.swf'], pathFrom: 'flash/bin-debug/', pathTo: 'build/'};
 
 //copy swf files and update demo
 gulp.task('copy:flash', mvFiles.bind(null, flashFilesToMove));
@@ -81,8 +81,9 @@ function mvFiles(cfg, done) {
 //watch file changes
 gulp.task('watch', function() {
     jsBuild.on('update', bundle);
-    gulp.watch(['demo/*.html', 'demo/*.css'], ['copy:static'], reload);
-    gulp.watch(['demo/*.js'], ['test'], reload);
+    gulp.watch(['demo/*.html', 'demo/*.css'], reload);
+    gulp.watch(['build/*.js'], ['test'], reload);
+    gulp.watch(['test/*.js'], ['test']);
     gulp.watch(['flash/bin-debug/*.swf'], ['copy:flash'], reload);
 });
 
@@ -91,9 +92,14 @@ gulp.task('watch', function() {
 gulp.task('serve', ['browserify', 'copy:flash', 'watch'], function () {
     browserSync({
         server: {
-            baseDir: 'demo'
+            baseDir: ['demo', 'build'],
+            routes: {
+                '/swfobject.js':        'bower_components/swfobject/swfobject/src/swfobject.js',
+                '/TestAd.swf':          'flash/bin-debug/TestAd.swf'
+            }
         }
     });
 });
 
+gulp.task('default', ['test', 'browserify']);
 

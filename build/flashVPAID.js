@@ -12,7 +12,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; }
 
 //if this code already run once don't do anything
-(function () {
+var FlashVPAID = (function () {
     if (window.FlashVPAID) return;
 
     var IVPAID = require('./IVPAID').IVPAID;
@@ -36,6 +36,8 @@ function _inherits(subClass, superClass) { if (typeof superClass !== 'function' 
             _classCallCheck(this, FlashVPAID);
 
             _get(Object.getPrototypeOf(FlashVPAID.prototype), 'constructor', this).call(this);
+
+            if (!swfobject) return this;
 
             this._handlers = {};
             this._callbacks = {};
@@ -63,9 +65,6 @@ function _inherits(subClass, superClass) { if (typeof superClass !== 'function' 
             if (swfobject.hasFlashPlayerVersion(version)) {
                 this.el = swfobject.createSWF(swfConfig, params, this._flashID);
             }
-
-            //if this.el is undefined means swfobject failed to create the swfobject
-            if (!this.el) return this;
         }
 
         _inherits(FlashVPAID, _IVPAID);
@@ -342,6 +341,12 @@ function _inherits(subClass, superClass) { if (typeof superClass !== 'function' 
         return FlashVPAID;
     })(IVPAID);
 
+    Object.defineProperty(FlashVPAID, 'VPAID_FLASH_HANDLER', {
+        writable: false,
+        configurable: false,
+        value: VPAID_FLASH_HANDLER
+    });
+
     window[VPAID_FLASH_HANDLER] = function (flashID, type, event, callID, error, data) {
         if (event === 'handShake') {
             instances[flashID]._flash_handShake(error, data);
@@ -354,7 +359,11 @@ function _inherits(subClass, superClass) { if (typeof superClass !== 'function' 
         }
     };
     window.FlashVPAID = FlashVPAID;
+
+    return FlashVPAID;
 })();
+
+module.exports = FlashVPAID;
 
 },{"./IVPAID":2,"./utils":3}],2:[function(require,module,exports){
 'use strict';

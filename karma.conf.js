@@ -9,8 +9,9 @@ module.exports = function (karma) {
      * This is the list of file patterns to load into the browser during testing.
      */
     files: [
+        'bower_components/swfobject/swfobject/src/swfobject.js',
         'js/**/*.js',
-        'test/*.js'
+        'test/*.js',
     ],
     exclude: [],
     frameworks: ['mocha', 'chai-sinon', 'browserify'],
@@ -43,7 +44,7 @@ module.exports = function (karma) {
     /**
      * Disable file watching by default.
      */
-    autoWatch: true,
+    autoWatch: false,
 
     /**
      * The list of browsers to launch to test on. This includes only "Firefox" by
@@ -60,7 +61,7 @@ module.exports = function (karma) {
      */
     browsers: [
       //'Safari',
-      'Firefox',
+      //'Firefox',
       'Chrome'
     ]
   });
