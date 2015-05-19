@@ -63,7 +63,7 @@ Running the project
 Example of the usage
 ==========================================
 
-````
+```javascript
 var flashVPaid = new FlashVPAID(myContent, loadAdUnit);
 function loadAdUnit(err, result) {
     if (err) {
@@ -90,7 +90,7 @@ function loadAdUnit(err, result) {
 
     });
 }
-````
+```
 
 for the api of flashVPAID check [IVAPAID](js/IVPAID.js).
 
