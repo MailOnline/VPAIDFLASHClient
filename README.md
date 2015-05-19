@@ -64,8 +64,8 @@ Example of the usage
 ==========================================
 
 ```javascript
-var flashVPaid = new FlashVPAID(myContent, loadAdUnit);
-function loadAdUnit(err, result) {
+var flashVPaid = new FlashVPAID(myContent, flashVPAIDWrapperLoaded);
+function flashVPAIDWrapperLoaded(err, result) {
     if (err) {
         //handle error here
         return;
