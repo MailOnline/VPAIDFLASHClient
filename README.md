@@ -18,10 +18,8 @@ Because some of the ad's are in flash, this projects will allow to expose the ap
 
 TODO
 ===============
-  - expose all the API
   - try to implement flex unit tests
-  - fix issue of copying in gulp
-  - make unit test to js api
+  - make unit test to js api - [started]
 
 JS
 ==
