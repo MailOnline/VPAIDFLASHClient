@@ -9,6 +9,8 @@ let isPositiveInt = require('./utils').isPositiveInt;
 let createElementWithID = require('./utils').createElementWithID;
 let uniqueVPAID = unique('vpaid');
 let instances = {};
+
+const ERROR = 'error';
 const VPAID_FLASH_HANDLER = 'vpaid_video_flash_handler';
 
 
@@ -71,7 +73,7 @@ class FlashVPAID extends IVPAID {
             } else {
 
                 //if there isn't any callback to return error use error event handler
-                this._fireEvent('error', [e]);
+                this._fireEvent(ERROR, [e]);
             }
         }
     }
@@ -93,10 +95,10 @@ class FlashVPAID extends IVPAID {
 
     _flash_methodAnswer(methodName, callbackID, err, result) {
 
-        //method's that return void will not have callbacks
-        if (callbackID === '') return;
-
-        if (!this._callbacks[callbackID]) {
+        //not all methods callback's are mandatory
+        if (callbackID === '' || !this._callbacks[callbackID]) {
+            //but if there exist an error, fire the error event
+            if (err) this._fireEvent(ERROR, err, result);
             return;
         }
 
