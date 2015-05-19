@@ -64,21 +64,32 @@ Example of the usage
 ==========================================
 
 ````
-var flashVPAID = new FlashVPAID(myContent, function (error, result) {
-  if (error) {
-    //or user's doesn't has flash
-    //or swfobject didn't create the flash for some reason
-    //or timeout in the handshake
-  }else {
-    //it was successful so we can load the adUnit
-    flashVPAID.loadAdUnit('TestAd.swf', function (error, result) {
-        flashVPAID.adIcons(function (error, hasAdIcons) {
-            if (!error) console.log(hasAdIcons);
-        });
-    });
-  }
-});
+var flashVPaid = new FlashVPAID(myContent, loadAdUnit);
+function loadAdUnit(err, result) {
+    if (err) {
+        //handle error here
+        return;
+    }
 
+    flashVPaid.loadAdUnit('TestAd.swf', function (error, success) {
+
+        if (err) {
+            //handle error here
+            return;
+        }
+
+        flashVPaid.adIcons(function (err, result) {
+            console.log('adIcons', result);
+        });
+        flashVPaid.setAdVolume(10, function (err, result) {
+            console.log('setAdVolume', result);
+        });
+        flashVPaid.getAdVolume(function (err, result) {
+            console.log('getAdVolume', result);
+        });
+
+    });
+}
 ````
 
 for the api of flashVPAID check [IVAPAID](js/IVPAID.js).
