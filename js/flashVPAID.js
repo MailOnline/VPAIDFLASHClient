@@ -73,41 +73,34 @@ class FlashVPAID extends IVPAID {
                 //if there isn't any callback to return error use error event handler
                 this._fireEvent('error', [e]);
             }
-            console.log(e);
         }
     }
 
-    _fireEvent(eventName, args) {
+    _fireEvent(eventName, err, result) {
         //TODO: check if forEach and isArray is added to the browser with babeljs
         if (Array.isArray(this._handlers[eventName])) {
             this._handlers[eventName].forEach(function (callback) {
                 setTimeout(function () {
-                    callback(args);
+                    callback(err, result);
                 }, 0);
             });
         }
     }
 
-    _flash_handShake (message) {
-        //this code will be executed if flash is prepared to be
-        //executed
-        if (message == 'prepared') {
-            this._load();
-        }
+    _flash_handShake (error, message) {
+        this._load(error, message);
     }
 
-    _flash_methodAnswer(methodName, callbackID, args) {
+    _flash_methodAnswer(methodName, callbackID, err, result) {
 
         //method's that return void will not have callbacks
         if (callbackID === '') return;
 
         if (!this._callbacks[callbackID]) {
-            //TODO: something is wrong, this should never happens if it happens fire an error
             return;
         }
 
-        //TODO: check with carlos if we need to use apply instead
-        this._callbacks[callbackID](args);
+        this._callbacks[callbackID](err, result);
         delete this._callbacks[callbackID];
     }
 
@@ -148,7 +141,7 @@ class FlashVPAID extends IVPAID {
     loadAdUnit(adURL, callback) {
         this._safeFlashMethod('loadAdUnit', [adURL], callback);
     }
-    unloadAdUnit(callback) {
+    unloadAdUnit(callback = undefined) {
         this._safeFlashMethod('unloadAdUnit', [], callback);
     }
 
@@ -157,39 +150,39 @@ class FlashVPAID extends IVPAID {
     handshakeVersion(playerVPAIDVersion = '2.0', callback = undefined) {
         this._safeFlashMethod('handshakeVersion', [playerVPAIDVersion], callback);
     }
-    initAd (viewMode, desiredBitrate, width = 0, height = 0, creativeData = '', environmentVars = '') {
+    initAd (viewMode, desiredBitrate, width = 0, height = 0, creativeData = '', environmentVars = '', callback = undefined) {
         //resize element that has the flash object
         this.size(width, height);
 
-        this._safeFlashMethod('initAd', [this.getWidth(), this.getHeight(), viewMode, desiredBitrate, creativeData, environmentVars]);
+        this._safeFlashMethod('initAd', [this.getWidth(), this.getHeight(), viewMode, desiredBitrate, creativeData, environmentVars], callback);
     }
-    resizeAd(width, height, viewMode) {
+    resizeAd(width, height, viewMode, callback = undefined) {
         //resize element that has the flash object
         this.size(width, height);
 
         //resize ad inside the flash
-        this._safeFlashMethod('resizeAd', [this.getWidth(), this.getHeight(), viewMode]);
+        this._safeFlashMethod('resizeAd', [this.getWidth(), this.getHeight(), viewMode], callback);
     }
-    startAd() {
-        this._safeFlashMethod('startAd');
+    startAd(callback = undefined) {
+        this._safeFlashMethod('startAd', [], callback);
     }
-    stopAd() {
-        this._safeFlashMethod('stopAd');
+    stopAd(callback = undefined) {
+        this._safeFlashMethod('stopAd', [], callback);
     }
-    pauseAd() {
-        this._safeFlashMethod('pauseAd');
+    pauseAd(callback = undefined) {
+        this._safeFlashMethod('pauseAd', [], callback);
     }
-    resumeAd() {
-        this._safeFlashMethod('resumeAd');
+    resumeAd(callback = undefined) {
+        this._safeFlashMethod('resumeAd', [], callback);
     }
-    expandAd() {
-        this._safeFlashMethod('expandAd');
+    expandAd(callback = undefined) {
+        this._safeFlashMethod('expandAd', [], callback);
     }
-    collapseAd() {
-        this._safeFlashMethod('collapseAd');
+    collapseAd(callback = undefined) {
+        this._safeFlashMethod('collapseAd', [], callback);
     }
-    skipAd() {
-        this._safeFlashMethod('skipAd');
+    skipAd(callback = undefined) {
+        this._safeFlashMethod('skipAd', [], callback);
     }
 
     //properties that will be treat as async methods
@@ -215,8 +208,8 @@ class FlashVPAID extends IVPAID {
         this._safeFlashMethod('adDuration', [], callback);
     }
 
-    setAdVolume(volume) {
-        this._safeFlashMethod('setAdVolume', [volume]);
+    setAdVolume(volume, callback = undefined) {
+        this._safeFlashMethod('setAdVolume', [volume], callback);
     }
     getAdVolume(callback) {
         this._safeFlashMethod('getAdVolume', [], callback);
@@ -230,16 +223,15 @@ class FlashVPAID extends IVPAID {
     }
 }
 
-window[VPAID_FLASH_HANDLER] = function (flashID, type, event, ...message) {
-    console.log('flashID:', flashID, 'type:', type, 'eventOrMethod:', event, 'message:', message);
+window[VPAID_FLASH_HANDLER] = function (flashID, type, event, callID, error, data) {
+    console.log('flashID:', flashID, 'action:', event, 'data:', data);
     if (event === 'handShake') {
-        instances[flashID]._flash_handShake(message[0]);
+        instances[flashID]._flash_handShake(error, data);
     } else {
-        let callID = message.shift();
         if (type !== 'event') {
-            instances[flashID]._flash_methodAnswer(event, callID, message);
+            instances[flashID]._flash_methodAnswer(event, callID, error, data);
         } else {
-            instances[flashID]._fireEvent(event, callID, message);
+            instances[flashID]._fireEvent(event, error, data);
         }
     }
 }

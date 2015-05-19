@@ -16,11 +16,13 @@ package com.dailymail.vpaid
 	
 	public class VPAIDFlash extends Sprite
 	{
+		private const NO_AD:String = 'noAd';
+		private const ERROR:String = 'error';
+		
 		private var textField:TextField;
 		
 		private var jsHandler:String;
 		private var flashID:String;
-		private var marshallExceptions:Boolean;
 		
 		private var adURL:String;	
 		private var adLoader:BulkLoader;
@@ -33,18 +35,21 @@ package com.dailymail.vpaid
 			var paramObj:Object = LoaderInfo(this.root.loaderInfo).parameters;
 			jsHandler = paramObj.handler;
 			flashID = paramObj.flashid;
-			marshallExceptions = paramObj.marshallExceptions === 'true';
 			
-			if (paramObj.debug) {
-				debugMode();	
+			if (paramObj.debug !== 'false') {
+				debugMode();
 			}
 			
-			logDebug("ExternalInterface.available:" + ExternalInterface.available + ", paramObj.handler:" + jsHandler + ", paramObj.flashid:" + paramObj.flashid);
+			logDebug("paramObj.handler:" + jsHandler + ", paramObj.flashid:" + paramObj.flashid);
 			
 			adLoader = new BulkLoader('adLoader', 1);
 			if (ExternalInterface.available) {
+				ExternalInterface.marshallExceptions = paramObj.marshallExceptions === 'true';
+				
 				addVPAIDInterface();
-				ExternalInterface.call(jsHandler, flashID, 'method', 'handShake', 'prepared');
+				callInterface('method', 'handShake', '', null, 'prepared');
+			}else {
+				logDebug('no external interface available', true);
 			}
 		}
 		
@@ -62,22 +67,21 @@ package com.dailymail.vpaid
 		private function logDebug(msg:String, erase:Boolean = false):void {
 			if (textField) {
 				if (!erase) {
-					msg = textField + '///' + msg; 
+					msg = textField.text + '\n$ ' + msg; 
 				}
 				textField.text = msg;
 			}
 		}
 		
 		private function loadAdUnit(callID:String, url:String):void {
-			var self:VPAIDFlash = this;
 			adURL = url;
 			logDebug(url, true);
 			var loadItem:LoadingItem = adLoader.add(url, {maxTries: 1, type: BulkLoader.TYPE_MOVIECLIP});
 			loadItem.addEventListener(BulkLoader.ERROR, function (event):void {
-				onLoadAdUnitError.call(self, callID, event);
+				onLoadAdUnitError(callID, event);
 			});
 			loadItem.addEventListener(BulkLoader.COMPLETE, function (event):void {
-				onLoadAdUnit.call(self, callID, event);
+				onLoadAdUnit(callID, event);
 			});
 			if (!adLoader.isRunning) adLoader.start();
 		}
@@ -89,12 +93,12 @@ package com.dailymail.vpaid
 			VPAIDEvent.ALL_EVENTS.forEach(function (event:*, index:int, arr:Array):void {
 				adContent.addEventListener(event, dispatchEvent);
 			});
-			ExternalInterface.call(jsHandler, flashID, 'method', 'loadAdUnit', callID, true);
+			callInterface('method', 'loadAdUnit', callID, null, true);
 		}
 		
 		private function onLoadAdUnitError(callID:String, evt:ErrorEvent):void {
 			logDebug(evt.text);
-			ExternalInterface.call(jsHandler, flashID, 'error', 'loadAdUnit', evt.toString());
+			callInterface('method', 'loadAdUnit', callID, evt, true);
 		}
 		
 		private function unloadAdUnit(callID:String, evt:Event):void {
@@ -103,12 +107,10 @@ package com.dailymail.vpaid
 			});
 			removeChild(adContent);
 			adContent = null;
-			ExternalInterface.call(jsHandler, flashID, 'method', 'unloadAdUnit', callID, true);
+			callInterface('method', 'unloadAdUnit', callID, null, true);
 		}
 		
 		private function addVPAIDInterface():void {
-			var self:VPAIDFlash = this;
-			
 			var callbacks:Array = new Array(
 				
 				//methods
@@ -130,74 +132,79 @@ package com.dailymail.vpaid
 				{event: 'adRemainingTime', 	handler: proxyAdGetterProperty, 	type: 'property'},
 				{event: 'adDuration', 		handler: proxyAdGetterProperty, 	type: 'property'},
 				{event: 'adVolume', 		handler: proxyAdGetterProperty, 	type: 'property'},
-				{event: 'getAdVolume', 		handler: proxyAdGetterProperty, 	type: 'property'},
-				{event: 'setAdVolume', 		handler: proxyAdSetterProperty, 	type: 'property'},
+				{event: 'getAdVolume', 		handler: proxyAdGetterProperty, 	type: 'property', mapAction: 'adVolume'},
+				{event: 'setAdVolume', 		handler: proxyAdSetterProperty, 	type: 'property', mapAction: 'adVolume'},
 				{event: 'adCompanions', 	handler: proxyAdGetterProperty, 	type: 'property'},
 				{event: 'adIcons', 			handler: proxyAdGetterProperty, 	type: 'property'}
 			);
 			
-			//check if is better to use this on or off
-			ExternalInterface.marshallExceptions = marshallExceptions;
-			
 			//special callbacks
 			ExternalInterface.addCallback('loadAdUnit', function (message:Array):void {
-				loadAdUnit.apply(self, message);
+				loadAdUnit.apply(this, message);
 			});
 			ExternalInterface.addCallback('unloadAdUnit', function (message:Array):void {
-				unloadAdUnit.apply(self, message);
+				unloadAdUnit.apply(this, message);
 			});
 			
 			callbacks.forEach(function (item:*, index:int, arr:Array):void {
-				logDebug('addCallback:' + item.event);
-				try {
-					if (item.type == 'method') {
-						ExternalInterface.addCallback(item.event, function (message:Array):void {
-							item.handler.apply(self, [item.event].concat(message));
-						});
-					}else {
-						ExternalInterface.addCallback(item.event, function (message:Array):void {
-							item.handler.apply(self, [item.event].concat(message));
-						});
-					}
-				}catch (e:Error){
-					ExternalInterface.call(jsHandler, flashID, 'error', item.type, e);
-					logDebug('addCallback error:' + e.message, true);
-				}
+
+				ExternalInterface.addCallback(item.event, function (message:Array):void {
+					//callbackID, message
+					var callbackID:String = message.shift();
+					proxyAd(function ():* {
+						
+						return item.handler.apply(this, [item.mapAction || item.event].concat(message));
+
+					}, item.type, item.event, callbackID);
+				});
 			}, this);
 		}
 		
-		private function proxyAdMethod(EventType:String, callID:String, message:*):void {
+		private function proxyAd(adAction:Function, actionType:String, actionName:String, callbackID:String):void {
 			if (adContent) {
-				adContent[EventType](message);
+				safeCall(adAction, function (err, result):void {
+					callInterface(actionType, actionName, callbackID, err, result);
+				});
+			}else {
+				callInterface(actionType, actionName, callbackID, NO_AD, null);
 			}
 		}
 		
-		private function proxyAdGetterProperty(propertyType:String, callID:String):void {
-			if (adContent) {
-				try {
-					var result:* = adContent[propertyType];
-				} catch(e:Error) {
-					ExternalInterface.call(jsHandler, flashID, 'error', propertyType, callID, e);
-					logDebug('proxyAdProperty error:' + e.message, true);
-				}
-				
-				ExternalInterface.call(jsHandler, flashID, 'property', propertyType, callID, result);
-			}
+		private function proxyAdMethod(methodType:String, message:*):* {
+			return adContent[methodType](message);
 		}
 		
-		private function proxyAdSetterProperty(propertyType:String, callID:String, value:*):void {
-			if (adContent) {
-				try {
-					adContent[propertyType] = value;
-				} catch(e:Error) {
-					ExternalInterface.call(jsHandler, flashID, 'error', propertyType, callID, e);
-					logDebug('proxyAdProperty error:' + e.message, true);
-				}
+		private function proxyAdGetterProperty(propertyType:String):* {
+			return adContent[propertyType];
+		}
+		
+		private function proxyAdSetterProperty(propertyType:String, value:*):* {
+			adContent[propertyType] = value;
+			return adContent[propertyType];
+		}
+
+		private function safeCall(func:Function, done:Function):void {
+			var err:Error = null;
+			var result:*;
+			try {
+				result = func();
+			}catch (e) {
+				err = e;
+			}
+			done(err, result);
+		}
+		
+		private function callInterface(type:String, typeID:String, callbackID:String, error:* = null, result:* = null):void {
+			ExternalInterface.call(jsHandler, flashID, type, typeID, callbackID, error, result);
+			logDebug('jsHandler: ' + jsHandler + ' flashID: ' + flashID + ' type:' + type + '  typeID: ' + typeID +' callbackID: ' + callbackID + ' error: ' + error + ' result: ' + result);
+			if (type == ERROR) {
+				logDebug('proxyAdProperty error:' + result.message, true);
 			}
 		}
 		
 		private function dispatchEvent(e:VPAIDEvent):void {
-			ExternalInterface.call(jsHandler, flashID, 'event', e.type, e.data);
+			callInterface('event', e.type, '', null, e.data);
 		}
 	}
 }
+

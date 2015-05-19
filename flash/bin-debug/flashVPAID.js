@@ -3,9 +3,9 @@
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-var _get = function get(_x13, _x14, _x15) { var _again = true; _function: while (_again) { desc = parent = getter = undefined; _again = false; var object = _x13,
-    property = _x14,
-    receiver = _x15; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x13 = parent; _x14 = property; _x15 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+var _get = function get(_x23, _x24, _x25) { var _again = true; _function: while (_again) { desc = parent = getter = undefined; _again = false; var object = _x23,
+    property = _x24,
+    receiver = _x25; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x23 = parent; _x24 = property; _x25 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
@@ -18,21 +18,11 @@ function _inherits(subClass, superClass) { if (typeof superClass !== 'function' 
     var IVPAID = require('./IVPAID').IVPAID;
     var noop = require('./utils').noop;
     var unique = require('./utils').unique;
+    var isPositiveInt = require('./utils').isPositiveInt;
+    var createElementWithID = require('./utils').createElementWithID;
     var uniqueVPAID = unique('vpaid');
     var instances = {};
     var VPAID_FLASH_HANDLER = 'vpaid_video_flash_handler';
-
-    function createElementWithID(parent, id) {
-        var nEl = document.createElement('div');
-        nEl.id = id;
-        parent.innerHTML = '';
-        parent.appendChild(nEl);
-        return nEl;
-    }
-
-    function isPositiveInt(newVal, oldVal) {
-        return Number.isSafeInteger(newVal) && newVal > 0 ? newVal : oldVal;
-    }
 
     var FlashVPAID = (function (_IVPAID) {
         function FlashVPAID(vpaidWrapper, callback) {
@@ -111,28 +101,24 @@ function _inherits(subClass, superClass) { if (typeof superClass !== 'function' 
             }
         }, {
             key: '_fireEvent',
-            value: function _fireEvent(eventName, args) {
+            value: function _fireEvent(eventName, err, result) {
                 //TODO: check if forEach and isArray is added to the browser with babeljs
                 if (Array.isArray(this._handlers[eventName])) {
                     this._handlers[eventName].forEach(function (callback) {
                         setTimeout(function () {
-                            callback(args);
+                            callback(err, result);
                         }, 0);
                     });
                 }
             }
         }, {
             key: '_flash_handShake',
-            value: function _flash_handShake(message) {
-                //this code will be executed if flash is prepared to be
-                //executed
-                if (message == 'prepared') {
-                    this._load();
-                }
+            value: function _flash_handShake(error, message) {
+                this._load(error, message);
             }
         }, {
             key: '_flash_methodAnswer',
-            value: function _flash_methodAnswer(methodName, callbackID, args) {
+            value: function _flash_methodAnswer(methodName, callbackID, err, result) {
 
                 //method's that return void will not have callbacks
                 if (callbackID === '') return;
@@ -142,8 +128,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== 'function' 
                     return;
                 }
 
-                //TODO: check with carlos if we need to use apply instead
-                this._callbacks[callbackID](args);
+                this._callbacks[callbackID](err, result);
                 delete this._callbacks[callbackID];
             }
         }, {
@@ -224,55 +209,72 @@ function _inherits(subClass, superClass) { if (typeof superClass !== 'function' 
                 var height = arguments[3] === undefined ? 0 : arguments[3];
                 var creativeData = arguments[4] === undefined ? '' : arguments[4];
                 var environmentVars = arguments[5] === undefined ? '' : arguments[5];
+                var callback = arguments[6] === undefined ? undefined : arguments[6];
 
                 //resize element that has the flash object
                 this.size(width, height);
 
-                this._safeFlashMethod('initAd', [this.getWidth(), this.getHeight(), viewMode, desiredBitrate, creativeData, environmentVars]);
+                this._safeFlashMethod('initAd', [this.getWidth(), this.getHeight(), viewMode, desiredBitrate, creativeData, environmentVars], callback);
             }
         }, {
             key: 'resizeAd',
             value: function resizeAd(width, height, viewMode) {
+                var callback = arguments[3] === undefined ? undefined : arguments[3];
+
                 //resize element that has the flash object
                 this.size(width, height);
 
                 //resize ad inside the flash
-                this._safeFlashMethod('resizeAd', [this.getWidth(), this.getHeight(), viewMode]);
+                this._safeFlashMethod('resizeAd', [this.getWidth(), this.getHeight(), viewMode], callback);
             }
         }, {
             key: 'startAd',
             value: function startAd() {
-                this._safeFlashMethod('startAd');
+                var callback = arguments[0] === undefined ? undefined : arguments[0];
+
+                this._safeFlashMethod('startAd', [], callback);
             }
         }, {
             key: 'stopAd',
             value: function stopAd() {
-                this._safeFlashMethod('stopAd');
+                var callback = arguments[0] === undefined ? undefined : arguments[0];
+
+                this._safeFlashMethod('stopAd', [], callback);
             }
         }, {
             key: 'pauseAd',
             value: function pauseAd() {
-                this._safeFlashMethod('pauseAd');
+                var callback = arguments[0] === undefined ? undefined : arguments[0];
+
+                this._safeFlashMethod('pauseAd', [], callback);
             }
         }, {
             key: 'resumeAd',
             value: function resumeAd() {
-                this._safeFlashMethod('resumeAd');
+                var callback = arguments[0] === undefined ? undefined : arguments[0];
+
+                this._safeFlashMethod('resumeAd', [], callback);
             }
         }, {
             key: 'expandAd',
             value: function expandAd() {
-                this._safeFlashMethod('expandAd');
+                var callback = arguments[0] === undefined ? undefined : arguments[0];
+
+                this._safeFlashMethod('expandAd', [], callback);
             }
         }, {
             key: 'collapseAd',
             value: function collapseAd() {
-                this._safeFlashMethod('collapseAd');
+                var callback = arguments[0] === undefined ? undefined : arguments[0];
+
+                this._safeFlashMethod('collapseAd', [], callback);
             }
         }, {
             key: 'skipAd',
             value: function skipAd() {
-                this._safeFlashMethod('skipAd');
+                var callback = arguments[0] === undefined ? undefined : arguments[0];
+
+                this._safeFlashMethod('skipAd', [], callback);
             }
         }, {
             key: 'adLinear',
@@ -314,7 +316,9 @@ function _inherits(subClass, superClass) { if (typeof superClass !== 'function' 
         }, {
             key: 'setAdVolume',
             value: function setAdVolume(volume) {
-                this._safeFlashMethod('setAdVolume', [volume]);
+                var callback = arguments[1] === undefined ? undefined : arguments[1];
+
+                this._safeFlashMethod('setAdVolume', [volume], callback);
             }
         }, {
             key: 'getAdVolume',
@@ -336,20 +340,15 @@ function _inherits(subClass, superClass) { if (typeof superClass !== 'function' 
         return FlashVPAID;
     })(IVPAID);
 
-    window[VPAID_FLASH_HANDLER] = function (flashID, type, event) {
-        for (var _len = arguments.length, message = Array(_len > 3 ? _len - 3 : 0), _key = 3; _key < _len; _key++) {
-            message[_key - 3] = arguments[_key];
-        }
-
-        console.log('flashID:', flashID, 'type:', type, 'eventOrMethod:', event, 'message:', message);
+    window[VPAID_FLASH_HANDLER] = function (flashID, type, event, callID, error, data) {
+        console.log('flashID:', flashID, 'action:', event, 'data:', data);
         if (event === 'handShake') {
-            instances[flashID]._flash_handShake(message[0]);
+            instances[flashID]._flash_handShake(error, data);
         } else {
-            var callID = message.shift();
             if (type !== 'event') {
-                instances[flashID]._flash_methodAnswer(event, callID, message);
+                instances[flashID]._flash_methodAnswer(event, callID, error, data);
             } else {
-                instances[flashID]._fireEvent(event, callID, message);
+                instances[flashID]._fireEvent(event, error, data);
             }
         }
     };
@@ -402,7 +401,7 @@ var IVPAID = (function () {
         value: function on(eventName, callback) {}
     }, {
         key: 'loadAdUnit',
-        value: function loadAdUnit(callback, adURL) {}
+        value: function loadAdUnit(adURL, callback) {}
     }, {
         key: 'unloadAdUnit',
         value: function unloadAdUnit(callback) {}
@@ -424,31 +423,48 @@ var IVPAID = (function () {
             var height = arguments[3] === undefined ? 0 : arguments[3];
             var creativeData = arguments[4] === undefined ? '' : arguments[4];
             var environmentVars = arguments[5] === undefined ? '' : arguments[5];
+            var callback = arguments[6] === undefined ? undefined : arguments[6];
         }
     }, {
         key: 'resizeAd',
-        value: function resizeAd(width, height, viewMode) {}
+        value: function resizeAd(width, height, viewMode) {
+            var callback = arguments[3] === undefined ? undefined : arguments[3];
+        }
     }, {
         key: 'startAd',
-        value: function startAd() {}
+        value: function startAd() {
+            var callback = arguments[0] === undefined ? undefined : arguments[0];
+        }
     }, {
         key: 'stopAd',
-        value: function stopAd() {}
+        value: function stopAd() {
+            var callback = arguments[0] === undefined ? undefined : arguments[0];
+        }
     }, {
         key: 'pauseAd',
-        value: function pauseAd() {}
+        value: function pauseAd() {
+            var callback = arguments[0] === undefined ? undefined : arguments[0];
+        }
     }, {
         key: 'resumeAd',
-        value: function resumeAd() {}
+        value: function resumeAd() {
+            var callback = arguments[0] === undefined ? undefined : arguments[0];
+        }
     }, {
         key: 'expandAd',
-        value: function expandAd() {}
+        value: function expandAd() {
+            var callback = arguments[0] === undefined ? undefined : arguments[0];
+        }
     }, {
         key: 'collapseAd',
-        value: function collapseAd() {}
+        value: function collapseAd() {
+            var callback = arguments[0] === undefined ? undefined : arguments[0];
+        }
     }, {
         key: 'skipAd',
-        value: function skipAd() {}
+        value: function skipAd() {
+            var callback = arguments[0] === undefined ? undefined : arguments[0];
+        }
     }, {
         key: 'adLinear',
 
@@ -474,7 +490,9 @@ var IVPAID = (function () {
         value: function adDuration(callback) {}
     }, {
         key: 'setAdVolume',
-        value: function setAdVolume(soundVolume) {}
+        value: function setAdVolume(soundVolume) {
+            var callback = arguments[1] === undefined ? undefined : arguments[1];
+        }
     }, {
         key: 'getAdVolume',
         value: function getAdVolume(callback) {}
@@ -516,22 +534,37 @@ AdError
 */
 
 },{}],3:[function(require,module,exports){
-"use strict";
+'use strict';
 
-Object.defineProperty(exports, "__esModule", {
+Object.defineProperty(exports, '__esModule', {
     value: true
 });
 exports.unique = unique;
 exports.noop = noop;
+exports.createElementWithID = createElementWithID;
+exports.isPositiveInt = isPositiveInt;
+'use strict';
 
 function unique(prefix) {
     var count = -1;
     return function (f) {
-        return "" + prefix + "_" + ++count;
+        return '' + prefix + '_' + ++count;
     };
 }
 
 function noop() {}
+
+function createElementWithID(parent, id) {
+    var nEl = document.createElement('div');
+    nEl.id = id;
+    parent.innerHTML = '';
+    parent.appendChild(nEl);
+    return nEl;
+}
+
+function isPositiveInt(newVal, oldVal) {
+    return Number.isSafeInteger(newVal) && newVal > 0 ? newVal : oldVal;
+}
 
 },{}]},{},[1])
 

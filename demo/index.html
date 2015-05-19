@@ -15,10 +15,20 @@
             var flashVPaid = new FlashVPAID(myContent, loadAdUnit);
             function loadAdUnit() {
                 console.log('lets load ad unit');
-                flashVPaid.loadAdUnit('TestAd.swf', function () {
+                flashVPaid.loadAdUnit('TestAd.swf', function (error, success) {
+                    if (error) return;
+
                     console.log('adUnitLoaded');
-                    flashVPaid.adIcons(function (result) {
+                    flashVPaid.adIcons(function (err, result) {
                         console.log('adIcons', result);
+                    });
+
+                    flashVPaid.setAdVolume(10, function (err, result) {
+                        console.log('setAdVolume', result);
+                    });
+
+                    flashVPaid.getAdVolume(function (err, result) {
+                        console.log('getAdVolume', result);
                     });
                 });
             }

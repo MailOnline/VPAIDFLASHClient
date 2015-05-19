@@ -13,24 +13,24 @@ export class IVPAID {
 
     on(eventName, callback) {}
 
-    loadAdUnit(callback, adURL) {}
-    unloadAdUnit(callback) {}
+    loadAdUnit(adURL, callback) {}
+    unloadAdUnit(callback = undefined) {}
 
     //all methods below
     //are async methods
-    handshakeVersion(playerVPAIDVersion = '2.0', callback=undefined) {}
+    handshakeVersion(playerVPAIDVersion = '2.0', callback = undefined) {}
 
     //width and height is not in the beginning because we will use the default width/height used in the constructor
-    initAd (viewMode, desiredBitrate, width = 0, height = 0, creativeData = '', environmentVars = '') {}
-    resizeAd(width, height, viewMode) {}
+    initAd (viewMode, desiredBitrate, width = 0, height = 0, creativeData = '', environmentVars = '', callback = undefined) {}
+    resizeAd(width, height, viewMode, callback = undefined) {}
 
-    startAd() {}
-    stopAd() {}
-    pauseAd() {}
-    resumeAd() {}
-    expandAd() {}
-    collapseAd() {}
-    skipAd() {}
+    startAd(callback = undefined) {}
+    stopAd(callback = undefined) {}
+    pauseAd(callback = undefined) {}
+    resumeAd(callback = undefined) {}
+    expandAd(callback = undefined) {}
+    collapseAd(callback = undefined) {}
+    skipAd(callback = undefined) {}
 
     //properties that will be treat as async methods
     adLinear(callback) {}
@@ -40,14 +40,14 @@ export class IVPAID {
     adSkippableState(callback) {}
     adRemainingTime(callback) {}
     adDuration(callback) {}
-    setAdVolume(soundVolume) {}
+    setAdVolume(soundVolume, callback = undefined) {}
     getAdVolume(callback) {}
     adCompanions(callback) {}
     adIcons(callback) {}
 }
 
 /*
-Events that can be subscribed
+ALL Events that can be subscribed
 AdLoaded
 AdStarted
 AdStopped
