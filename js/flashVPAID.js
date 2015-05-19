@@ -1,5 +1,5 @@
 //if this code already run once don't do anything
-(function () {
+var FlashVPAID = (function () {
 if (window.FlashVPAID) return;
 
 let IVPAID = require('./IVPAID').IVPAID;
@@ -17,6 +17,8 @@ const VPAID_FLASH_HANDLER = 'vpaid_video_flash_handler';
 class FlashVPAID extends IVPAID {
     constructor (vpaidWrapper, callback, swfConfig = {data: 'VPAIDFlash.swf', width: 800, height: 400}, version = '9', params = { wmode: 'transparent', salign: 'tl', allowScriptAccess: 'always'}, debug = false) {
         super();
+
+        if (!swfobject) return this;
 
         this._handlers = {};
         this._callbacks = {};
@@ -47,8 +49,6 @@ class FlashVPAID extends IVPAID {
             this.el = swfobject.createSWF(swfConfig, params, this._flashID);
         }
 
-        //if this.el is undefined means swfobject failed to create the swfobject
-        if (!this.el) return this;
     }
 
     //internal methods don't call outside of FlashVPAID
@@ -225,7 +225,13 @@ class FlashVPAID extends IVPAID {
     }
 }
 
-window[VPAID_FLASH_HANDLER] = function (flashID, type, event, callID, error, data) {
+Object.defineProperty(FlashVPAID, 'VPAID_FLASH_HANDLER', {
+    writable: false,
+    configurable: false,
+    value: VPAID_FLASH_HANDLER
+});
+
+window[VPAID_FLASH_HANDLER] = (flashID, type, event, callID, error, data) => {
     if (event === 'handShake') {
         instances[flashID]._flash_handShake(error, data);
     } else {
@@ -238,5 +244,8 @@ window[VPAID_FLASH_HANDLER] = function (flashID, type, event, callID, error, dat
 }
 window.FlashVPAID = FlashVPAID;
 
+return FlashVPAID;
 })();
+
+module.exports =  FlashVPAID;
 
