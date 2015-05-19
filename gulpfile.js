@@ -60,12 +60,9 @@ gulp.task('test', function (done) {
 });
 
 var flashFilesToMove = { files: ['VPAIDFlash.swf', 'TestAd.swf'], pathFrom: 'flash/bin-debug/', pathTo: 'demo/'};
-var demoFilesToMove = { files: ['index.html', '*.js'], pathFrom: 'demo/', pathTo: 'flash/bin-debug/'};
 
 //copy swf files and update demo
 gulp.task('copy:flash', mvFiles.bind(null, flashFilesToMove));
-//update html template
-gulp.task('copy:static', mvFiles.bind(null, demoFilesToMove));
 
 function mvFiles(cfg, done) {
     var filesToMv = cfg.files.map(function (file) {
