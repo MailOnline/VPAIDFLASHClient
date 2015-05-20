@@ -127,7 +127,11 @@ var FlashVPAID = (function () {
                     return;
                 }
 
-                this._callbacks[callbackID](err, result);
+                var callback = this._callbacks[callbackID];
+                setTimeout(function () {
+                    callback(err, result);
+                }, 0);
+
                 delete this._callbacks[callbackID];
             }
         }, {

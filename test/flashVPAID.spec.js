@@ -17,9 +17,9 @@ function after(count, handler) {
 
 
 describe('flashVPAID api', function()  {
-    var swfObjectCallback;
-    var flashWrapper1, flashWrapper2;
-    var noop = function () {};
+    let swfObjectCallback;
+    let flashWrapper1, flashWrapper2;
+    let noop = function () {};
 
     beforeEach(function() {
         sinon.stub(swfobject, 'hasFlashPlayerVersion').returns(true);
@@ -29,7 +29,10 @@ describe('flashVPAID api', function()  {
             //we need to simulate all the methods created by Flash ExternalInterface
             //so we can later spy this methods
             ALL_VPAID_METHODS.forEach(function (method) {
-                el[method] = noop;
+                el[method] = function (argsData) {
+                    let callBackID = argsData[0];
+                    window[FlashVPAID.VPAID_FLASH_HANDLER](flashID, '', method, callBackID, null, 'ok');
+                }
             });
 
             setTimeout(function () {
@@ -65,7 +68,7 @@ describe('flashVPAID api', function()  {
 
     it('must fire callback when vpaid flash wrapper is loaded', function (done) {
 
-        var callback = sinon.spy(function () {
+        let callback = sinon.spy(function () {
             assert(callback.calledWith(null, 'ok'));
             done();
         });
@@ -111,18 +114,58 @@ describe('flashVPAID api', function()  {
 
         let flashVPAID = new FlashVPAID(flashWrapper1, function () {
 
-            sinon.stub(flashVPAID.el, 'loadAdUnit', function (argsData) {
-                let callBackID = argsData[0];
-                window[FlashVPAID.VPAID_FLASH_HANDLER](flashVPAID.getFlashID(), 'method', 'loadAdUnit', callBackID, null, 'ok');
-            });
-
-            flashVPAID.loadAdUnit('', function (error, result) {
+            let callback = sinon.spy(function (error, result) {
+                assert(callback.calledOnce);
                 assert.equal(result, 'ok');
                 done();
             });
 
+            flashVPAID.loadAdUnit('random.swf', callback);
+
         });
     });
 
+    it('must get the volume', function (done) {
+
+        let flashVPAID = new FlashVPAID(flashWrapper1, function () {
+            flashVPAID.loadAdUnit('random.swf', function (error, result) {
+
+                sinon.stub(flashVPAID.el, 'getAdVolume', function (argsData) {
+                    let callBackID = argsData[0];
+                    window[FlashVPAID.VPAID_FLASH_HANDLER](flashVPAID.getFlashID(), 'method', 'getAdVolume', callBackID, null, .8);
+                });
+
+                let callback = sinon.spy(function () {
+                    assert(callback.calledOnce);
+                    assert(callback.calledWith(null, .8));
+                    done();
+                });
+
+                flashVPAID.getAdVolume(callback);
+            });
+        });
+    });
+
+    it('must set the volume', function (done) {
+
+        let flashVPAID = new FlashVPAID(flashWrapper1, function () {
+            flashVPAID.loadAdUnit('random.swf', function (error, result) {
+
+                sinon.stub(flashVPAID.el, 'setAdVolume', function (argsData) {
+                    window[FlashVPAID.VPAID_FLASH_HANDLER].apply(null, [flashVPAID.getFlashID(), 'method', 'setAdVolume'].concat(argsData));
+                });
+
+                var callback = sinon.spy(function () {
+                    assert(callback.calledOnce());
+                    assert(callback.calledWith(null, .5));
+                    done();
+                });
+
+                flashVPAID.setAdVolume(.5, callback);
+              done();
+            });
+        });
+
+    });
 });
 

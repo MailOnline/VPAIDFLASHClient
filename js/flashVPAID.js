@@ -102,7 +102,11 @@ class FlashVPAID extends IFLASH_VPAID {
             return;
         }
 
-        this._callbacks[callbackID](err, result);
+        let callback = this._callbacks[callbackID];
+        setTimeout(function () {
+            callback(err, result);
+        }, 0);
+
         delete this._callbacks[callbackID];
     }
 
