@@ -13,8 +13,9 @@ module.exports = function (karma) {
         'js/**/*.js',
         'test/*.js',
     ],
+    colors: true,
     exclude: [],
-    frameworks: ['mocha', 'chai-sinon', 'browserify'],
+    frameworks: ['mocha', 'chai-sinon', 'browserify', 'source-map-support'],
     plugins: ['karma-*'],
     preprocessors: {
         'js/**/*.js': ['browserify'],
@@ -31,7 +32,7 @@ module.exports = function (karma) {
     /**
      * How to report, by default.
      */
-    reporters: ['dots'],
+    reporters: ['spec'],
 
     /**
      * On which port should the browser connect, on which port is the test runner
