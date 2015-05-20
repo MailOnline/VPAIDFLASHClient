@@ -16,7 +16,7 @@ function after(count, handler) {
 }
 
 
-describe('flashVPAID api', function()  {
+describe('flashVPAID.js api', function()  {
     let swfObjectCallback;
     let flashWrapper1, flashWrapper2;
     let noop = function () {};
@@ -167,5 +167,49 @@ describe('flashVPAID api', function()  {
         });
 
     });
+
+    (function () {
+        let booleanGetters = [
+            'adLinear',
+            'adExpanded',
+            'adSkippableState',
+            'adRemainingTime',
+            'adCompanions',
+            'adIcons'
+        ];
+
+        booleanGetters.forEach(function (method) {
+            it('must get ' + method, function (done) {
+
+                let flashVPAID = new FlashVPAID(flashWrapper1, function () {
+                    flashVPAID.loadAdUnit('random.swf', function (error, result) {
+
+                        let callback1, callback2, elCounter = 0;
+
+                        sinon.stub(flashVPAID.el, method, function (argsData) {
+                            window[FlashVPAID.VPAID_FLASH_HANDLER](flashVPAID.getFlashID(), 'method', method, argsData[0], null, ++elCounter > 1);
+                        });
+
+                        let counter = after(2, function () {
+                            assert(callback1.calledOnce);
+                            assert(callback2.calledOnce);
+                            assert(callback1.calledWith(null, false));
+                            assert(callback2.calledWith(null, true));
+                            done();
+                        });
+
+                        callback1 = sinon.spy(counter);
+                        callback2 = sinon.spy(counter);
+
+                        flashVPAID[method](callback1);
+                        flashVPAID[method](callback2);
+
+                      done();
+                    });
+                });
+
+            });
+        });
+    })();
 });
 
