@@ -90,7 +90,7 @@ var FlashVPAID = (function () {
                     this.el[methodName]([callbackID].concat(args));
                 } catch (e) {
                     if (callback) {
-                        delete this.callback[callbackID];
+                        delete this._callbacks[callbackID];
                         callback(e);
                     } else {
 

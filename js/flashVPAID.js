@@ -68,7 +68,7 @@ class FlashVPAID extends IFLASH_VPAID {
 
         } catch (e) {
             if (callback) {
-                delete this.callback[callbackID];
+                delete this._callbacks[callbackID];
                 callback(e);
             } else {
 

@@ -91,7 +91,7 @@ package com.dailymail.vpaid
 			addChild(adContent);
 			vpaidWrapper = new VPAIDWrapper(adContent);
 			VPAIDEvent.ALL_EVENTS.forEach(function (event:*, index:int, arr:Array):void {
-				adContent.addEventListener(event, dispatchEvent);
+				vpaidWrapper.addEventListener(event, dispatchEvent);
 			});
 			callInterface('method', 'loadAdUnit', callID, null, true);
 		}
@@ -103,10 +103,11 @@ package com.dailymail.vpaid
 		
 		private function unloadAdUnit(callID:String, evt:Event):void {
 			VPAIDEvent.ALL_EVENTS.forEach(function (event:*, index:int, arr:Array):void {
-				adContent.removeEventListener(event, dispatchEvent);
+				vpaidWrapper.removeEventListener(event, dispatchEvent);
 			});
 			removeChild(adContent);
 			adContent = null;
+			vpaidWrapper = null;
 			callInterface('method', 'unloadAdUnit', callID, null, true);
 		}
 		
@@ -161,7 +162,7 @@ package com.dailymail.vpaid
 		}
 		
 		private function proxyAd(adAction:Function, actionType:String, actionName:String, callbackID:String):void {
-			if (adContent) {
+			if (vpaidWrapper) {
 				safeCall(adAction, function (err, result):void {
 					callInterface(actionType, actionName, callbackID, err, result);
 				});
@@ -171,16 +172,16 @@ package com.dailymail.vpaid
 		}
 		
 		private function proxyAdMethod(methodType:String, message:*):* {
-			return adContent[methodType](message);
+			return vpaidWrapper[methodType](message);
 		}
 		
 		private function proxyAdGetterProperty(propertyType:String):* {
-			return adContent[propertyType];
+			return vpaidWrapper[propertyType];
 		}
 		
 		private function proxyAdSetterProperty(propertyType:String, value:*):* {
-			adContent[propertyType] = value;
-			return adContent[propertyType];
+			vpaidWrapper[propertyType] = value;
+			return vpaidWrapper[propertyType];
 		}
 
 		private function safeCall(func:Function, done:Function):void {
