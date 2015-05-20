@@ -2,7 +2,7 @@
 var FlashVPAID = (function () {
 if (window.FlashVPAID) return;
 
-let IVPAID = require('./IVPAID').IVPAID;
+let IFLASH_VPAID = require('./IVPAID').IFLASH_VPAID;
 let noop = require('./utils').noop;
 let unique = require('./utils').unique;
 let isPositiveInt = require('./utils').isPositiveInt;
@@ -14,7 +14,7 @@ const ERROR = 'error';
 const VPAID_FLASH_HANDLER = 'vpaid_video_flash_handler';
 
 
-class FlashVPAID extends IVPAID {
+class FlashVPAID extends IFLASH_VPAID {
     constructor (vpaidWrapper, callback, swfConfig = {data: 'VPAIDFlash.swf', width: 800, height: 400}, version = '9', params = { wmode: 'transparent', salign: 'tl', allowScriptAccess: 'always'}, debug = false) {
         super();
 

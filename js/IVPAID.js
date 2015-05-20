@@ -1,21 +1,5 @@
 //simple representation of the API
 export class IVPAID {
-
-    //custom implementation, sync methods
-    getSize() {}
-    setSize(width, height) {}
-    getWidth() {}
-    setWidth(w) {}
-    getHeight() {}
-    setHeight(h) {}
-
-    getFlashID() {}
-
-    on(eventName, callback) {}
-
-    loadAdUnit(adURL, callback) {}
-    unloadAdUnit(callback = undefined) {}
-
     //all methods below
     //are async methods
     handshakeVersion(playerVPAIDVersion = '2.0', callback = undefined) {}
@@ -46,27 +30,50 @@ export class IVPAID {
     adIcons(callback) {}
 }
 
-/*
-ALL Events that can be subscribed
-AdLoaded
-AdStarted
-AdStopped
-AdSkipped
-AdSkippableStateChange
-AdSizeChange
-AdLinearChange
-AdDurationChange
-AdExpandedChange
-AdRemainingTimeChange [Deprecated in 2.0] but will be still fired for backwards compatibility
-AdVolumeChange
-AdImpression
-AdVideoStart, AdVideoFirstQuartile, AdVideoMidpoint, AdVideoThirdQuartile,
-AdVideoComplete
-AdClickThru
-AdInteraction
-AdUserAcceptInvitation, AdUserMinimize, AdUserClose
-AdPaused, AdPlaying
-AdLog
-AdError
-*/
+//custom implementation, sync methods, to help handling a flash vpaid
+export class IFLASH_VPAID extends IVPAID {
+    getSize() {}
+    setSize(width, height) {}
+    getWidth() {}
+    setWidth(w) {}
+    getHeight() {}
+    setHeight(h) {}
+
+    getFlashID() {}
+
+    on(eventName, callback) {}
+
+    loadAdUnit(adURL, callback) {}
+    unloadAdUnit(callback = undefined) {}
+}
+
+//ALL events that can be subscribed
+export let ALL_EVENTS = [
+    'AdLoaded',
+    'AdStarted',
+    'AdStopped',
+    'AdSkipped',
+    'AdSkippableStateChange',
+    'AdSizeChange',
+    'AdLinearChange',
+    'AdDurationChange',
+    'AdExpandedChange',
+    'AdRemainingTimeChange', // [Deprecated in 2.0] but will be still fired for backwards compatibility
+    'AdVolumeChange',
+    'AdImpression',
+    'AdVideoStart',
+    'AdVideoFirstQuartile',
+    'AdVideoMidpoint',
+    'AdVideoThirdQuartile',
+    'AdVideoComplete',
+    'AdClickThru',
+    'AdInteraction',
+    'AdUserAcceptInvitation',
+    'AdUserMinimize',
+    'AdUserClose',
+    'AdPaused',
+    'AdPlaying',
+    'AdLog',
+    'AdError'
+];
 

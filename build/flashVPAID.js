@@ -15,7 +15,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== 'function' 
 var FlashVPAID = (function () {
     if (window.FlashVPAID) return;
 
-    var IVPAID = require('./IVPAID').IVPAID;
+    var IFLASH_VPAID = require('./IVPAID').IFLASH_VPAID;
     var noop = require('./utils').noop;
     var unique = require('./utils').unique;
     var isPositiveInt = require('./utils').isPositiveInt;
@@ -26,7 +26,7 @@ var FlashVPAID = (function () {
     var ERROR = 'error';
     var VPAID_FLASH_HANDLER = 'vpaid_video_flash_handler';
 
-    var FlashVPAID = (function (_IVPAID) {
+    var FlashVPAID = (function (_IFLASH_VPAID) {
         function FlashVPAID(vpaidWrapper, callback) {
             var swfConfig = arguments[2] === undefined ? { data: 'VPAIDFlash.swf', width: 800, height: 400 } : arguments[2];
             var version = arguments[3] === undefined ? '9' : arguments[3];
@@ -67,7 +67,7 @@ var FlashVPAID = (function () {
             }
         }
 
-        _inherits(FlashVPAID, _IVPAID);
+        _inherits(FlashVPAID, _IFLASH_VPAID);
 
         _createClass(FlashVPAID, [{
             key: '_safeFlashMethod',
@@ -339,7 +339,7 @@ var FlashVPAID = (function () {
         }]);
 
         return FlashVPAID;
-    })(IVPAID);
+    })(IFLASH_VPAID);
 
     Object.defineProperty(FlashVPAID, 'VPAID_FLASH_HANDLER', {
         writable: false,
@@ -374,6 +374,8 @@ Object.defineProperty(exports, '__esModule', {
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
+function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; }
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
 //simple representation of the API
@@ -384,40 +386,6 @@ var IVPAID = (function () {
     }
 
     _createClass(IVPAID, [{
-        key: 'getSize',
-
-        //custom implementation, sync methods
-        value: function getSize() {}
-    }, {
-        key: 'setSize',
-        value: function setSize(width, height) {}
-    }, {
-        key: 'getWidth',
-        value: function getWidth() {}
-    }, {
-        key: 'setWidth',
-        value: function setWidth(w) {}
-    }, {
-        key: 'getHeight',
-        value: function getHeight() {}
-    }, {
-        key: 'setHeight',
-        value: function setHeight(h) {}
-    }, {
-        key: 'getFlashID',
-        value: function getFlashID() {}
-    }, {
-        key: 'on',
-        value: function on(eventName, callback) {}
-    }, {
-        key: 'loadAdUnit',
-        value: function loadAdUnit(adURL, callback) {}
-    }, {
-        key: 'unloadAdUnit',
-        value: function unloadAdUnit() {
-            var callback = arguments[0] === undefined ? undefined : arguments[0];
-        }
-    }, {
         key: 'handshakeVersion',
 
         //all methods below
@@ -521,29 +489,62 @@ var IVPAID = (function () {
 
 exports.IVPAID = IVPAID;
 
-/*
-ALL Events that can be subscribed
-AdLoaded
-AdStarted
-AdStopped
-AdSkipped
-AdSkippableStateChange
-AdSizeChange
-AdLinearChange
-AdDurationChange
-AdExpandedChange
-AdRemainingTimeChange [Deprecated in 2.0] but will be still fired for backwards compatibility
-AdVolumeChange
-AdImpression
-AdVideoStart, AdVideoFirstQuartile, AdVideoMidpoint, AdVideoThirdQuartile,
-AdVideoComplete
-AdClickThru
-AdInteraction
-AdUserAcceptInvitation, AdUserMinimize, AdUserClose
-AdPaused, AdPlaying
-AdLog
-AdError
-*/
+//custom implementation, sync methods, to help handling a flash vpaid
+
+var IFLASH_VPAID = (function (_IVPAID) {
+    function IFLASH_VPAID() {
+        _classCallCheck(this, IFLASH_VPAID);
+
+        if (_IVPAID != null) {
+            _IVPAID.apply(this, arguments);
+        }
+    }
+
+    _inherits(IFLASH_VPAID, _IVPAID);
+
+    _createClass(IFLASH_VPAID, [{
+        key: 'getSize',
+        value: function getSize() {}
+    }, {
+        key: 'setSize',
+        value: function setSize(width, height) {}
+    }, {
+        key: 'getWidth',
+        value: function getWidth() {}
+    }, {
+        key: 'setWidth',
+        value: function setWidth(w) {}
+    }, {
+        key: 'getHeight',
+        value: function getHeight() {}
+    }, {
+        key: 'setHeight',
+        value: function setHeight(h) {}
+    }, {
+        key: 'getFlashID',
+        value: function getFlashID() {}
+    }, {
+        key: 'on',
+        value: function on(eventName, callback) {}
+    }, {
+        key: 'loadAdUnit',
+        value: function loadAdUnit(adURL, callback) {}
+    }, {
+        key: 'unloadAdUnit',
+        value: function unloadAdUnit() {
+            var callback = arguments[0] === undefined ? undefined : arguments[0];
+        }
+    }]);
+
+    return IFLASH_VPAID;
+})(IVPAID);
+
+exports.IFLASH_VPAID = IFLASH_VPAID;
+
+//ALL events that can be subscribed
+var ALL_EVENTS = ['AdLoaded', 'AdStarted', 'AdStopped', 'AdSkipped', 'AdSkippableStateChange', 'AdSizeChange', 'AdLinearChange', 'AdDurationChange', 'AdExpandedChange', 'AdRemainingTimeChange', // [Deprecated in 2.0] but will be still fired for backwards compatibility
+'AdVolumeChange', 'AdImpression', 'AdVideoStart', 'AdVideoFirstQuartile', 'AdVideoMidpoint', 'AdVideoThirdQuartile', 'AdVideoComplete', 'AdClickThru', 'AdInteraction', 'AdUserAcceptInvitation', 'AdUserMinimize', 'AdUserClose', 'AdPaused', 'AdPlaying', 'AdLog', 'AdError'];
+exports.ALL_EVENTS = ALL_EVENTS;
 
 },{}],3:[function(require,module,exports){
 'use strict';
