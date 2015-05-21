@@ -567,6 +567,7 @@ var FlashWrapper = (function () {
     }, {
         key: 'removeCallback',
         value: function removeCallback(methodName, callback) {
+            //TODO: check if keys and find is added to the browser with babeljs
             var key = Object.keys(this._callbacks).find(function (key) {
                 return this._callbacks[key] === callback;
             });
