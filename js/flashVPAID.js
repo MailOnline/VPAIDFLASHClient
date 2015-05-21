@@ -15,7 +15,7 @@ const VPAID_FLASH_HANDLER = 'vpaid_video_flash_handler';
 
 
 class FlashVPAID extends IFLASH_VPAID {
-    constructor (vpaidWrapper, callback, swfConfig = {data: 'VPAIDFlash.swf', width: 800, height: 400}, version = '9', params = { wmode: 'transparent', salign: 'tl', allowScriptAccess: 'always'}, debug = false) {
+    constructor (vpaidWrapper, callback, swfConfig = {data: 'VPAIDFlash.swf', width: 800, height: 400}, version = '9', params = { wmode: 'transparent', salign: 'tl', allowScriptAccess: 'always'}, debug = true) {
         super();
 
         if (!swfobject) return this;
@@ -117,8 +117,8 @@ class FlashVPAID extends IFLASH_VPAID {
     setSize(newWidth, newHeight) {
         this._width = isPositiveInt(newWidth, this._width);
         this._height = isPositiveInt(newHeight, this._height);
-        this._el.setAttribute('width', this._width);
-        this._el.setAttribute('height', this._height);
+        this.el.setAttribute('width', this._width);
+        this.el.setAttribute('height', this._height);
     }
     getWidth() {
         return this._width;
@@ -158,13 +158,13 @@ class FlashVPAID extends IFLASH_VPAID {
     }
     initAd (viewMode, desiredBitrate, width = 0, height = 0, creativeData = '', environmentVars = '', callback = undefined) {
         //resize element that has the flash object
-        this.size(width, height);
+        this.setSize(width, height);
 
         this._safeFlashMethod('initAd', [this.getWidth(), this.getHeight(), viewMode, desiredBitrate, creativeData, environmentVars], callback);
     }
     resizeAd(width, height, viewMode, callback = undefined) {
         //resize element that has the flash object
-        this.size(width, height);
+        this.setSize(width, height);
 
         //resize ad inside the flash
         this._safeFlashMethod('resizeAd', [this.getWidth(), this.getHeight(), viewMode], callback);

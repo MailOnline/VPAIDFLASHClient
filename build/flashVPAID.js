@@ -31,7 +31,7 @@ var FlashVPAID = (function () {
             var swfConfig = arguments[2] === undefined ? { data: 'VPAIDFlash.swf', width: 800, height: 400 } : arguments[2];
             var version = arguments[3] === undefined ? '9' : arguments[3];
             var params = arguments[4] === undefined ? { wmode: 'transparent', salign: 'tl', allowScriptAccess: 'always' } : arguments[4];
-            var debug = arguments[5] === undefined ? false : arguments[5];
+            var debug = arguments[5] === undefined ? true : arguments[5];
 
             _classCallCheck(this, FlashVPAID);
 
@@ -146,8 +146,8 @@ var FlashVPAID = (function () {
             value: function setSize(newWidth, newHeight) {
                 this._width = isPositiveInt(newWidth, this._width);
                 this._height = isPositiveInt(newHeight, this._height);
-                this._el.setAttribute('width', this._width);
-                this._el.setAttribute('height', this._height);
+                this.el.setAttribute('width', this._width);
+                this.el.setAttribute('height', this._height);
             }
         }, {
             key: 'getWidth',
@@ -217,7 +217,7 @@ var FlashVPAID = (function () {
                 var callback = arguments[6] === undefined ? undefined : arguments[6];
 
                 //resize element that has the flash object
-                this.size(width, height);
+                this.setSize(width, height);
 
                 this._safeFlashMethod('initAd', [this.getWidth(), this.getHeight(), viewMode, desiredBitrate, creativeData, environmentVars], callback);
             }
@@ -227,7 +227,7 @@ var FlashVPAID = (function () {
                 var callback = arguments[3] === undefined ? undefined : arguments[3];
 
                 //resize element that has the flash object
-                this.size(width, height);
+                this.setSize(width, height);
 
                 //resize ad inside the flash
                 this._safeFlashMethod('resizeAd', [this.getWidth(), this.getHeight(), viewMode], callback);

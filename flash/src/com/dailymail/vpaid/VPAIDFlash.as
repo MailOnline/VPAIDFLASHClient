@@ -65,6 +65,7 @@ package com.dailymail.vpaid
 		}
 		
 		private function logDebug(msg:String, erase:Boolean = false):void {
+			trace(msg);
 			if (textField) {
 				if (!erase) {
 					msg = textField.text + '\n$ ' + msg; 
@@ -115,15 +116,16 @@ package com.dailymail.vpaid
 			var callbacks:Array = new Array(
 				
 				//methods
-				{event: 'initAd', 			handler: proxyAdMethod, 	type: 'method'},
-				{event: 'resizeAd', 		handler: proxyAdMethod, 	type: 'method'},
-				{event: 'startAd', 			handler: proxyAdMethod, 	type: 'method'},
-				{event: 'stopAd', 			handler: proxyAdMethod, 	type: 'method'},
-				{event: 'pauseAd', 			handler: proxyAdMethod, 	type: 'method'},
-				{event: 'resumeAd', 		handler: proxyAdMethod, 	type: 'method'},
-				{event: 'expandAd', 		handler: proxyAdMethod, 	type: 'method'},
-				{event: 'collapseAd', 		handler: proxyAdMethod, 	type: 'method'},
-				{event: 'skipAd', 			handler: proxyAdMethod, 	type: 'method'},
+				{event: 'handshakeVersion', handler: proxyAdMethod, 			type: 'method'},
+				{event: 'initAd', 			handler: proxyAdMethod, 			type: 'method'},
+				{event: 'resizeAd', 		handler: proxyAdMethod, 			type: 'method'},
+				{event: 'startAd', 			handler: proxyAdMethod, 			type: 'method'},
+				{event: 'stopAd', 			handler: proxyAdMethod, 			type: 'method'},
+				{event: 'pauseAd', 			handler: proxyAdMethod, 			type: 'method'},
+				{event: 'resumeAd', 		handler: proxyAdMethod, 			type: 'method'},
+				{event: 'expandAd', 		handler: proxyAdMethod, 			type: 'method'},
+				{event: 'collapseAd', 		handler: proxyAdMethod, 			type: 'method'},
+				{event: 'skipAd', 			handler: proxyAdMethod, 			type: 'method'},
 				//properties that will be handled 
 				{event: 'adLinear', 		handler: proxyAdGetterProperty,		type: 'property'},
 				{event: 'adWidth', 			handler: proxyAdGetterProperty, 	type: 'property'},
@@ -171,8 +173,8 @@ package com.dailymail.vpaid
 			}
 		}
 		
-		private function proxyAdMethod(methodType:String, message:*):* {
-			return vpaidWrapper[methodType](message);
+		private function proxyAdMethod(methodType:String, ...message):* {
+			return vpaidWrapper[methodType].apply(vpaidWrapper, message);
 		}
 		
 		private function proxyAdGetterProperty(propertyType:String):* {
@@ -198,8 +200,9 @@ package com.dailymail.vpaid
 		private function callInterface(type:String, typeID:String, callbackID:String, error:* = null, result:* = null):void {
 			ExternalInterface.call(jsHandler, flashID, type, typeID, callbackID, error, result);
 			logDebug('jsHandler: ' + jsHandler + ' flashID: ' + flashID + ' type:' + type + '  typeID: ' + typeID +' callbackID: ' + callbackID + ' error: ' + error + ' result: ' + result);
-			if (type == ERROR) {
-				logDebug('proxyAdProperty error:' + result.message, true);
+			if (error) {
+				logDebug('proxyAdProperty error:' + error.message, true);
+				trace(error);
 			}
 		}
 		
