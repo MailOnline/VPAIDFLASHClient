@@ -6,12 +6,12 @@ JS + Flash wrapper for [VPAID](http://www.iab.net/vpaid).
 
 Because some of the ad's are in flash, this projects will allow to expose the api to be used by js.
 
-**JS** is reponsible of:
+**JS** is responsible of:
   - create a **uniqueid** for the vpaid and request swfobject to load the swf
   - to do the bridge between vpaid api between flash and js using [ExternalInterface](http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/external/ExternalInterface.html)
   - for security reasons the swf will not be allowed to communicate with flash if not excuting in the server
 
-**Flash** is reponsible of:
+**Flash** is responsible of:
   - load the ad Unit
   - expose ad Unit interface to outside
   - using the **uniqueid** to identify the swf
