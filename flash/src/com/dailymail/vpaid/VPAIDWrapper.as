@@ -91,53 +91,53 @@ package com.dailymail.vpaid
 		{
 			ad.startAd();
 		}
-		
+
 		public function stopAd():void
 		{
 			ad.stopAd();
 		}
-		
+
 		public function pauseAd():void
 		{
 			ad.pauseAd();
 		}
-		
+
 		public function resumeAd():void
 		{
 			ad.resumeAd();
 		}
-		
+
 		public function expandAd():void
 		{
 			ad.expandAd();
 		}
-		
+
 		public function collapseAd():void
 		{
 			ad.collapseAd();
 		}
-		
+
 		public function skipAd():void
 		{
 			ad.skipAd();
 		}
-		
+
 		override public function addEventListener(type:String, listener:Function, useCapture:Boolean=false, priority:int=0, useWeakReference:Boolean=false):void {
 			ad.addEventListener(type, listener, useCapture, priority, useWeakReference);
 		}
-		
+
 		override public function removeEventListener(type:String, listener:Function, useCapture:Boolean=false):void {
 			ad.removeEventListener(type, listener, useCapture);
 		}
-		
+
 		override public function dispatchEvent(event:Event):Boolean {
 			return ad.dispatchEvent(event);
 		}
-		
+
 		override public function hasEventListener(type:String):Boolean {
 			return ad.hasEventListener(type);
 		}
-		
+
 		override public function willTrigger(type:String):Boolean {
 			return ad.willTrigger(type);
 		}

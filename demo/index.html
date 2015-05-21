@@ -14,9 +14,10 @@
             var flashVPaid = new FlashVPAID(myContent, flashVPAIDWrapperLoaded);
             function flashVPAIDWrapperLoaded() {
                 console.log('lets load ad unit');
-                var adURL = 'http://cdn.innovid.com/2.62.8110/platform/vpaid/VPAIDIRollPackage.swf?configURL=http%3A%2F%2Fstatic.innovid.com%2Firoll%2Fconfig%2F1hl7lc.xml%3Fcb%3D787766d7-ebab-3656-c24f-0ddebab645e9&secure=false';
+                //var adURL = 'http://cdn.innovid.com/2.62.8110/platform/vpaid/VPAIDIRollPackage.swf?configURL=http%3A%2F%2Fstatic.innovid.com%2Firoll%2Fconfig%2F1hl7lc.xml%3Fcb%3D787766d7-ebab-3656-c24f-0ddebab645e9&secure=false';
                 //var adURL = 'VPAIDIRollPackage.swf?configURL=http%3A%2F%2Fstatic.innovid.com%2Firoll%2Fconfig%2F1hl7lc.xml%3Fcb%3D787766d7-ebab-3656-c24f-0ddebab645e9&secure=false';
                 //var adURL = 'TestAd.swf';
+                var adURL = 'http://cdn-sys.brainient.com/flash/v6/select846.swf?video_id=a3f30b8e-2ad8-4123-bc58-42fccb3e48cd&user_id=1228&tzone=&settings=json&settingsPath=http://cdn-tags.brainient.com/1228/a3f30b8e-2ad8-4123-bc58-42fccb3e48cd/config.json';
                 flashVPaid.loadAdUnit(adURL, function (error, success) {
                     if (error) return;
 

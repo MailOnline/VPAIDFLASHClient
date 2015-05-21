@@ -72,6 +72,10 @@ package com.dailymail.vpaid
 			return _data;
 		}
 		
+		static public function convertVPAIDEvent(e:*):VPAIDEvent {
+			return new VPAIDEvent(e.type, e.data, e.bubbles, e.cancelable);
+		}
+
 		override public function clone():Event {
 			return new VPAIDEvent(type, data, bubbles, cancelable);
 		}

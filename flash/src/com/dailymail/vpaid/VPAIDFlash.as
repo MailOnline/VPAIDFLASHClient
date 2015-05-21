@@ -196,7 +196,7 @@ package com.dailymail.vpaid
 			}
 			done(err, result);
 		}
-		
+
 		private function callInterface(type:String, typeID:String, callbackID:String, error:* = null, result:* = null):void {
 			ExternalInterface.call(jsHandler, flashID, type, typeID, callbackID, error, result);
 			logDebug('jsHandler: ' + jsHandler + ' flashID: ' + flashID + ' type:' + type + '  typeID: ' + typeID +' callbackID: ' + callbackID + ' error: ' + error + ' result: ' + result);
@@ -206,8 +206,9 @@ package com.dailymail.vpaid
 			}
 		}
 		
-		private function dispatchEvent(e:VPAIDEvent):void {
-			callInterface('event', e.type, '', null, e.data);
+		private function dispatchEvent(e:Event):void {
+			var event:VPAIDEvent = VPAIDEvent.convertVPAIDEvent(e);
+			callInterface('event', event.type, '', null, event.data);
 		}
 	}
 }
