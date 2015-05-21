@@ -35,6 +35,7 @@ var FlashVPAID = (function () {
             this._vpaidParentEl = vpaidParentEl;
             this._flashID = uniqueVPAID();
             this._load = callback || noop;
+            this._destroyed = false;
 
             //validate the height
             swfConfig.width = isPositiveInt(swfConfig.width, 800);
@@ -55,6 +56,23 @@ var FlashVPAID = (function () {
         }
 
         _createClass(FlashVPAID, [{
+            key: 'destroy',
+            value: function destroy() {
+                this._flash.offAll();
+                this._flash.removeAllCallbacks();
+                this._flash = null;
+                this.vpaidParentEl.removeChild(this.el);
+                this.el = null;
+                this._creativeLoad = null;
+                delete instances[this._flashID];
+                this._destroyed = true;
+            }
+        }, {
+            key: 'isDestroyed',
+            value: function isDestroyed() {
+                return this._destroyed;
+            }
+        }, {
             key: '_flash_handShake',
             value: function _flash_handShake(error, message) {
                 this._load(error, message);
@@ -90,7 +108,7 @@ var FlashVPAID = (function () {
                 this._creative = null;
 
                 if (this._creativeLoad) {
-                    this.removeCallback(this._creativeLoad);
+                    this._flash.removeCallback(this._creativeLoad);
                     this._creativeLoad = null;
                 }
 
@@ -294,6 +312,11 @@ var Creative = (function (_IVPAID) {
     _createClass(Creative, [{
         key: 'on',
         value: function on(eventName, callback) {
+            this._flash.on(eventName, callback);
+        }
+    }, {
+        key: 'off',
+        value: function off(eventName, callback) {
             this._flash.on(eventName, callback);
         }
     }, {
@@ -554,6 +577,13 @@ var FlashWrapper = (function () {
 
             delete this._callbacks[key];
             return callback;
+        }
+    }, {
+        key: 'removeAllCallback',
+        value: function removeAllCallback() {
+            var old = this._callbacks;
+            this._callbacks = {};
+            return old;
         }
     }, {
         key: 'trigger',

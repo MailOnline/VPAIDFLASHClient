@@ -14,7 +14,6 @@ let instances = {};
 const ERROR = 'error';
 const VPAID_FLASH_HANDLER = 'vpaid_video_flash_handler';
 
-
 class FlashVPAID {
     constructor (vpaidParentEl, callback, swfConfig = {data: 'VPAIDFlash.swf', width: 800, height: 400}, version = '9', params = { wmode: 'transparent', salign: 'tl', allowScriptAccess: 'always'}, debug = true) {
         if (!swfobject) throw new Error('no swfobject in global scope. check: https://github.com/swfobject/swfobject or https://code.google.com/p/swfobject/');
@@ -22,6 +21,7 @@ class FlashVPAID {
         this._vpaidParentEl = vpaidParentEl;
         this._flashID = uniqueVPAID();
         this._load =  callback || noop;
+        this._destroyed = false;
 
 
         //validate the height
@@ -41,6 +41,21 @@ class FlashVPAID {
             this._flash = new FlashWrapper(this.el, swfConfig.data, this._flashID, swfConfig.width, swfConfig.height);
         }
 
+    }
+
+    destroy () {
+        this._flash.offAll();
+        this._flash.removeAllCallbacks();
+        this._flash = null;
+        this.vpaidParentEl.removeChild(this.el);
+        this.el = null;
+        this._creativeLoad = null;
+        delete instances[this._flashID];
+        this._destroyed = true;
+    }
+
+    isDestroyed () {
+        return this._destroyed;
     }
 
     _flash_handShake (error, message) {
@@ -70,7 +85,7 @@ class FlashVPAID {
         this._creative = null;
 
         if (this._creativeLoad) {
-            this.removeCallback(this._creativeLoad);
+            this._flash.removeCallback(this._creativeLoad);
             this._creativeLoad = null;
         }
 

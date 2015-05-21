@@ -82,6 +82,12 @@ export class FlashWrapper {
         return callback;
     }
 
+    removeAllCallback() {
+        let old = this._callbacks;
+        this._callbacks = {};
+        return old;
+    }
+
     trigger(eventName, err, result) {
         //TODO: check if forEach and isArray is added to the browser with babeljs
         if (Array.isArray(this._handlers[eventName])) {

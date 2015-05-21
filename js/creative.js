@@ -10,6 +10,10 @@ export class Creative extends IVPAID {
         this._flash.on(eventName, callback);
     }
 
+    off(eventName, callback) {
+        this._flash.on(eventName, callback);
+    }
+
     //VPAID interface
     handshakeVersion(playerVPAIDVersion = '2.0', callback = undefined) {
         this._flash.callFlashMethod('handshakeVersion', [playerVPAIDVersion], callback);
