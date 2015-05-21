@@ -23,6 +23,13 @@
 
                     flashVPaid.on('AdLoaded', function (err, result) {
                         console.log('event:AdLoaded', err, result);
+                        flashVPaid.startAd(function (err, result) {
+                            console.log('startAd call', err, result);
+                        });
+                    });
+
+                    flashVPaid.on('AdStarted', function (err, result) {
+                        console.log('event:AdStarted', err, result);
                     });
 
                     console.log('adUnitLoaded');
