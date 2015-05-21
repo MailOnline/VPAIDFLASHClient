@@ -1,13 +1,12 @@
 {
-  "name": "mol-flash-vpaid",
-  "version": "0.0.0",
+  "name": "mol-flashVPAID",
+  "version": "0.0.1",
   "authors": [
     "Luis Silva <luis.dasilva@mailonline.co.uk>"
   ],
   "description": "",
-  "main": [
-  ],
-  "license": "",
+  "main": [ "build/flashVPAID.js", "build/flashVPAID.js.map", "build/VPAIDFlash.swf" ],
+  "license": "Private",
   "ignore": [
     "node_modules",
     "bower_components",
