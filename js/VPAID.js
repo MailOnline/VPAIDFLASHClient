@@ -30,23 +30,6 @@ export class IVPAID {
     adIcons(callback) {}
 }
 
-//custom implementation, sync methods, to help handling a flash vpaid
-export class IFLASH_VPAID extends IVPAID {
-    getSize() {}
-    setSize(width, height) {}
-    getWidth() {}
-    setWidth(w) {}
-    getHeight() {}
-    setHeight(h) {}
-
-    getFlashID() {}
-
-    on(eventName, callback) {}
-
-    loadAdUnit(adURL, callback) {}
-    unloadAdUnit(callback = undefined) {}
-}
-
 //ALL events that can be subscribed
 export let ALL_EVENTS = [
     'AdLoaded',

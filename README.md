@@ -71,27 +71,54 @@ function flashVPAIDWrapperLoaded(err, result) {
         return;
     }
 
-    flashVPaid.loadAdUnit('TestAd.swf', function (error, success) {
+    flashVPaid.loadAdUnit('TestAd.swf', function (error, creative) {
 
         if (err) {
             //handle error here
             return;
         }
 
-        flashVPaid.adIcons(function (err, result) {
-            console.log('adIcons', result);
+        creative.on('AdLoaded', function (err, result) {
+            console.log('event:AdLoaded', err, result);
+            startAd();
         });
-        flashVPaid.setAdVolume(10, function (err, result) {
-            console.log('setAdVolume', result);
+
+        creative.on('AdStarted', function (err, result) {
+            console.log('event:AdStarted', err, result);
+            checkAdProperties();
         });
-        flashVPaid.getAdVolume(function (err, result) {
-            console.log('getAdVolume', result);
+
+        creative.handshakeVersion('2.0', function (err, result) {
+            initAd();
         });
+
+        function initAd() {
+            creative.initAd('normal', -1, 0, 0, '', '', function (err) {
+                console.log('initAd', err);
+            });
+        }
+
+        function startAd() {
+            creative.startAd(function (err, result) {
+                console.log('startAd call', err, result);
+            });
+        }
+
+        function checkAdProperties() {
+            creative.adIcons(function (err, result) {
+                console.log('adIcons', result);
+            });
+            creative.setAdVolume(10, function (err, result) {
+                console.log('setAdVolume', result);
+            });
+            creative.getAdVolume(function (err, result) {
+                console.log('getAdVolume', result);
+            });
+        }
 
     });
 }
 ```
 
-for the api of flashVPAID check [IVAPAID](js/IVPAID.js).
-
+for the api of flashVPAID check [flashVPAID](js/flashVPAID.js), for creative api check [VAPAID](js/VPAID.js).
 
