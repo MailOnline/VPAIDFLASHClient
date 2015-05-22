@@ -56,8 +56,8 @@ PS:
 Running the project
 ===================
 
-  - install nodejs and gulp
-  - `npm install` to install all dependecies
+  - install nodejs, bower and gulp
+  - `npm install` and `bower install` to install all dependencies
   - `gulp serve` to start build script and a demo page should be open in default browser
 
 Example of the usage
