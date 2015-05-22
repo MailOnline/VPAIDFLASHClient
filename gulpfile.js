@@ -20,6 +20,8 @@ var assign = require('lodash').assign;
 //test
 var karma = require('gulp-karma');
 
+var binPath = './bin';
+
 var jsBuild = watchify(
     browserify(
         assign(
@@ -45,7 +47,7 @@ function bundle() {
         .pipe(buffer())
         .pipe(sourcemaps.init({loadMaps: true}))
         .pipe(sourcemaps.write('./'))
-        .pipe(gulp.dest('./build/'))
+        .pipe(gulp.dest(binPath))
         .pipe(reload({stream: true, once: true}));
 }
 
@@ -58,7 +60,7 @@ gulp.task('test', function () {
         }));
 });
 
-var flashFilesToMove = { files: ['VPAIDFlash.swf'], pathFrom: 'flash/bin-debug/', pathTo: 'build/'};
+var flashFilesToMove = { files: ['VPAIDFlash.swf'], pathFrom: 'flash/bin-debug/', pathTo: binPath };
 
 //copy swf files and update demo
 gulp.task('copy:flash', mvFiles.bind(null, flashFilesToMove));
@@ -82,7 +84,7 @@ function mvFiles(cfg, done) {
 gulp.task('watch', function() {
     jsBuild.on('update', bundle);
     gulp.watch(['demo/*.html', 'demo/*.css'], reload);
-    gulp.watch(['build/*.js'], ['test'], reload);
+    gulp.watch([binPath + '/*.js'], ['test'], reload);
     gulp.watch(['test/*.js'], ['test']);
     gulp.watch(['flash/bin-debug/*.swf'], ['copy:flash'], reload);
 });
@@ -92,7 +94,7 @@ gulp.task('watch', function() {
 gulp.task('serve', ['browserify', 'copy:flash', 'watch'], function () {
     browserSync({
         server: {
-            baseDir: ['demo', 'build'],
+            baseDir: ['demo', binPath],
             routes: {
                 '/swfobject.js':        'bower_components/swfobject/swfobject/src/swfobject.js',
                 '/TestAd.swf':          'flash/bin-debug/TestAd.swf'
