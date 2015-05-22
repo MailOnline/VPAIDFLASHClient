@@ -51,14 +51,15 @@ Flash debugger
 --------------
 Allows to flash to throw errors in a popup like window. To install go to [adobe support page](https://www.adobe.com/support/flashplayer/downloads.html) and install the flash player with **content debugger** in the name for the correct OS.
 PS:
-  - in chrome because it has a special version of flash is a *pain* to install, so install for firefox version.
+  - in Google Chrome the Flash debugger is not working (the last time I tried), I found an [*issue* in chromium](https://code.google.com/p/chromium/issues/detail?id=478056), so install in Firefox or other if not working for you in Google Chrome.
 
 Running the project
 ===================
 
   - install nodejs, bower and gulp
   - `npm install` and `bower install` to install all dependencies
-  - `gulp serve` to start build script and a demo page should be open in default browser
+  - `gulp serve` or `npm start` to start build script and a demo page should be open in default browser
+  - `npm test` to run only the tests
 
 Example of the usage
 ==========================================
