@@ -1,21 +1,8 @@
 let VPAIDFlashToJS = require('../js/VPAIDFlashToJS.js');
 let VPAID_FLASH_HANDLER = require('../js/jsFlashBridge.js').JSFlashBridge.VPAID_FLASH_HANDLER;
 let VPAIDCreative = require('../js/VPAIDCreative.js').VPAIDCreative;
-let IVPAIDCreative = require('../js/IVPAIDCreative.js').IVPAIDCreative;
-
-//get all properties to override
-const ALL_VPAID_METHODS = ['loadAdUnit', 'unloadAdUnit'].concat(Object.getOwnPropertyNames(IVPAIDCreative.prototype).filter(function (property) {
-    return ['constructor'].indexOf(property) === -1;
-}));
-
-function after(count, handler) {
-    return function () {
-        count--;
-        if (count <= 0) {
-            handler();
-        }
-    };
-}
+let after = require('./testHelper.js').after;
+let addFlashMethodsToEl = require('./testHelper.js').addFlashMethodsToEl;
 
 
 describe('flashVPAID.js api', function()  {
@@ -30,12 +17,7 @@ describe('flashVPAID.js api', function()  {
 
             //we need to simulate all the methods created by Flash ExternalInterface
             //so we can later spy this methods
-            ALL_VPAID_METHODS.forEach(function (method) {
-                el[method] = function (argsData) {
-                    let callBackID = argsData[0];
-                    window[VPAID_FLASH_HANDLER](flashID, '', method, callBackID, null, 'ok');
-                }
-            });
+            addFlashMethodsToEl(el, flashID);
 
             setTimeout(function () {
                 //simulate flash calling the application
@@ -58,14 +40,6 @@ describe('flashVPAID.js api', function()  {
 
         document.body.removeChild(flashWrapper1);
         document.body.removeChild(flashWrapper2);
-    });
-
-    it('must create in global a function in global scope', function () {
-
-        let flashVPAID = new VPAIDFlashToJS(flashWrapper1, noop);
-
-        assert.isFunction(window[VPAID_FLASH_HANDLER]);
-
     });
 
     it('must fire callback when vpaid flash wrapper is loaded', function (done) {

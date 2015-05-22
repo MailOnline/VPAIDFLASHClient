@@ -1,5 +1,6 @@
 let unique = require('./utils').unique;
 let isPositiveInt = require('./utils').isPositiveInt;
+const registry = require('./jsFlashBridgeRegistry');
 const VPAID_FLASH_HANDLER = 'vpaid_video_flash_handler';
 const ERROR = 'error';
 
@@ -17,8 +18,7 @@ export class JSFlashBridge {
         this._uniqueMethodIdentifier = unique(this._flashID);
         this._loadHandShake = loadHandShake;
 
-        //because flash externalInterface will call
-        instances[this._flashID] = this;
+        registry.addInstance(this, this._flashID);
     }
 
     on(eventName, callback) {
@@ -90,7 +90,7 @@ export class JSFlashBridge {
         return callback;
     }
 
-    removeAllCallback() {
+    removeAllCallbacks() {
         let old = this._callbacks;
         this._callbacks = {};
         return old;
@@ -152,6 +152,14 @@ export class JSFlashBridge {
     getFlashURL() {
         return this._flashURL;
     }
+    destroy() {
+        this.offAll();
+        this.removeAllCallbacks();
+        registry.destroyInstanceByID(this._flashID);
+        if (this._el.parentElement) {
+            this._el.parentElement.removeChild(this._el);
+        }
+    }
 }
 
 Object.defineProperty(JSFlashBridge, 'VPAID_FLASH_HANDLER', {
@@ -161,13 +169,15 @@ Object.defineProperty(JSFlashBridge, 'VPAID_FLASH_HANDLER', {
 });
 
 window[VPAID_FLASH_HANDLER] = (flashID, type, event, callID, error, data) => {
+    let instance = registry.getInstanceByID(flashID);
+    if (!instance) return;
     if (event === 'handShake') {
-        instances[flashID]._loadHandShake(error, data);
+        instance._loadHandShake(error, data);
     } else {
         if (type !== 'event') {
-            instances[flashID].callCallback(event, callID, error, data);
+            instance.callCallback(event, callID, error, data);
         } else {
-            instances[flashID].trigger(event, error, data);
+            instance.trigger(event, error, data);
         }
     }
 }

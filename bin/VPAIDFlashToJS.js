@@ -6,8 +6,8 @@ var _createClass = (function () { function defineProperties(target, props) { for
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
 //if this code already run once don't do anything
-var VPAIDFlashJSMediator = (function () {
-    if (window.FlashVPAID) return;
+var VPAIDFlashToJS = (function () {
+    if (window.VPAIDFlashToJS) return;
 
     var JSFlashBridge = require('./jsFlashBridge').JSFlashBridge;
     var VPAIDCreative = require('./VPAIDCreative').VPAIDCreative;
@@ -53,13 +53,10 @@ var VPAIDFlashJSMediator = (function () {
         _createClass(VPAIDFlashToJS, [{
             key: 'destroy',
             value: function destroy() {
-                this._flash.offAll();
-                this._flash.removeAllCallbacks();
+                this._flash.destroy();
                 this._flash = null;
-                this.vpaidParentEl.removeChild(this.el);
                 this.el = null;
                 this._creativeLoad = null;
-                delete instances[this._flashID];
                 this._destroyed = true;
             }
         }, {
@@ -126,7 +123,7 @@ var VPAIDFlashJSMediator = (function () {
 
 module.exports = VPAIDFlashToJS;
 
-},{"./VPAIDCreative":3,"./jsFlashBridge":4,"./utils":5}],2:[function(require,module,exports){
+},{"./VPAIDCreative":3,"./jsFlashBridge":4,"./utils":6}],2:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -457,6 +454,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 var unique = require('./utils').unique;
 var isPositiveInt = require('./utils').isPositiveInt;
+var registry = require('./jsFlashBridgeRegistry');
 var VPAID_FLASH_HANDLER = 'vpaid_video_flash_handler';
 var ERROR = 'error';
 
@@ -476,8 +474,7 @@ var JSFlashBridge = (function () {
         this._uniqueMethodIdentifier = unique(this._flashID);
         this._loadHandShake = loadHandShake;
 
-        //because flash externalInterface will call
-        instances[this._flashID] = this;
+        registry.addInstance(this, this._flashID);
     }
 
     _createClass(JSFlashBridge, [{
@@ -562,8 +559,8 @@ var JSFlashBridge = (function () {
             return callback;
         }
     }, {
-        key: 'removeAllCallback',
-        value: function removeAllCallback() {
+        key: 'removeAllCallbacks',
+        value: function removeAllCallbacks() {
             var old = this._callbacks;
             this._callbacks = {};
             return old;
@@ -643,6 +640,16 @@ var JSFlashBridge = (function () {
         value: function getFlashURL() {
             return this._flashURL;
         }
+    }, {
+        key: 'destroy',
+        value: function destroy() {
+            this.offAll();
+            this.removeAllCallbacks();
+            registry.destroyInstanceByID(this._flashID);
+            if (this._el.parentElement) {
+                this._el.parentElement.removeChild(this._el);
+            }
+        }
     }]);
 
     return JSFlashBridge;
@@ -657,18 +664,52 @@ Object.defineProperty(JSFlashBridge, 'VPAID_FLASH_HANDLER', {
 });
 
 window[VPAID_FLASH_HANDLER] = function (flashID, type, event, callID, error, data) {
+    var instance = registry.getInstanceByID(flashID);
+    if (!instance) return;
     if (event === 'handShake') {
-        instances[flashID]._loadHandShake(error, data);
+        instance._loadHandShake(error, data);
     } else {
         if (type !== 'event') {
-            instances[flashID].callCallback(event, callID, error, data);
+            instance.callCallback(event, callID, error, data);
         } else {
-            instances[flashID].trigger(event, error, data);
+            instance.trigger(event, error, data);
         }
     }
 };
 
-},{"./utils":5}],5:[function(require,module,exports){
+},{"./jsFlashBridgeRegistry":5,"./utils":6}],5:[function(require,module,exports){
+'use strict';
+
+var instances = {};
+var JSFlashBridgeRegistry = {};
+
+Object.defineProperty(JSFlashBridgeRegistry, 'addInstance', {
+    writable: false,
+    configurable: false,
+    value: function value(instance, id) {
+        instances[id] = instance;
+    }
+});
+
+Object.defineProperty(JSFlashBridgeRegistry, 'getInstanceByID', {
+    writable: false,
+    configurable: false,
+    value: function value(id) {
+        return instances[id];
+    }
+});
+
+Object.defineProperty(JSFlashBridgeRegistry, 'destroyInstanceByID', {
+    writable: false,
+    configurable: false,
+    value: function value(id) {
+        delete instances[id];
+    }
+});
+
+module.exports = JSFlashBridgeRegistry;
+
+},{}],6:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {

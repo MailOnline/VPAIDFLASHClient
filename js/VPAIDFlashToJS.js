@@ -1,6 +1,6 @@
 //if this code already run once don't do anything
-let VPAIDFlashJSMediator = (function () {
-if (window.FlashVPAID) return;
+let VPAIDFlashToJS = (function () {
+if (window.VPAIDFlashToJS) return;
 
 let JSFlashBridge = require('./jsFlashBridge').JSFlashBridge;
 let VPAIDCreative = require('./VPAIDCreative').VPAIDCreative;
@@ -38,13 +38,10 @@ class VPAIDFlashToJS {
     }
 
     destroy () {
-        this._flash.offAll();
-        this._flash.removeAllCallbacks();
+        this._flash.destroy();
         this._flash = null;
-        this.vpaidParentEl.removeChild(this.el);
         this.el = null;
         this._creativeLoad = null;
-        delete instances[this._flashID];
         this._destroyed = true;
     }
 
