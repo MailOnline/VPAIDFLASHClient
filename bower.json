@@ -5,7 +5,7 @@
     "Luis Silva <luis.dasilva@mailonline.co.uk>"
   ],
   "description": "",
-  "main": [ "build/flashVPAID.js", "build/flashVPAID.js.map", "build/VPAIDFlash.swf" ],
+  "main": [ "build/VPAIDFlashToJS.js", "build/VPAIDFlashToJS.js.map", "build/VPAIDFlash.swf" ],
   "license": "Private",
   "ignore": [
     "node_modules",
