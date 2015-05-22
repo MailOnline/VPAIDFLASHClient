@@ -4,14 +4,14 @@
 		<title>SWFObject 2 dynamic publishing example page</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 		<script type="text/javascript" src="/swfobject.js"></script>
-		<script type="text/javascript" src="/flashVPAID.js"></script>
+		<script type="text/javascript" src="/VPAIDFlashToJS.js"></script>
 	</head>
 	<body>
 		<div id="myContent">
 			<h1>Alternative content</h1>
         </div>
         <script>
-            var flashVPaid = new FlashVPAID(myContent, flashVPAIDWrapperLoaded);
+            var flashVPaid = new VPAIDFlashToJS(myContent, flashVPAIDWrapperLoaded);
             function flashVPAIDWrapperLoaded() {
                 console.log('lets load ad unit');
                 //var adURL = 'http://cdn.innovid.com/2.62.8110/platform/vpaid/VPAIDIRollPackage.swf?configURL=http%3A%2F%2Fstatic.innovid.com%2Firoll%2Fconfig%2F1hl7lc.xml%3Fcb%3D787766d7-ebab-3656-c24f-0ddebab645e9&secure=false';

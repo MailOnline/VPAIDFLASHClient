@@ -43,7 +43,7 @@ The flash code was compiled with [FlashBuilder](http://www.adobe.com/uk/products
 
 Debug
 =====
-  - when creating a flashVPAID instance the last parameter is debug, if this flag is set to true, will create a visual textfield that allows to show errors
+  - when creating a VPAIDFlasToJs instance the last parameter is debug, if this flag is set to true, will create a visual textfield that allows to show errors
   - as well if the js+flash is working all errors catch by the VPAIDFlash.swf will be sent to js
   - other error's can be caugth with Flash debugger
 
@@ -65,7 +65,7 @@ Example of the usage
 ==========================================
 
 ```javascript
-var flashVPaid = new FlashVPAID(myContent, flashVPAIDWrapperLoaded);
+var flashVPaid = new VPAIDFlashToJS(element, flashVPAIDWrapperLoaded);
 function flashVPAIDWrapperLoaded(err, result) {
     if (err) {
         //handle error here
@@ -121,5 +121,5 @@ function flashVPAIDWrapperLoaded(err, result) {
 }
 ```
 
-for the api of flashVPAID check [flashVPAID](js/flashVPAID.js), for creative api check [VAPAID](js/VPAID.js).
+for the api of VPAIDFlashToJS check [VPAIDFlashToJS.js](js/flashVPAID.js), for creative api check [IVPAID.js](js/IVPAID.js).
 

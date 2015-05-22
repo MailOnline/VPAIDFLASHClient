@@ -1,9 +1,10 @@
-let FlashVPAID = require('../js/flashVPAID.js');
-let Creative = require('../js/creative').Creative;
-let IVPAID = require('../js/VPAID.js').IVPAID;
+let VPAIDFlashToJS = require('../js/VPAIDFlashToJS.js');
+let VPAID_FLASH_HANDLER = require('../js/jsFlashBridge.js').JSFlashBridge.VPAID_FLASH_HANDLER;
+let VPAIDCreative = require('../js/VPAIDCreative.js').VPAIDCreative;
+let IVPAIDCreative = require('../js/IVPAIDCreative.js').IVPAIDCreative;
 
 //get all properties to override
-const ALL_VPAID_METHODS = ['loadAdUnit', 'unloadAdUnit'].concat(Object.getOwnPropertyNames(IVPAID.prototype).filter(function (property) {
+const ALL_VPAID_METHODS = ['loadAdUnit', 'unloadAdUnit'].concat(Object.getOwnPropertyNames(IVPAIDCreative.prototype).filter(function (property) {
     return ['constructor'].indexOf(property) === -1;
 }));
 
@@ -32,13 +33,13 @@ describe('flashVPAID.js api', function()  {
             ALL_VPAID_METHODS.forEach(function (method) {
                 el[method] = function (argsData) {
                     let callBackID = argsData[0];
-                    window[FlashVPAID.VPAID_FLASH_HANDLER](flashID, '', method, callBackID, null, 'ok');
+                    window[VPAID_FLASH_HANDLER](flashID, '', method, callBackID, null, 'ok');
                 }
             });
 
             setTimeout(function () {
                 //simulate flash calling the application
-                window[FlashVPAID.VPAID_FLASH_HANDLER](flashID, '', 'handShake', '', null, 'ok');
+                window[VPAID_FLASH_HANDLER](flashID, '', 'handShake', '', null, 'ok');
             }, 0);
 
             return el;
@@ -61,9 +62,9 @@ describe('flashVPAID.js api', function()  {
 
     it('must create in global a function in global scope', function () {
 
-        let flashVPAID = new FlashVPAID(flashWrapper1, noop);
+        let flashVPAID = new VPAIDFlashToJS(flashWrapper1, noop);
 
-        assert.isFunction(window[FlashVPAID.VPAID_FLASH_HANDLER]);
+        assert.isFunction(window[VPAID_FLASH_HANDLER]);
 
     });
 
@@ -74,7 +75,7 @@ describe('flashVPAID.js api', function()  {
             done();
         });
 
-        let flashVPAID = new FlashVPAID(flashWrapper1, callback);
+        let flashVPAID = new VPAIDFlashToJS(flashWrapper1, callback);
 
     });
 
@@ -87,8 +88,8 @@ describe('flashVPAID.js api', function()  {
             done();
         });
 
-        flashVPAID1 = new FlashVPAID(flashWrapper1, counter);
-        flashVPAID2 = new FlashVPAID(flashWrapper2, counter);
+        flashVPAID1 = new VPAIDFlashToJS(flashWrapper1, counter);
+        flashVPAID2 = new VPAIDFlashToJS(flashWrapper2, counter);
 
     });
 
@@ -104,20 +105,20 @@ describe('flashVPAID.js api', function()  {
         });
 
         callback1 = sinon.spy(counter);
-        flashVPAID1 = new FlashVPAID(flashWrapper1, callback1);
+        flashVPAID1 = new VPAIDFlashToJS(flashWrapper1, callback1);
 
         callback2 = sinon.spy(counter);
-        flashVPAID2 = new FlashVPAID(flashWrapper1, callback2);
+        flashVPAID2 = new VPAIDFlashToJS(flashWrapper1, callback2);
 
     });
 
     it('must load adUnit', function (done) {
 
-        let flashVPAID = new FlashVPAID(flashWrapper1, function () {
+        let flashVPAID = new VPAIDFlashToJS(flashWrapper1, function () {
 
             let callback = sinon.spy(function (error, result) {
                 assert(callback.calledOnce);
-                assert.instanceOf(result, Creative, 'callback result must return a creative');
+                assert.instanceOf(result, VPAIDCreative, 'callback result must return a creative');
                 done();
             });
 
@@ -128,12 +129,12 @@ describe('flashVPAID.js api', function()  {
 
     it('must get the volume', function (done) {
 
-        let flashVPAID = new FlashVPAID(flashWrapper1, function () {
+        let flashVPAID = new VPAIDFlashToJS(flashWrapper1, function () {
             flashVPAID.loadAdUnit('random.swf', function (error, creative) {
 
                 sinon.stub(flashVPAID.el, 'getAdVolume', function (argsData) {
                     let callBackID = argsData[0];
-                    window[FlashVPAID.VPAID_FLASH_HANDLER](flashVPAID.getFlashID(), 'method', 'getAdVolume', callBackID, null, .8);
+                    window[VPAID_FLASH_HANDLER](flashVPAID.getFlashID(), 'method', 'getAdVolume', callBackID, null, .8);
                 });
 
                 let callback = sinon.spy(function () {
@@ -149,11 +150,11 @@ describe('flashVPAID.js api', function()  {
 
     it('must set the volume', function (done) {
 
-        let flashVPAID = new FlashVPAID(flashWrapper1, function () {
+        let flashVPAID = new VPAIDFlashToJS(flashWrapper1, function () {
             flashVPAID.loadAdUnit('random.swf', function (error, creative) {
 
                 sinon.stub(flashVPAID.el, 'setAdVolume', function (argsData) {
-                    window[FlashVPAID.VPAID_FLASH_HANDLER].apply(null, [flashVPAID.getFlashID(), 'method', 'setAdVolume'].concat(argsData));
+                    window[VPAID_FLASH_HANDLER].apply(null, [flashVPAID.getFlashID(), 'method', 'setAdVolume'].concat(argsData));
                 });
 
                 var callback = sinon.spy(function () {
@@ -182,13 +183,13 @@ describe('flashVPAID.js api', function()  {
         booleanGetters.forEach(function (method) {
             it('must get ' + method, function (done) {
 
-                let flashVPAID = new FlashVPAID(flashWrapper1, function () {
+                let flashVPAID = new VPAIDFlashToJS(flashWrapper1, function () {
                     flashVPAID.loadAdUnit('random.swf', function (error, creative) {
 
                         let callback1, callback2, elCounter = 0;
 
                         sinon.stub(flashVPAID.el, method, function (argsData) {
-                            window[FlashVPAID.VPAID_FLASH_HANDLER](flashVPAID.getFlashID(), 'method', method, argsData[0], null, ++elCounter > 1);
+                            window[VPAID_FLASH_HANDLER](flashVPAID.getFlashID(), 'method', method, argsData[0], null, ++elCounter > 1);
                         });
 
                         let counter = after(2, function () {

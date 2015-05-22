@@ -1,20 +1,18 @@
 //if this code already run once don't do anything
-let FlashVPAID = (function () {
+let VPAIDFlashJSMediator = (function () {
 if (window.FlashVPAID) return;
 
-let FlashWrapper = require('./flashWrapper').FlashWrapper;
-let Creative = require('./creative').Creative;
+let JSFlashBridge = require('./jsFlashBridge').JSFlashBridge;
+let VPAIDCreative = require('./VPAIDCreative').VPAIDCreative;
 
 let noop = require('./utils').noop;
 let isPositiveInt = require('./utils').isPositiveInt;
 let createElementWithID = require('./utils').createElementWithID;
 let uniqueVPAID = require('./utils').unique('vpaid');
-let instances = {};
 
 const ERROR = 'error';
-const VPAID_FLASH_HANDLER = 'vpaid_video_flash_handler';
 
-class FlashVPAID {
+class VPAIDFlashToJS {
     constructor (vpaidParentEl, callback, swfConfig = {data: 'VPAIDFlash.swf', width: 800, height: 400}, version = '9', params = { wmode: 'transparent', salign: 'tl', allowScriptAccess: 'always'}, debug = true) {
         if (!swfobject) throw new Error('no swfobject in global scope. check: https://github.com/swfobject/swfobject or https://code.google.com/p/swfobject/');
 
@@ -23,22 +21,18 @@ class FlashVPAID {
         this._load =  callback || noop;
         this._destroyed = false;
 
-
         //validate the height
         swfConfig.width = isPositiveInt(swfConfig.width, 800);
         swfConfig.height = isPositiveInt(swfConfig.height, 400);
 
         createElementWithID(vpaidParentEl, this._flashID);
 
-        //because flash externalInterface will call
-        instances[this._flashID] = this;
-
         params.movie = swfConfig.data;
-        params.FlashVars = `flashid=${this._flashID}&handler=${VPAID_FLASH_HANDLER}&debug=${debug}`;
+        params.FlashVars = `flashid=${this._flashID}&handler=${JSFlashBridge.VPAID_FLASH_HANDLER}&debug=${debug}`;
 
         if (swfobject.hasFlashPlayerVersion(version)) {
             this.el = swfobject.createSWF(swfConfig, params, this._flashID);
-            this._flash = new FlashWrapper(this.el, swfConfig.data, this._flashID, swfConfig.width, swfConfig.height);
+            this._flash = new JSFlashBridge(this.el, swfConfig.data, this._flashID, swfConfig.width, swfConfig.height, callback || noop);
         }
 
     }
@@ -58,10 +52,6 @@ class FlashVPAID {
         return this._destroyed;
     }
 
-    _flash_handShake (error, message) {
-        this._load(error, message);
-    }
-
     loadAdUnit(adURL, callback) {
         if (this._creative) {
             throw new error('creative still exists');
@@ -69,7 +59,7 @@ class FlashVPAID {
 
         this._creativeLoad = (err, message) => {
             if (!err) {
-                this._creative = new Creative(this._flash);
+                this._creative = new VPAIDCreative(this._flash);
             }
             this._creativeLoad = null;
             callback(err, this._creative);
@@ -99,27 +89,10 @@ class FlashVPAID {
     }
 }
 
-Object.defineProperty(FlashVPAID, 'VPAID_FLASH_HANDLER', {
-    writable: false,
-    configurable: false,
-    value: VPAID_FLASH_HANDLER
-});
+window.VPAIDFlashToJS = VPAIDFlashToJS;
 
-window[VPAID_FLASH_HANDLER] = (flashID, type, event, callID, error, data) => {
-    if (event === 'handShake') {
-        instances[flashID]._flash_handShake(error, data);
-    } else {
-        if (type !== 'event') {
-            instances[flashID]._flash.callCallback(event, callID, error, data);
-        } else {
-            instances[flashID]._flash.trigger(event, error, data);
-        }
-    }
-}
-window.FlashVPAID = FlashVPAID;
-
-return FlashVPAID;
+return VPAIDFlashToJS;
 })();
 
-module.exports =  FlashVPAID;
+module.exports =  VPAIDFlashToJS;
 

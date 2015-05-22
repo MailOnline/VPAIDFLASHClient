@@ -1,5 +1,6 @@
 //simple representation of the API
-export class IVPAID {
+export class IVPAIDCreative {
+
     //all methods below
     //are async methods
     handshakeVersion(playerVPAIDVersion = '2.0', callback = undefined) {}
@@ -30,33 +31,36 @@ export class IVPAID {
     adIcons(callback) {}
 }
 
-//ALL events that can be subscribed
-export let ALL_EVENTS = [
-    'AdLoaded',
-    'AdStarted',
-    'AdStopped',
-    'AdSkipped',
-    'AdSkippableStateChange',
-    'AdSizeChange',
-    'AdLinearChange',
-    'AdDurationChange',
-    'AdExpandedChange',
-    'AdRemainingTimeChange', // [Deprecated in 2.0] but will be still fired for backwards compatibility
-    'AdVolumeChange',
-    'AdImpression',
-    'AdVideoStart',
-    'AdVideoFirstQuartile',
-    'AdVideoMidpoint',
-    'AdVideoThirdQuartile',
-    'AdVideoComplete',
-    'AdClickThru',
-    'AdInteraction',
-    'AdUserAcceptInvitation',
-    'AdUserMinimize',
-    'AdUserClose',
-    'AdPaused',
-    'AdPlaying',
-    'AdLog',
-    'AdError'
-];
+Object.defineProperty(IVPAIDCreative, 'EVENTS', {
+    writable: false,
+    configurable: false,
+    value: [
+        'AdLoaded',
+        'AdStarted',
+        'AdStopped',
+        'AdSkipped',
+        'AdSkippableStateChange',
+        'AdSizeChange',
+        'AdLinearChange',
+        'AdDurationChange',
+        'AdExpandedChange',
+        'AdRemainingTimeChange', // [Deprecated in 2.0] but will be still fired for backwards compatibility
+        'AdVolumeChange',
+        'AdImpression',
+        'AdVideoStart',
+        'AdVideoFirstQuartile',
+        'AdVideoMidpoint',
+        'AdVideoThirdQuartile',
+        'AdVideoComplete',
+        'AdClickThru',
+        'AdInteraction',
+        'AdUserAcceptInvitation',
+        'AdUserMinimize',
+        'AdUserClose',
+        'AdPaused',
+        'AdPlaying',
+        'AdLog',
+        'AdError'
+    ]
+});
 

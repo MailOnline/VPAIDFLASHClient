@@ -1,9 +1,12 @@
 let unique = require('./utils').unique;
 let isPositiveInt = require('./utils').isPositiveInt;
+const VPAID_FLASH_HANDLER = 'vpaid_video_flash_handler';
 const ERROR = 'error';
 
-export class FlashWrapper {
-    constructor (el, flashURL, flashID, width, height) {
+let instances = {};
+
+export class JSFlashBridge {
+    constructor (el, flashURL, flashID, width, height, loadHandShake) {
         this._el = el;
         this._flashID = flashID;
         this._flashURL = flashURL;
@@ -12,6 +15,10 @@ export class FlashWrapper {
         this._handlers = {};
         this._callbacks = {};
         this._uniqueMethodIdentifier = unique(this._flashID);
+        this._loadHandShake = loadHandShake;
+
+        //because flash externalInterface will call
+        instances[this._flashID] = this;
     }
 
     on(eventName, callback) {
@@ -144,6 +151,24 @@ export class FlashWrapper {
     }
     getFlashURL() {
         return this._flashURL;
+    }
+}
+
+Object.defineProperty(JSFlashBridge, 'VPAID_FLASH_HANDLER', {
+    writable: false,
+    configurable: false,
+    value: VPAID_FLASH_HANDLER
+});
+
+window[VPAID_FLASH_HANDLER] = (flashID, type, event, callID, error, data) => {
+    if (event === 'handShake') {
+        instances[flashID]._loadHandShake(error, data);
+    } else {
+        if (type !== 'event') {
+            instances[flashID].callCallback(event, callID, error, data);
+        } else {
+            instances[flashID].trigger(event, error, data);
+        }
     }
 }
 

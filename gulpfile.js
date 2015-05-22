@@ -21,6 +21,7 @@ var assign = require('lodash').assign;
 var karma = require('gulp-karma');
 
 var binPath = './bin';
+var mainJS = 'VPAIDFlashToJS.js';
 
 var jsBuild = watchify(
     browserify(
@@ -28,7 +29,7 @@ var jsBuild = watchify(
             {},
             watchify.args,
             {
-                entries: ['./js/flashVPAID.js'],
+                entries: ['./js/' + mainJS],
                 debug: true,
             }
         )
@@ -43,7 +44,7 @@ jsBuild.on('log', gutil.log); // output build logs to terminal
 function bundle() {
     return jsBuild.bundle()
         .on('error', gutil.log.bind(gutil, 'Browserify error'))
-        .pipe(source('flashVPAID.js'))
+        .pipe(source(mainJS))
         .pipe(buffer())
         .pipe(sourcemaps.init({loadMaps: true}))
         .pipe(sourcemaps.write('./'))
