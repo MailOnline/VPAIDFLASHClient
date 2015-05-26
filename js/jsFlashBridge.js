@@ -1,5 +1,7 @@
 let unique = require('./utils').unique;
 let isPositiveInt = require('./utils').isPositiveInt;
+let SingleValueRegistry = require('./registry').SingleValueRegistry;
+let MultipleValuesRegistry = require('./registry').MultipleValuesRegistry;
 const registry = require('./jsFlashBridgeRegistry');
 const VPAID_FLASH_HANDLER = 'vpaid_video_flash_handler';
 const ERROR = 'error';
@@ -13,40 +15,28 @@ export class JSFlashBridge {
         this._flashURL = flashURL;
         this._width = width;
         this._height = height;
-        this._handlers = {};
-        this._callbacks = {};
+        this._handlers = new MultipleValuesRegistry();
+        this._callbacks = new SingleValueRegistry();
         this._uniqueMethodIdentifier = unique(this._flashID);
         this._loadHandShake = loadHandShake;
 
-        registry.addInstance(this, this._flashID);
+        registry.addInstance(this._flashID, this);
     }
 
     on(eventName, callback) {
-        if (!this._handlers[eventName]) {
-            this._handlers[eventName] = [];
-        }
-        this._handlers[eventName].push(callback);
+        this._handlers.add(eventName, callback);
     }
 
     off(eventName, callback) {
-        if (!this._handlers[eventName]) { return; }
-
-        var index = this._handlers[eventName].indexOf(callback);
-
-        if (index < 0) { return; }
-        return this._handlers[eventName].splice(index, 1);
+        return this._handlers.remove(eventName, callback);
     }
 
     offEvent(eventName) {
-        if (!this._handlers[eventName]) { return; }
-
-        return this._handlers[eventName].splice(0, this._handlers[eventName].length);
+        return this._handlers.removeByKey(eventName);
     }
 
     offAll() {
-        var old = this._handlers;
-        this._handlers = {};
-        return old;
+        return this._handlers.removeAll();
     }
 
     callFlashMethod(methodName, args = [], callback = undefined) {
@@ -54,7 +44,7 @@ export class JSFlashBridge {
         // if no callback, some methods the return is void so they don't need callback
         if (callback) {
             var callbackID = this._uniqueMethodIdentifier();
-            this._callbacks[callbackID] = callback;
+            this._callbacks.add(callbackID, callback);
         }
 
 
@@ -65,8 +55,10 @@ export class JSFlashBridge {
 
         } catch (e) {
             if (callback) {
-                delete this._callbacks[callbackID];
-                callback(e);
+                this._callbacks.remove(callbackID);
+                setTimeout( () => {
+                    callback(e);
+                }, 0);
             } else {
 
                 //if there isn't any callback to return error use error event handler
@@ -75,53 +67,35 @@ export class JSFlashBridge {
         }
     }
 
-
-    removeCallback(methodName, callback) {
-        //TODO: check if keys and find is added to the browser with babeljs
-        var key = Object.keys(this._callbacks).find(function (key) {
-            return this._callbacks[key] === callback;
-        });
-
-        if (!key) {
-            return;
-        }
-
-        delete this._callbacks[key];
-        return callback;
-    }
-
     removeAllCallbacks() {
-        let old = this._callbacks;
-        this._callbacks = {};
-        return old;
+        return this._callbacks.removeAll();
     }
 
-    trigger(eventName, err, result) {
+    _trigger(eventName, err, result) {
         //TODO: check if forEach and isArray is added to the browser with babeljs
-        if (Array.isArray(this._handlers[eventName])) {
-            this._handlers[eventName].forEach(function (callback) {
-                setTimeout(function () {
-                    callback(err, result);
-                }, 0);
-            });
-        }
+        this._handlers.get(eventName).forEach(function (callback) {
+            setTimeout(function () {
+                callback(err, result);
+            }, 0);
+        });
     }
 
-    callCallback(methodName, callbackID, err, result) {
+    _callCallback(methodName, callbackID, err, result) {
+
+        let callback = this._callbacks.get(callbackID);
 
         //not all methods callback's are mandatory
-        if (callbackID === '' || !this._callbacks[callbackID]) {
-            //but if there exist an error, fire the error event
-            if (err) this.trigger(ERROR, err, result);
+        //but if there exist an error, fire the error event
+        if (err && (callbackID === '' || !callback)) {
+            this.trigger(ERROR, err, result);
             return;
         }
 
-        let callback = this._callbacks[callbackID];
         setTimeout(function () {
             callback(err, result);
         }, 0);
 
-        delete this._callbacks[callbackID];
+        this._callbacks.remove(callbackID);
     }
 
     //methods like properties specific to this implementation of VPAID
@@ -155,7 +129,7 @@ export class JSFlashBridge {
     destroy() {
         this.offAll();
         this.removeAllCallbacks();
-        registry.destroyInstanceByID(this._flashID);
+        registry.removeInstanceByID(this._flashID);
         if (this._el.parentElement) {
             this._el.parentElement.removeChild(this._el);
         }
@@ -175,9 +149,9 @@ window[VPAID_FLASH_HANDLER] = (flashID, type, event, callID, error, data) => {
         instance._loadHandShake(error, data);
     } else {
         if (type !== 'event') {
-            instance.callCallback(event, callID, error, data);
+            instance._callCallback(event, callID, error, data);
         } else {
-            instance.trigger(event, error, data);
+            instance._trigger(event, error, data);
         }
     }
 }

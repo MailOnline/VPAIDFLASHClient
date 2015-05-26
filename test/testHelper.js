@@ -19,11 +19,12 @@ export function addFlashMethodsToEl(el, flashID) {
     ALL_VPAID_METHODS.forEach(function (method) {
         el[method] = function (argsData) {
             let callBackID = argsData[0];
-            window[VPAID_FLASH_HANDLER](flashID, '', method, callBackID, null, 'ok');
+            setTimeout(function () {
+                window[VPAID_FLASH_HANDLER](flashID, 'method', method, callBackID, null, 'ok');
+            }, 0);
         }
     });
 }
 
 export function noop() {}
-
 

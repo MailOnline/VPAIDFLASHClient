@@ -123,7 +123,7 @@ var VPAIDFlashToJS = (function () {
 
 module.exports = VPAIDFlashToJS;
 
-},{"./VPAIDCreative":3,"./jsFlashBridge":4,"./utils":6}],2:[function(require,module,exports){
+},{"./VPAIDCreative":3,"./jsFlashBridge":4,"./utils":7}],2:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -454,6 +454,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 var unique = require('./utils').unique;
 var isPositiveInt = require('./utils').isPositiveInt;
+var SingleValueRegistry = require('./registry').SingleValueRegistry;
+var MultipleValuesRegistry = require('./registry').MultipleValuesRegistry;
 var registry = require('./jsFlashBridgeRegistry');
 var VPAID_FLASH_HANDLER = 'vpaid_video_flash_handler';
 var ERROR = 'error';
@@ -469,51 +471,33 @@ var JSFlashBridge = (function () {
         this._flashURL = flashURL;
         this._width = width;
         this._height = height;
-        this._handlers = {};
-        this._callbacks = {};
+        this._handlers = new MultipleValuesRegistry();
+        this._callbacks = new SingleValueRegistry();
         this._uniqueMethodIdentifier = unique(this._flashID);
         this._loadHandShake = loadHandShake;
 
-        registry.addInstance(this, this._flashID);
+        registry.addInstance(this._flashID, this);
     }
 
     _createClass(JSFlashBridge, [{
         key: 'on',
         value: function on(eventName, callback) {
-            if (!this._handlers[eventName]) {
-                this._handlers[eventName] = [];
-            }
-            this._handlers[eventName].push(callback);
+            this._handlers.add(eventName, callback);
         }
     }, {
         key: 'off',
         value: function off(eventName, callback) {
-            if (!this._handlers[eventName]) {
-                return;
-            }
-
-            var index = this._handlers[eventName].indexOf(callback);
-
-            if (index < 0) {
-                return;
-            }
-            return this._handlers[eventName].splice(index, 1);
+            return this._handlers.remove(eventName, callback);
         }
     }, {
         key: 'offEvent',
         value: function offEvent(eventName) {
-            if (!this._handlers[eventName]) {
-                return;
-            }
-
-            return this._handlers[eventName].splice(0, this._handlers[eventName].length);
+            return this._handlers.removeByKey(eventName);
         }
     }, {
         key: 'offAll',
         value: function offAll() {
-            var old = this._handlers;
-            this._handlers = {};
-            return old;
+            return this._handlers.removeAll();
         }
     }, {
         key: 'callFlashMethod',
@@ -525,7 +509,7 @@ var JSFlashBridge = (function () {
             // if no callback, some methods the return is void so they don't need callback
             if (callback) {
                 var callbackID = this._uniqueMethodIdentifier();
-                this._callbacks[callbackID] = callback;
+                this._callbacks.add(callbackID, callback);
             }
 
             try {
@@ -534,8 +518,10 @@ var JSFlashBridge = (function () {
                 this._el[methodName]([callbackID].concat(args));
             } catch (e) {
                 if (callback) {
-                    delete this._callbacks[callbackID];
-                    callback(e);
+                    this._callbacks.remove(callbackID);
+                    setTimeout(function () {
+                        callback(e);
+                    }, 0);
                 } else {
 
                     //if there isn't any callback to return error use error event handler
@@ -544,56 +530,38 @@ var JSFlashBridge = (function () {
             }
         }
     }, {
-        key: 'removeCallback',
-        value: function removeCallback(methodName, callback) {
-            //TODO: check if keys and find is added to the browser with babeljs
-            var key = Object.keys(this._callbacks).find(function (key) {
-                return this._callbacks[key] === callback;
-            });
-
-            if (!key) {
-                return;
-            }
-
-            delete this._callbacks[key];
-            return callback;
-        }
-    }, {
         key: 'removeAllCallbacks',
         value: function removeAllCallbacks() {
-            var old = this._callbacks;
-            this._callbacks = {};
-            return old;
+            return this._callbacks.removeAll();
         }
     }, {
-        key: 'trigger',
-        value: function trigger(eventName, err, result) {
+        key: '_trigger',
+        value: function _trigger(eventName, err, result) {
             //TODO: check if forEach and isArray is added to the browser with babeljs
-            if (Array.isArray(this._handlers[eventName])) {
-                this._handlers[eventName].forEach(function (callback) {
-                    setTimeout(function () {
-                        callback(err, result);
-                    }, 0);
-                });
-            }
+            this._handlers.get(eventName).forEach(function (callback) {
+                setTimeout(function () {
+                    callback(err, result);
+                }, 0);
+            });
         }
     }, {
-        key: 'callCallback',
-        value: function callCallback(methodName, callbackID, err, result) {
+        key: '_callCallback',
+        value: function _callCallback(methodName, callbackID, err, result) {
+
+            var callback = this._callbacks.get(callbackID);
 
             //not all methods callback's are mandatory
-            if (callbackID === '' || !this._callbacks[callbackID]) {
-                //but if there exist an error, fire the error event
-                if (err) this.trigger(ERROR, err, result);
+            //but if there exist an error, fire the error event
+            if (err && (callbackID === '' || !callback)) {
+                this.trigger(ERROR, err, result);
                 return;
             }
 
-            var callback = this._callbacks[callbackID];
             setTimeout(function () {
                 callback(err, result);
             }, 0);
 
-            delete this._callbacks[callbackID];
+            this._callbacks.remove(callbackID);
         }
     }, {
         key: 'getSize',
@@ -645,7 +613,7 @@ var JSFlashBridge = (function () {
         value: function destroy() {
             this.offAll();
             this.removeAllCallbacks();
-            registry.destroyInstanceByID(this._flashID);
+            registry.removeInstanceByID(this._flashID);
             if (this._el.parentElement) {
                 this._el.parentElement.removeChild(this._el);
             }
@@ -670,24 +638,25 @@ window[VPAID_FLASH_HANDLER] = function (flashID, type, event, callID, error, dat
         instance._loadHandShake(error, data);
     } else {
         if (type !== 'event') {
-            instance.callCallback(event, callID, error, data);
+            instance._callCallback(event, callID, error, data);
         } else {
-            instance.trigger(event, error, data);
+            instance._trigger(event, error, data);
         }
     }
 };
 
-},{"./jsFlashBridgeRegistry":5,"./utils":6}],5:[function(require,module,exports){
+},{"./jsFlashBridgeRegistry":5,"./registry":6,"./utils":7}],5:[function(require,module,exports){
 'use strict';
 
-var instances = {};
-var JSFlashBridgeRegistry = {};
+var SingleValueRegistry = require('./registry').SingleValueRegistry;
+var instances = new SingleValueRegistry();
 
+var JSFlashBridgeRegistry = {};
 Object.defineProperty(JSFlashBridgeRegistry, 'addInstance', {
     writable: false,
     configurable: false,
-    value: function value(instance, id) {
-        instances[id] = instance;
+    value: function value(id, instance) {
+        instances.add(id, instance);
     }
 });
 
@@ -695,21 +664,173 @@ Object.defineProperty(JSFlashBridgeRegistry, 'getInstanceByID', {
     writable: false,
     configurable: false,
     value: function value(id) {
-        return instances[id];
+        return instances.get(id);
     }
 });
 
-Object.defineProperty(JSFlashBridgeRegistry, 'destroyInstanceByID', {
+Object.defineProperty(JSFlashBridgeRegistry, 'removeInstanceByID', {
     writable: false,
     configurable: false,
     value: function value(id) {
-        delete instances[id];
+        return instances.remove(id);
     }
 });
 
 module.exports = JSFlashBridgeRegistry;
 
-},{}],6:[function(require,module,exports){
+},{"./registry":6}],6:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var MultipleValuesRegistry = (function () {
+    function MultipleValuesRegistry() {
+        _classCallCheck(this, MultipleValuesRegistry);
+
+        this._registries = {};
+    }
+
+    _createClass(MultipleValuesRegistry, [{
+        key: "add",
+        value: function add(id, value) {
+            if (!this._registries[id]) {
+                this._registries[id] = [];
+            }
+            if (this._registries[id].indexOf(value) === -1) {
+                this._registries[id].push(value);
+            }
+        }
+    }, {
+        key: "get",
+        value: function get(id) {
+            return this._registries[id] || [];
+        }
+    }, {
+        key: "findValueKeys",
+        value: function findValueKeys(value) {
+            //TODO: check if keys and find is added to the browser with babeljs
+            var keys = Object.keys(this._registries).filter(function (key) {
+                return this._registries[key].indexOf(value) !== -1;
+            });
+
+            return keys;
+        }
+    }, {
+        key: "remove",
+        value: function remove(key, value) {
+            if (!this._registries[key]) {
+                return;
+            }
+
+            var index = this._registries[key].indexOf(value);
+
+            if (index < 0) {
+                return;
+            }
+            return this._registries[key].splice(index, 1);
+        }
+    }, {
+        key: "removeByKey",
+        value: function removeByKey(id) {
+            var old = this._registries[id];
+            delete this._registries[id];
+            return old;
+        }
+    }, {
+        key: "removeByValue",
+        value: function removeByValue(value) {
+            var keys = this._findValueKeys(value);
+            return keys.map(function (key) {
+                return this.destroy(key, value);
+            });
+        }
+    }, {
+        key: "removeAll",
+        value: function removeAll() {
+            var old = this._registries;
+            this._registries = {};
+            return old;
+        }
+    }, {
+        key: "size",
+        value: function size() {
+            return Object.keys(this._registries).length;
+        }
+    }]);
+
+    return MultipleValuesRegistry;
+})();
+
+exports.MultipleValuesRegistry = MultipleValuesRegistry;
+
+var SingleValueRegistry = (function () {
+    function SingleValueRegistry() {
+        _classCallCheck(this, SingleValueRegistry);
+
+        this._registries = {};
+    }
+
+    _createClass(SingleValueRegistry, [{
+        key: "add",
+        value: function add(id, value) {
+            this._registries[id] = value;
+        }
+    }, {
+        key: "get",
+        value: function get(id) {
+            return this._registries[id];
+        }
+    }, {
+        key: "findValueKeys",
+        value: function findValueKeys(value) {
+            //TODO: check if keys and find is added to the browser with babeljs
+            var key = Object.keys(this._registries).filter(function (key) {
+                return this._registries[key] === value;
+            });
+
+            return key;
+        }
+    }, {
+        key: "remove",
+        value: function remove(id) {
+            var old = this._registries[id];
+            delete this._registries[id];
+            return old;
+        }
+    }, {
+        key: "removeByValue",
+        value: function removeByValue(value) {
+            var keys = this._findValueKeys(value);
+            return keys.map(function (key) {
+                return this.destroy(key);
+            });
+        }
+    }, {
+        key: "removeAll",
+        value: function removeAll() {
+            var old = this._registries;
+            this._registries = {};
+            return old;
+        }
+    }, {
+        key: "size",
+        value: function size() {
+            return Object.keys(this._registries).length;
+        }
+    }]);
+
+    return SingleValueRegistry;
+})();
+
+exports.SingleValueRegistry = SingleValueRegistry;
+
+},{}],7:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {

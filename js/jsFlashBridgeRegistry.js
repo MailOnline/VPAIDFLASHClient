@@ -1,11 +1,12 @@
-let instances = {};
-const JSFlashBridgeRegistry = {};
+let SingleValueRegistry = require('./registry').SingleValueRegistry;
+let instances = new SingleValueRegistry();
 
+const JSFlashBridgeRegistry = {};
 Object.defineProperty(JSFlashBridgeRegistry, 'addInstance', {
     writable: false,
     configurable: false,
-    value: function (instance, id) {
-        instances[id] = instance;
+    value: function (id, instance) {
+        instances.add(id, instance);
     }
 });
 
@@ -13,15 +14,15 @@ Object.defineProperty(JSFlashBridgeRegistry, 'getInstanceByID', {
     writable: false,
     configurable: false,
     value: function (id) {
-        return instances[id];
+        return instances.get(id);
     }
 });
 
-Object.defineProperty(JSFlashBridgeRegistry, 'destroyInstanceByID', {
+Object.defineProperty(JSFlashBridgeRegistry, 'removeInstanceByID', {
     writable: false,
     configurable: false,
     value: function (id) {
-        delete instances[id];
+        return instances.remove(id);
     }
 });
 
