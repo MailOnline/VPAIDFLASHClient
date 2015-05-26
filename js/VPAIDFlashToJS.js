@@ -3,7 +3,7 @@ let VPAIDFlashToJS = (function () {
 if (window.VPAIDFlashToJS) return;
 
 let JSFlashBridge = require('./jsFlashBridge').JSFlashBridge;
-let VPAIDCreative = require('./VPAIDCreative').VPAIDCreative;
+let VPAIDAdUnit = require('./VPAIDAdUnit').VPAIDAdUnit;
 
 let noop = require('./utils').noop;
 let isPositiveInt = require('./utils').isPositiveInt;
@@ -41,7 +41,7 @@ class VPAIDFlashToJS {
         this._flash.destroy();
         this._flash = null;
         this.el = null;
-        this._creativeLoad = null;
+        this._adUnitLoad = null;
         this._destroyed = true;
     }
 
@@ -50,30 +50,30 @@ class VPAIDFlashToJS {
     }
 
     loadAdUnit(adURL, callback) {
-        if (this._creative) {
-            throw new error('creative still exists');
+        if (this._adUnit) {
+            throw new error('AdUnit still exists');
         }
 
-        this._creativeLoad = (err, message) => {
+        this._adUnitLoad = (err, message) => {
             if (!err) {
-                this._creative = new VPAIDCreative(this._flash);
+                this._adUnit = new VPAIDAdUnit(this._flash);
             }
-            this._creativeLoad = null;
-            callback(err, this._creative);
+            this._adUnitLoad = null;
+            callback(err, this._adUnit);
         };
 
-        this._flash.callFlashMethod('loadAdUnit', [adURL], this._creativeLoad);
+        this._flash.callFlashMethod('loadAdUnit', [adURL], this._adUnitLoad);
     }
     unloadAdUnit(callback = undefined) {
-        if (!this._creative) {
-            throw new Error("Can't unload a creative that doesn't exist");
+        if (!this._adUnit) {
+            throw new Error("Can't unload a adUnit that doesn't exist");
         }
 
-        this._creative = null;
+        this._adUnit = null;
 
-        if (this._creativeLoad) {
-            this._flash.removeCallback(this._creativeLoad);
-            this._creativeLoad = null;
+        if (this._adUnitLoad) {
+            this._flash.removeCallback(this._adUnitLoad);
+            this._adUnitLoad = null;
         }
 
         this._flash.callFlashMethod('unloadAdUnit', [], callback);

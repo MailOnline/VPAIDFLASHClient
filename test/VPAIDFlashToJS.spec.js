@@ -1,6 +1,6 @@
 let VPAIDFlashToJS = require('../js/VPAIDFlashToJS.js');
 let VPAID_FLASH_HANDLER = require('../js/jsFlashBridge.js').JSFlashBridge.VPAID_FLASH_HANDLER;
-let VPAIDCreative = require('../js/VPAIDCreative.js').VPAIDCreative;
+let VPAIDAdUnit = require('../js/VPAIDAdUnit.js').VPAIDAdUnit;
 let after = require('./testHelper.js').after;
 let addFlashMethodsToEl = require('./testHelper.js').addFlashMethodsToEl;
 
@@ -92,7 +92,7 @@ describe('flashVPAID.js api', function()  {
 
             let callback = sinon.spy(function (error, result) {
                 assert(callback.calledOnce);
-                assert.instanceOf(result, VPAIDCreative, 'callback result must return a creative');
+                assert.instanceOf(result, VPAIDAdUnit, 'callback result must return a adUnit');
                 done();
             });
 
@@ -104,7 +104,7 @@ describe('flashVPAID.js api', function()  {
     it('must get the volume', function (done) {
 
         let flashVPAID = new VPAIDFlashToJS(flashWrapper1, function () {
-            flashVPAID.loadAdUnit('random.swf', function (error, creative) {
+            flashVPAID.loadAdUnit('random.swf', function (error, adUnit) {
 
                 sinon.stub(flashVPAID.el, 'getAdVolume', function (argsData) {
                     let callBackID = argsData[0];
@@ -117,7 +117,7 @@ describe('flashVPAID.js api', function()  {
                     done();
                 });
 
-                creative.getAdVolume(callback);
+                adUnit.getAdVolume(callback);
             });
         });
     });
@@ -125,7 +125,7 @@ describe('flashVPAID.js api', function()  {
     it('must set the volume', function (done) {
 
         let flashVPAID = new VPAIDFlashToJS(flashWrapper1, function () {
-            flashVPAID.loadAdUnit('random.swf', function (error, creative) {
+            flashVPAID.loadAdUnit('random.swf', function (error, adUnit) {
 
                 sinon.stub(flashVPAID.el, 'setAdVolume', function (argsData) {
                     window[VPAID_FLASH_HANDLER].apply(null, [flashVPAID.getFlashID(), 'method', 'setAdVolume'].concat(argsData));
@@ -137,7 +137,7 @@ describe('flashVPAID.js api', function()  {
                     done();
                 });
 
-                creative.setAdVolume(.5, callback);
+                adUnit.setAdVolume(.5, callback);
               done();
             });
         });
@@ -158,7 +158,7 @@ describe('flashVPAID.js api', function()  {
             it('must get ' + method, function (done) {
 
                 let flashVPAID = new VPAIDFlashToJS(flashWrapper1, function () {
-                    flashVPAID.loadAdUnit('random.swf', function (error, creative) {
+                    flashVPAID.loadAdUnit('random.swf', function (error, adUnit) {
 
                         let callback1, callback2, elCounter = 0;
 
@@ -177,8 +177,8 @@ describe('flashVPAID.js api', function()  {
                         callback1 = sinon.spy(counter);
                         callback2 = sinon.spy(counter);
 
-                        creative[method](callback1);
-                        creative[method](callback2);
+                        adUnit[method](callback1);
+                        adUnit[method](callback2);
 
                       done();
                     });

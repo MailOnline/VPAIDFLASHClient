@@ -1,5 +1,5 @@
 //simple representation of the API
-export class IVPAIDCreative {
+export class IVPAIDAdUnit {
 
     //all methods below
     //are async methods
@@ -31,7 +31,7 @@ export class IVPAIDCreative {
     adIcons(callback) {}
 }
 
-Object.defineProperty(IVPAIDCreative, 'EVENTS', {
+Object.defineProperty(IVPAIDAdUnit, 'EVENTS', {
     writable: false,
     configurable: false,
     value: [

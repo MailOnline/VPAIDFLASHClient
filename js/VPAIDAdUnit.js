@@ -1,6 +1,6 @@
-let IVPAIDCreative = require('./IVPAIDCreative').IVPAIDCreative;
+let IVPAIDAdUnit = require('./IVPAIDAdUnit').IVPAIDAdUnit;
 
-export class VPAIDCreative extends IVPAIDCreative {
+export class VPAIDAdUnit extends IVPAIDAdUnit {
     constructor (flash) {
         super();
         this._flash = flash;

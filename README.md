@@ -72,47 +72,47 @@ function flashVPAIDWrapperLoaded(err, result) {
         return;
     }
 
-    flashVPaid.loadAdUnit('TestAd.swf', function (error, creative) {
+    flashVPaid.loadAdUnit('TestAd.swf', function (error, adUnit) {
 
         if (err) {
             //handle error here
             return;
         }
 
-        creative.on('AdLoaded', function (err, result) {
+        adUnit.on('AdLoaded', function (err, result) {
             console.log('event:AdLoaded', err, result);
             startAd();
         });
 
-        creative.on('AdStarted', function (err, result) {
+        adUnit.on('AdStarted', function (err, result) {
             console.log('event:AdStarted', err, result);
             checkAdProperties();
         });
 
-        creative.handshakeVersion('2.0', function (err, result) {
+        adUnit.handshakeVersion('2.0', function (err, result) {
             initAd();
         });
 
         function initAd() {
-            creative.initAd('normal', -1, 0, 0, '', '', function (err) {
+            adUnit.initAd('normal', -1, 0, 0, '', '', function (err) {
                 console.log('initAd', err);
             });
         }
 
         function startAd() {
-            creative.startAd(function (err, result) {
+            adUnit.startAd(function (err, result) {
                 console.log('startAd call', err, result);
             });
         }
 
         function checkAdProperties() {
-            creative.adIcons(function (err, result) {
+            adUnit.adIcons(function (err, result) {
                 console.log('adIcons', result);
             });
-            creative.setAdVolume(10, function (err, result) {
+            adUnit.setAdVolume(10, function (err, result) {
                 console.log('setAdVolume', result);
             });
-            creative.getAdVolume(function (err, result) {
+            adUnit.getAdVolume(function (err, result) {
                 console.log('getAdVolume', result);
             });
         }
@@ -121,5 +121,5 @@ function flashVPAIDWrapperLoaded(err, result) {
 }
 ```
 
-for the api of VPAIDFlashToJS check [VPAIDFlashToJS.js](js/flashVPAID.js), for creative api check [IVPAID.js](js/IVPAID.js).
+for the api of VPAIDFlashToJS check [VPAIDFlashToJS.js](js/flashVPAID.js), for adUnit api check [IVPAIDAdUnit.js](js/IVPAIDAdUnit.js).
 

@@ -10,7 +10,7 @@ var VPAIDFlashToJS = (function () {
     if (window.VPAIDFlashToJS) return;
 
     var JSFlashBridge = require('./jsFlashBridge').JSFlashBridge;
-    var VPAIDCreative = require('./VPAIDCreative').VPAIDCreative;
+    var VPAIDAdUnit = require('./VPAIDAdUnit').VPAIDAdUnit;
 
     var noop = require('./utils').noop;
     var isPositiveInt = require('./utils').isPositiveInt;
@@ -56,7 +56,7 @@ var VPAIDFlashToJS = (function () {
                 this._flash.destroy();
                 this._flash = null;
                 this.el = null;
-                this._creativeLoad = null;
+                this._adUnitLoad = null;
                 this._destroyed = true;
             }
         }, {
@@ -69,34 +69,34 @@ var VPAIDFlashToJS = (function () {
             value: function loadAdUnit(adURL, callback) {
                 var _this = this;
 
-                if (this._creative) {
-                    throw new error('creative still exists');
+                if (this._adUnit) {
+                    throw new error('AdUnit still exists');
                 }
 
-                this._creativeLoad = function (err, message) {
+                this._adUnitLoad = function (err, message) {
                     if (!err) {
-                        _this._creative = new VPAIDCreative(_this._flash);
+                        _this._adUnit = new VPAIDAdUnit(_this._flash);
                     }
-                    _this._creativeLoad = null;
-                    callback(err, _this._creative);
+                    _this._adUnitLoad = null;
+                    callback(err, _this._adUnit);
                 };
 
-                this._flash.callFlashMethod('loadAdUnit', [adURL], this._creativeLoad);
+                this._flash.callFlashMethod('loadAdUnit', [adURL], this._adUnitLoad);
             }
         }, {
             key: 'unloadAdUnit',
             value: function unloadAdUnit() {
                 var callback = arguments[0] === undefined ? undefined : arguments[0];
 
-                if (!this._creative) {
-                    throw new Error('Can\'t unload a creative that doesn\'t exist');
+                if (!this._adUnit) {
+                    throw new Error('Can\'t unload a adUnit that doesn\'t exist');
                 }
 
-                this._creative = null;
+                this._adUnit = null;
 
-                if (this._creativeLoad) {
-                    this._flash.removeCallback(this._creativeLoad);
-                    this._creativeLoad = null;
+                if (this._adUnitLoad) {
+                    this._flash.removeCallback(this._adUnitLoad);
+                    this._adUnitLoad = null;
                 }
 
                 this._flash.callFlashMethod('unloadAdUnit', [], callback);
@@ -123,7 +123,7 @@ var VPAIDFlashToJS = (function () {
 
 module.exports = VPAIDFlashToJS;
 
-},{"./VPAIDCreative":3,"./jsFlashBridge":4,"./utils":7}],2:[function(require,module,exports){
+},{"./VPAIDAdUnit":3,"./jsFlashBridge":4,"./utils":7}],2:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -136,12 +136,12 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 //simple representation of the API
 
-var IVPAIDCreative = (function () {
-    function IVPAIDCreative() {
-        _classCallCheck(this, IVPAIDCreative);
+var IVPAIDAdUnit = (function () {
+    function IVPAIDAdUnit() {
+        _classCallCheck(this, IVPAIDAdUnit);
     }
 
-    _createClass(IVPAIDCreative, [{
+    _createClass(IVPAIDAdUnit, [{
         key: 'handshakeVersion',
 
         //all methods below
@@ -240,12 +240,12 @@ var IVPAIDCreative = (function () {
         value: function adIcons(callback) {}
     }]);
 
-    return IVPAIDCreative;
+    return IVPAIDAdUnit;
 })();
 
-exports.IVPAIDCreative = IVPAIDCreative;
+exports.IVPAIDAdUnit = IVPAIDAdUnit;
 
-Object.defineProperty(IVPAIDCreative, 'EVENTS', {
+Object.defineProperty(IVPAIDAdUnit, 'EVENTS', {
     writable: false,
     configurable: false,
     value: ['AdLoaded', 'AdStarted', 'AdStopped', 'AdSkipped', 'AdSkippableStateChange', 'AdSizeChange', 'AdLinearChange', 'AdDurationChange', 'AdExpandedChange', 'AdRemainingTimeChange', // [Deprecated in 2.0] but will be still fired for backwards compatibility
@@ -269,19 +269,19 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; }
 
-var IVPAIDCreative = require('./IVPAIDCreative').IVPAIDCreative;
+var IVPAIDAdUnit = require('./IVPAIDAdUnit').IVPAIDAdUnit;
 
-var VPAIDCreative = (function (_IVPAIDCreative) {
-    function VPAIDCreative(flash) {
-        _classCallCheck(this, VPAIDCreative);
+var VPAIDAdUnit = (function (_IVPAIDAdUnit) {
+    function VPAIDAdUnit(flash) {
+        _classCallCheck(this, VPAIDAdUnit);
 
-        _get(Object.getPrototypeOf(VPAIDCreative.prototype), 'constructor', this).call(this);
+        _get(Object.getPrototypeOf(VPAIDAdUnit.prototype), 'constructor', this).call(this);
         this._flash = flash;
     }
 
-    _inherits(VPAIDCreative, _IVPAIDCreative);
+    _inherits(VPAIDAdUnit, _IVPAIDAdUnit);
 
-    _createClass(VPAIDCreative, [{
+    _createClass(VPAIDAdUnit, [{
         key: 'on',
         value: function on(eventName, callback) {
             this._flash.on(eventName, callback);
@@ -436,12 +436,12 @@ var VPAIDCreative = (function (_IVPAIDCreative) {
         }
     }]);
 
-    return VPAIDCreative;
-})(IVPAIDCreative);
+    return VPAIDAdUnit;
+})(IVPAIDAdUnit);
 
-exports.VPAIDCreative = VPAIDCreative;
+exports.VPAIDAdUnit = VPAIDAdUnit;
 
-},{"./IVPAIDCreative":2}],4:[function(require,module,exports){
+},{"./IVPAIDAdUnit":2}],4:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {

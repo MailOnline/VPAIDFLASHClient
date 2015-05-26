@@ -1,6 +1,6 @@
-let IVPAIDCreative = require('../js/IVPAIDCreative.js').IVPAIDCreative;
+let IVPAIDAdUnit = require('../js/IVPAIDAdUnit.js').IVPAIDAdUnit;
 const VPAID_FLASH_HANDLER = require('../js/jsFlashBridge.js').JSFlashBridge.VPAID_FLASH_HANDLER;
-const ALL_VPAID_METHODS = ['loadAdUnit', 'unloadAdUnit'].concat(Object.getOwnPropertyNames(IVPAIDCreative.prototype).filter(function (property) {
+const ALL_VPAID_METHODS = ['loadAdUnit', 'unloadAdUnit'].concat(Object.getOwnPropertyNames(IVPAIDAdUnit.prototype).filter(function (property) {
     return ['constructor'].indexOf(property) === -1;
 }));
 

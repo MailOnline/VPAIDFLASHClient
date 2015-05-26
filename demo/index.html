@@ -18,13 +18,13 @@
                 //var adURL = 'VPAIDIRollPackage.swf?configURL=http%3A%2F%2Fstatic.innovid.com%2Firoll%2Fconfig%2F1hl7lc.xml%3Fcb%3D787766d7-ebab-3656-c24f-0ddebab645e9&secure=false';
                 //var adURL = 'TestAd.swf';
                 var adURL = 'http://cdn-sys.brainient.com/flash/v6/select846.swf?video_id=a3f30b8e-2ad8-4123-bc58-42fccb3e48cd&user_id=1228&tzone=&settings=json&settingsPath=http://cdn-tags.brainient.com/1228/a3f30b8e-2ad8-4123-bc58-42fccb3e48cd/config.json';
-                flashVPaid.loadAdUnit(adURL, function (error, creative) {
+                flashVPaid.loadAdUnit(adURL, function (error, adUnit) {
                     if (error) return;
 
-                    creative.handshakeVersion('2.0', initAd);
-                    creative.on('AdLoaded', startAd);
+                    adUnit.handshakeVersion('2.0', initAd);
+                    adUnit.on('AdLoaded', startAd);
 
-                    creative.on('AdStarted', function (err, result) {
+                    adUnit.on('AdStarted', function (err, result) {
                         console.log('event:AdStarted', err, result);
                         checkAdProperties();
                     });
@@ -33,26 +33,26 @@
 
                     function initAd(err, result) {
                         console.log('handShake', err, result);
-                        creative.initAd('normal', -1, 0, 0, '', '', function (err) {
+                        adUnit.initAd('normal', -1, 0, 0, '', '', function (err) {
                             console.log('initAd', err);
                         });
                     }
 
                     function startAd(err, result) {
                         console.log('event:AdLoaded', err, result);
-                        creative.startAd(function (err, result) {
+                        adUnit.startAd(function (err, result) {
                             console.log('startAd call', err, result);
                         });
                     }
 
                     function checkAdProperties() {
-                        creative.adIcons(function (err, result) {
+                        adUnit.adIcons(function (err, result) {
                             console.log('adIcons', result);
                         });
-                        creative.setAdVolume(10, function (err, result) {
+                        adUnit.setAdVolume(10, function (err, result) {
                             console.log('setAdVolume', result);
                         });
-                        creative.getAdVolume(function (err, result) {
+                        adUnit.getAdVolume(function (err, result) {
                             console.log('getAdVolume', result);
                         });
                     }
