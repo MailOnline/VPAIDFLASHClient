@@ -710,8 +710,8 @@ var MultipleValuesRegistry = (function () {
             return this._registries[id] || [];
         }
     }, {
-        key: "findValueKeys",
-        value: function findValueKeys(value) {
+        key: "findByValue",
+        value: function findByValue(value) {
             //TODO: check if keys and find is added to the browser with babeljs
             var keys = Object.keys(this._registries).filter(function (key) {
                 return this._registries[key].indexOf(value) !== -1;
@@ -743,7 +743,7 @@ var MultipleValuesRegistry = (function () {
     }, {
         key: "removeByValue",
         value: function removeByValue(value) {
-            var keys = this._findValueKeys(value);
+            var keys = this.findByValue(value);
             return keys.map(function (key) {
                 return this.destroy(key, value);
             });
@@ -785,8 +785,8 @@ var SingleValueRegistry = (function () {
             return this._registries[id];
         }
     }, {
-        key: "findValueKeys",
-        value: function findValueKeys(value) {
+        key: "findByValue",
+        value: function findByValue(value) {
             //TODO: check if keys and find is added to the browser with babeljs
             var key = Object.keys(this._registries).filter(function (key) {
                 return this._registries[key] === value;
@@ -804,7 +804,7 @@ var SingleValueRegistry = (function () {
     }, {
         key: "removeByValue",
         value: function removeByValue(value) {
-            var keys = this._findValueKeys(value);
+            var keys = this.findByValue(value);
             return keys.map(function (key) {
                 return this.destroy(key);
             });
