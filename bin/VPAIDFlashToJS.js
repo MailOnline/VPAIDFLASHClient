@@ -460,8 +460,6 @@ var registry = require('./jsFlashBridgeRegistry');
 var VPAID_FLASH_HANDLER = 'vpaid_video_flash_handler';
 var ERROR = 'error';
 
-var instances = {};
-
 var JSFlashBridge = (function () {
     function JSFlashBridge(el, flashURL, flashID, width, height, loadHandShake) {
         _classCallCheck(this, JSFlashBridge);

@@ -6,8 +6,6 @@ const registry = require('./jsFlashBridgeRegistry');
 const VPAID_FLASH_HANDLER = 'vpaid_video_flash_handler';
 const ERROR = 'error';
 
-let instances = {};
-
 export class JSFlashBridge {
     constructor (el, flashURL, flashID, width, height, loadHandShake) {
         this._el = el;
