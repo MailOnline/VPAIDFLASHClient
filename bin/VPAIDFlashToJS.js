@@ -23,8 +23,8 @@ var VPAIDFlashToJS = (function () {
         function VPAIDFlashToJS(vpaidParentEl, callback) {
             var swfConfig = arguments[2] === undefined ? { data: 'VPAIDFlash.swf', width: 800, height: 400 } : arguments[2];
             var version = arguments[3] === undefined ? '9' : arguments[3];
-            var params = arguments[4] === undefined ? { wmode: 'transparent', salign: 'tl', allowScriptAccess: 'always' } : arguments[4];
-            var debug = arguments[5] === undefined ? true : arguments[5];
+            var params = arguments[4] === undefined ? { wmode: 'transparent', salign: 'TL', align: 'TL', allowScriptAccess: 'always', scale: 'noScale', allowFullScreen: 'true', quality: 'high' } : arguments[4];
+            var debug = arguments[5] === undefined ? false : arguments[5];
 
             _classCallCheck(this, VPAIDFlashToJS);
 

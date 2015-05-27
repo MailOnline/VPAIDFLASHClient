@@ -13,7 +13,8 @@ let uniqueVPAID = require('./utils').unique('vpaid');
 const ERROR = 'error';
 
 class VPAIDFlashToJS {
-    constructor (vpaidParentEl, callback, swfConfig = {data: 'VPAIDFlash.swf', width: 800, height: 400}, version = '9', params = { wmode: 'transparent', salign: 'tl', allowScriptAccess: 'always'}, debug = true) {
+    constructor (vpaidParentEl, callback, swfConfig = {data: 'VPAIDFlash.swf', width: 800, height: 400}, version = '9', params = { wmode: 'transparent', salign: 'TL', align: 'TL', allowScriptAccess: 'always', scale: 'noScale', allowFullScreen: 'true', quality: 'high'}, debug = false) {
+
         if (!swfobject) throw new Error('no swfobject in global scope. check: https://github.com/swfobject/swfobject or https://code.google.com/p/swfobject/');
 
         this._vpaidParentEl = vpaidParentEl;
