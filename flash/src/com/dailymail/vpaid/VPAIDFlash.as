@@ -35,6 +35,7 @@ package com.dailymail.vpaid
 			var paramObj:Object = LoaderInfo(this.root.loaderInfo).parameters;
 			jsHandler = paramObj.handler;
 			flashID = paramObj.flashid;
+			stage.align = paramObj.salign || stage.align;
 			
 			if (paramObj.debug !== 'false') {
 				debugMode();

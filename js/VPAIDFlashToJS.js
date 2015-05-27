@@ -13,7 +13,7 @@ let uniqueVPAID = require('./utils').unique('vpaid');
 const ERROR = 'error';
 
 class VPAIDFlashToJS {
-    constructor (vpaidParentEl, callback, swfConfig = {data: 'VPAIDFlash.swf', width: 800, height: 400}, version = '9', params = { wmode: 'transparent', salign: 'TL', align: 'TL', allowScriptAccess: 'always', scale: 'noScale', allowFullScreen: 'true', quality: 'high'}, debug = false) {
+    constructor (vpaidParentEl, callback, swfConfig = {data: 'VPAIDFlash.swf', width: 800, height: 400}, version = '9', params = { wmode: 'transparent', salign: 'tl', align: 'left', allowScriptAccess: 'always', scale: 'noScale', allowFullScreen: 'true', quality: 'high'}, debug = false) {
 
         if (!swfobject) throw new Error('no swfobject in global scope. check: https://github.com/swfobject/swfobject or https://code.google.com/p/swfobject/');
 
@@ -29,7 +29,7 @@ class VPAIDFlashToJS {
         createElementWithID(vpaidParentEl, this._flashID);
 
         params.movie = swfConfig.data;
-        params.FlashVars = `flashid=${this._flashID}&handler=${JSFlashBridge.VPAID_FLASH_HANDLER}&debug=${debug}`;
+        params.FlashVars = `flashid=${this._flashID}&handler=${JSFlashBridge.VPAID_FLASH_HANDLER}&debug=${debug}&salign=${params.salign}`;
 
         if (swfobject.hasFlashPlayerVersion(version)) {
             this.el = swfobject.createSWF(swfConfig, params, this._flashID);
