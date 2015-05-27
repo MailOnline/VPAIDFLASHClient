@@ -11,7 +11,7 @@ export class VPAIDAdUnit extends IVPAIDAdUnit {
     }
 
     off(eventName, callback) {
-        this._flash.on(eventName, callback);
+        this._flash.off(eventName, callback);
     }
 
     //VPAID interface

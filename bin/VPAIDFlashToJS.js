@@ -289,7 +289,7 @@ var VPAIDAdUnit = (function (_IVPAIDAdUnit) {
     }, {
         key: 'off',
         value: function off(eventName, callback) {
-            this._flash.on(eventName, callback);
+            this._flash.off(eventName, callback);
         }
     }, {
         key: 'handshakeVersion',
