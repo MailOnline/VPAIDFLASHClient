@@ -56,6 +56,7 @@ var VPAIDFlashToJS = (function () {
                 this._flash.destroy();
                 this._flash = null;
                 this.el = null;
+                this._adUnitLoad._destroy();
                 this._adUnitLoad = null;
                 this._destroyed = true;
             }
@@ -92,12 +93,13 @@ var VPAIDFlashToJS = (function () {
                     throw new Error('Can\'t unload a adUnit that doesn\'t exist');
                 }
 
-                this._adUnit = null;
-
                 if (this._adUnitLoad) {
-                    this._flash.removeCallback(this._adUnitLoad);
                     this._adUnitLoad = null;
+                    this._flash.removeCallback(this._adUnitLoad);
                 }
+
+                this._adUnit._destroy();
+                this._adUnit = null;
 
                 this._flash.callFlashMethod('unloadAdUnit', [], callback);
             }
@@ -270,6 +272,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; }
 
 var IVPAIDAdUnit = require('./IVPAIDAdUnit').IVPAIDAdUnit;
+var ALL_VPAID_METHODS = Object.getOwnPropertyNames(IVPAIDAdUnit.prototype).filter(function (property) {
+    return ['constructor'].indexOf(property) === -1;
+});
 
 var VPAIDAdUnit = (function (_IVPAIDAdUnit) {
     function VPAIDAdUnit(flash) {
@@ -282,6 +287,18 @@ var VPAIDAdUnit = (function (_IVPAIDAdUnit) {
     _inherits(VPAIDAdUnit, _IVPAIDAdUnit);
 
     _createClass(VPAIDAdUnit, [{
+        key: '_destroy',
+        value: function _destroy() {
+            var _this2 = this;
+
+            ALL_VPAID_METHODS.forEach(function (methodName) {
+                _this2._flash.removeCallbackByMethodName(methodName);
+            });
+            IVPAIDAdUnit.EVENTS.forEach(function (event) {
+                _this2._flash.offEvent(event);
+            });
+        }
+    }, {
         key: 'on',
         value: function on(eventName, callback) {
             this._flash.on(eventName, callback);
@@ -506,7 +523,7 @@ var JSFlashBridge = (function () {
             var callbackID = '';
             // if no callback, some methods the return is void so they don't need callback
             if (callback) {
-                var callbackID = this._uniqueMethodIdentifier();
+                var callbackID = '' + this._uniqueMethodIdentifier() + '_' + methodName;
                 this._callbacks.add(callbackID, callback);
             }
 
@@ -526,6 +543,22 @@ var JSFlashBridge = (function () {
                     this._trigger(ERROR, [e]);
                 }
             }
+        }
+    }, {
+        key: 'removeCallback',
+        value: function removeCallback(callback) {
+            return this._callbacks.removeByValue(callback);
+        }
+    }, {
+        key: 'removeCallbackByMethodName',
+        value: function removeCallbackByMethodName(suffix) {
+            var _this = this;
+
+            this._callbacks.filterKeys(function (key) {
+                return key.endsWith(suffix);
+            }).forEach(function (key) {
+                _this._callbacks.remove(key);
+            });
         }
     }, {
         key: 'removeAllCallbacks',
@@ -550,8 +583,10 @@ var JSFlashBridge = (function () {
 
             //not all methods callback's are mandatory
             //but if there exist an error, fire the error event
-            if (err && (callbackID === '' || !callback)) {
-                this.trigger(ERROR, err, result);
+            if (!callback) {
+                if (err && callbackID === '') {
+                    this.trigger(ERROR, err, result);
+                }
                 return;
             }
 
@@ -710,6 +745,11 @@ var MultipleValuesRegistry = (function () {
             return this._registries[id] || [];
         }
     }, {
+        key: "filterKeys",
+        value: function filterKeys(handler) {
+            return Object.keys(this._registries).filter(handler);
+        }
+    }, {
         key: "findByValue",
         value: function findByValue(value) {
             var _this = this;
@@ -787,6 +827,11 @@ var SingleValueRegistry = (function () {
         key: "get",
         value: function get(id) {
             return this._registries[id];
+        }
+    }, {
+        key: "filterKeys",
+        value: function filterKeys(handler) {
+            return Object.keys(this._registries).filter(handler);
         }
     }, {
         key: "findByValue",

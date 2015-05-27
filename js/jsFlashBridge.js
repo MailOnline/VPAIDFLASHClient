@@ -41,7 +41,7 @@ export class JSFlashBridge {
         var callbackID = '';
         // if no callback, some methods the return is void so they don't need callback
         if (callback) {
-            var callbackID = this._uniqueMethodIdentifier();
+            var callbackID = `${this._uniqueMethodIdentifier()}_${methodName}`;
             this._callbacks.add(callbackID, callback);
         }
 
@@ -65,6 +65,18 @@ export class JSFlashBridge {
         }
     }
 
+    removeCallback(callback) {
+        return this._callbacks.removeByValue(callback);
+    }
+
+    removeCallbackByMethodName(suffix) {
+        this._callbacks.filterKeys((key) => {
+            return key.endsWith(suffix);
+        }).forEach((key) => {
+            this._callbacks.remove(key);
+        });
+    }
+
     removeAllCallbacks() {
         return this._callbacks.removeAll();
     }
@@ -84,8 +96,10 @@ export class JSFlashBridge {
 
         //not all methods callback's are mandatory
         //but if there exist an error, fire the error event
-        if (err && (callbackID === '' || !callback)) {
-            this.trigger(ERROR, err, result);
+        if (!callback) {
+            if (err && callbackID === '') {
+                this.trigger(ERROR, err, result);
+            }
             return;
         }
 

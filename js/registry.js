@@ -13,6 +13,9 @@ export class MultipleValuesRegistry {
     get (id) {
         return this._registries[id] || [];
     }
+    filterKeys (handler) {
+        return Object.keys(this._registries).filter(handler);
+    }
     findByValue (value) {
         //TODO: check if keys and find is added to the browser with babeljs
         var keys = Object.keys(this._registries).filter((key) => {
@@ -59,6 +62,9 @@ export class SingleValueRegistry {
     }
     get (id) {
         return this._registries[id];
+    }
+    filterKeys (handler) {
+        return Object.keys(this._registries).filter(handler);
     }
     findByValue (value) {
         //TODO: check if keys is added to the browser with babeljs

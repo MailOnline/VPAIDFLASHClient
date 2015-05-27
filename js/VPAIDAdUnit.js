@@ -1,9 +1,21 @@
 let IVPAIDAdUnit = require('./IVPAIDAdUnit').IVPAIDAdUnit;
+let ALL_VPAID_METHODS = Object.getOwnPropertyNames(IVPAIDAdUnit.prototype).filter(function (property) {
+    return ['constructor'].indexOf(property) === -1;
+});
 
 export class VPAIDAdUnit extends IVPAIDAdUnit {
     constructor (flash) {
         super();
         this._flash = flash;
+    }
+
+    _destroy() {
+        ALL_VPAID_METHODS.forEach((methodName) => {
+            this._flash.removeCallbackByMethodName(methodName);
+        });
+        IVPAIDAdUnit.EVENTS.forEach((event) => {
+            this._flash.offEvent(event);
+        });
     }
 
     on(eventName, callback) {

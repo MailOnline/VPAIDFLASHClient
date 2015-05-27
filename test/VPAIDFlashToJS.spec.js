@@ -101,6 +101,44 @@ describe('flashVPAID.js api', function()  {
         });
     });
 
+
+    it('must unload adUnit', function (done) {
+
+        let flashVPAID = new VPAIDFlashToJS(flashWrapper1, function () {
+
+            let callback = sinon.spy(function (error, result) {
+                done();
+            });
+
+            flashVPAID.loadAdUnit('random.swf', function (erro, adUnit) {
+
+                [
+                    'adLinear',
+                    'adExpanded'
+                ].forEach(function (methodName) {
+                    sinon.stub(flashVPAID.el, methodName, function (argsData) {
+                        setTimeout( function () {
+                            window[VPAID_FLASH_HANDLER](flashVPAID.getFlashID(), 'method', methodName, argsData[0], null, true);
+                        }, 0);
+                    });
+                    adUnit[methodName](noop);
+                });
+
+                adUnit.on('AdSizeChange', noop);
+                adUnit.on('AdPaused', noop);
+
+                assert.equal(flashVPAID._flash._callbacks.size(), 2);
+                assert.equal(flashVPAID._flash._handlers.size(), 2);
+
+                flashVPAID.unloadAdUnit();
+                assert.equal(flashVPAID._flash._callbacks.size(), 0, 'must remove all callbacks of adUnit');
+                assert.equal(flashVPAID._flash._handlers.size(), 0, 'must remove all adUnit events');
+                done();
+            });
+
+        });
+    });
+
     it('must get the volume', function (done) {
 
         let flashVPAID = new VPAIDFlashToJS(flashWrapper1, function () {
