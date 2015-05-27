@@ -712,9 +712,11 @@ var MultipleValuesRegistry = (function () {
     }, {
         key: "findByValue",
         value: function findByValue(value) {
+            var _this = this;
+
             //TODO: check if keys and find is added to the browser with babeljs
             var keys = Object.keys(this._registries).filter(function (key) {
-                return this._registries[key].indexOf(value) !== -1;
+                return _this._registries[key].indexOf(value) !== -1;
             });
 
             return keys;
@@ -743,9 +745,11 @@ var MultipleValuesRegistry = (function () {
     }, {
         key: "removeByValue",
         value: function removeByValue(value) {
+            var _this2 = this;
+
             var keys = this.findByValue(value);
             return keys.map(function (key) {
-                return this.destroy(key, value);
+                return _this2.remove(key, value);
             });
         }
     }, {
@@ -787,12 +791,14 @@ var SingleValueRegistry = (function () {
     }, {
         key: "findByValue",
         value: function findByValue(value) {
-            //TODO: check if keys and find is added to the browser with babeljs
-            var key = Object.keys(this._registries).filter(function (key) {
-                return this._registries[key] === value;
+            var _this3 = this;
+
+            //TODO: check if keys is added to the browser with babeljs
+            var keys = Object.keys(this._registries).filter(function (key) {
+                return _this3._registries[key] === value;
             });
 
-            return key;
+            return keys;
         }
     }, {
         key: "remove",
@@ -804,9 +810,11 @@ var SingleValueRegistry = (function () {
     }, {
         key: "removeByValue",
         value: function removeByValue(value) {
+            var _this4 = this;
+
             var keys = this.findByValue(value);
             return keys.map(function (key) {
-                return this.destroy(key);
+                return _this4.remove(key);
             });
         }
     }, {

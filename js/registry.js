@@ -15,7 +15,7 @@ export class MultipleValuesRegistry {
     }
     findByValue (value) {
         //TODO: check if keys and find is added to the browser with babeljs
-        var keys = Object.keys(this._registries).filter(function (key) {
+        var keys = Object.keys(this._registries).filter((key) => {
             return this._registries[key].indexOf(value) !== -1;
         });
 
@@ -36,8 +36,8 @@ export class MultipleValuesRegistry {
     }
     removeByValue (value) {
         let keys = this.findByValue(value);
-        return keys.map(function (key) {
-            return this.destroy(key, value);
+        return keys.map((key) => {
+            return this.remove(key, value);
         });
     }
     removeAll() {
@@ -61,12 +61,12 @@ export class SingleValueRegistry {
         return this._registries[id];
     }
     findByValue (value) {
-        //TODO: check if keys and find is added to the browser with babeljs
-        var key = Object.keys(this._registries).filter(function (key) {
+        //TODO: check if keys is added to the browser with babeljs
+        var keys = Object.keys(this._registries).filter((key) => {
             return this._registries[key] === value;
         });
 
-        return key;
+        return keys;
     }
     remove (id) {
         let old = this._registries[id];
@@ -75,8 +75,8 @@ export class SingleValueRegistry {
     }
     removeByValue (value) {
         let keys = this.findByValue(value);
-        return keys.map(function (key) {
-            return this.destroy(key);
+        return keys.map((key) => {
+            return this.remove(key);
         });
     }
     removeAll() {
