@@ -6,7 +6,7 @@ export class IVPAIDAdUnit {
     handshakeVersion(playerVPAIDVersion = '2.0', callback = undefined) {}
 
     //width and height is not in the beginning because we will use the default width/height used in the constructor
-    initAd (viewMode, desiredBitrate, width = 0, height = 0, creativeData = '', environmentVars = '', callback = undefined) {}
+    initAd (width, height, viewMode, desiredBitrate, creativeData = '', environmentVars = '', callback = undefined) {}
     resizeAd(width, height, viewMode, callback = undefined) {}
 
     startAd(callback = undefined) {}

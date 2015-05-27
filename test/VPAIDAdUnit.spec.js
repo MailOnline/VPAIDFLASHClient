@@ -34,7 +34,7 @@ describe('VPAIDAdUnit.js api', function() {
 
     it('must implement initAd', function () {
         let flashMethod = sinon.stub(flash, 'callFlashMethod');
-        adUnit.initAd('thumbnail', -1, 100, 200, '', '', noop);
+        adUnit.initAd(100, 200, 'thumbnail', -1, '', '', noop);
         assert(flashMethod.calledWith('initAd', [100, 200, 'thumbnail', -1, '', ''], noop));
         assert.equal(el.getAttribute('width'), '100');
         assert.equal(el.getAttribute('height'), '200');

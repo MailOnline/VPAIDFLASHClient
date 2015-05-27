@@ -94,7 +94,7 @@ function flashVPAIDWrapperLoaded(err, result) {
         });
 
         function initAd() {
-            adUnit.initAd('normal', -1, 0, 0, '', '', function (err) {
+            adUnit.initAd(0, 0, 'normal', -1, '', '', function (err) {
                 console.log('initAd', err);
             });
         }
