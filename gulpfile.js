@@ -82,7 +82,7 @@ function mvFiles(cfg, done) {
 
 
 //watch file changes
-gulp.task('watch', function() {
+gulp.task('watch:demo', function() {
     jsBuild.on('update', bundle);
     gulp.watch(['demo/*.html', 'demo/*.css'], reload);
     gulp.watch([binPath + '/*.js'], ['test'], reload);
@@ -91,8 +91,16 @@ gulp.task('watch', function() {
 });
 
 
+//watch file changes
+gulp.task('watch:test', function() {
+    jsBuild.on('update', bundle);
+    gulp.watch(['test/*.js'], ['test']);
+    gulp.watch(['flash/bin-debug/*.swf'], ['copy:flash', 'test']);
+});
+
+
 //create the static server
-gulp.task('serve', ['browserify', 'copy:flash', 'watch'], function () {
+gulp.task('serve', ['browserify', 'copy:flash', 'watch:demo'], function () {
     browserSync({
         server: {
             baseDir: ['demo', binPath],
@@ -104,5 +112,5 @@ gulp.task('serve', ['browserify', 'copy:flash', 'watch'], function () {
     });
 });
 
-gulp.task('default', ['test', 'browserify']);
+gulp.task('default', ['test', 'browserify', 'watch:test']);
 
