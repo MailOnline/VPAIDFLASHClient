@@ -90,7 +90,7 @@ class VPAIDFlashToJS {
         if (this._destroyed) {
             throw new error('VPAIDFlashToJS is destroyed!');
         }
-        if (!this._adUnit) {
+        if (!this._adUnit && !this._adUnitLoad) {
             throw new Error("Can't unload a adUnit that doesn't exist");
         }
 
@@ -99,8 +99,10 @@ class VPAIDFlashToJS {
             this._flash.removeCallback(this._adUnitLoad);
         }
 
-        this._adUnit._destroy();
-        this._adUnit = null;
+        if (this._adUnit) {
+            this._adUnit._destroy();
+            this._adUnit = null;
+        }
 
         this._flash.callFlashMethod('unloadAdUnit', [], callback);
     }

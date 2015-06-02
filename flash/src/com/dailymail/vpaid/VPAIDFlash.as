@@ -103,13 +103,23 @@ package com.dailymail.vpaid
 			callInterface('method', 'loadAdUnit', callID, evt, true);
 		}
 		
-		private function unloadAdUnit(callID:String, evt:Event):void {
-			VPAIDEvent.ALL_EVENTS.forEach(function (event:*, index:int, arr:Array):void {
-				vpaidWrapper.removeEventListener(event, dispatchEvent);
-			});
-			removeChild(adContent);
-			adContent = null;
-			vpaidWrapper = null;
+		private function unloadAdUnit(callID:String):void {
+			//if is still being loaded
+			var loadItem:LoadingItem = adLoader.get(adURL);
+			if (loadItem) {
+				loadItem.cleanListeners();
+				loadItem.destroy();
+			}
+
+			//if is already loaded
+			if (vpaidWrapper) {
+				VPAIDEvent.ALL_EVENTS.forEach(function (event:*, index:int, arr:Array):void {
+					vpaidWrapper.removeEventListener(event, dispatchEvent);
+				});
+				removeChild(adContent);
+				adContent = null;
+				vpaidWrapper = null;
+			}
 			callInterface('method', 'unloadAdUnit', callID, null, true);
 		}
 		
