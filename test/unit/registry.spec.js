@@ -1,5 +1,5 @@
-let SingleValueRegistry = require('../js/registry.js').SingleValueRegistry;
-let MultipleValuesRegistry = require('../js/registry.js').MultipleValuesRegistry;
+let SingleValueRegistry = require('../../js/registry.js').SingleValueRegistry;
+let MultipleValuesRegistry = require('../../js/registry.js').MultipleValuesRegistry;
 
 describe('registry.js SingleValueRegistry', function()  {
     let registry;

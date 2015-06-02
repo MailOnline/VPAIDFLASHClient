@@ -11,7 +11,9 @@ module.exports = function (karma) {
     files: [
         'bower_components/swfobject/swfobject/src/swfobject.js',
         'js/**/*.js',
-        'test/*.js',
+        'test/unit/*.js',
+        'test/integration/*.js',
+        { pattern: 'flash/bin-debug/*.swf', included: false, served: true }
     ],
     colors: true,
     exclude: [],
@@ -19,7 +21,7 @@ module.exports = function (karma) {
     plugins: ['karma-*'],
     preprocessors: {
         'js/**/*.js': ['browserify'],
-        'test/*.js': ['browserify']
+        'test/**/*.js': ['browserify']
     },
     browserify: {
         debug: true,
@@ -39,12 +41,9 @@ module.exports = function (karma) {
      * operating, and what is the URL path for the browser to use.
      */
     port: 9018,
-    runnerPort: 9100,
+    runnerPort: 9019,
     urlRoot: '/',
-
-    /**
-     * Disable file watching by default.
-     */
+    singleRun: true,
     autoWatch: false,
 
     /**
@@ -64,7 +63,11 @@ module.exports = function (karma) {
       //'Safari',
       //'Firefox',
       'Chrome'
-    ]
+    ],
+    proxies: {
+        '/VPAIDFlash.swf': '/base/flash/bin-debug/VPAIDFlash.swf',
+        '/TestAd.swf': '/base/flash/bin-debug/TestAd.swf'
+    }
   });
 };
 

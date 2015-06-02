@@ -1,11 +1,11 @@
-let VPAIDFlashToJS = require('../js/VPAIDFlashToJS.js');
-let VPAID_FLASH_HANDLER = require('../js/jsFlashBridge.js').JSFlashBridge.VPAID_FLASH_HANDLER;
-let VPAIDAdUnit = require('../js/VPAIDAdUnit.js').VPAIDAdUnit;
-let after = require('./testHelper.js').after;
-let addFlashMethodsToEl = require('./testHelper.js').addFlashMethodsToEl;
+let VPAIDFlashToJS = require('../../js/VPAIDFlashToJS.js');
+let VPAID_FLASH_HANDLER = require('../../js/jsFlashBridge.js').JSFlashBridge.VPAID_FLASH_HANDLER;
+let VPAIDAdUnit = require('../../js/VPAIDAdUnit.js').VPAIDAdUnit;
+let after = require('../testHelper.js').after;
+let addFlashMethodsToEl = require('../testHelper.js').addFlashMethodsToEl;
 
 
-describe('flashVPAID.js api', function()  {
+describe('VPAIDFlashToJs.js api', function()  {
     let swfObjectCallback;
     let flashWrapper1, flashWrapper2;
     let noop = function () {};
@@ -106,10 +106,6 @@ describe('flashVPAID.js api', function()  {
 
         let flashVPAID = new VPAIDFlashToJS(flashWrapper1, function () {
 
-            let callback = sinon.spy(function (error, result) {
-                done();
-            });
-
             flashVPAID.loadAdUnit('random.swf', function (erro, adUnit) {
 
                 [
@@ -133,6 +129,46 @@ describe('flashVPAID.js api', function()  {
                 flashVPAID.unloadAdUnit();
                 assert.equal(flashVPAID._flash._callbacks.size(), 0, 'must remove all callbacks of adUnit');
                 assert.equal(flashVPAID._flash._handlers.size(), 0, 'must remove all adUnit events');
+                done();
+            });
+
+        });
+    });
+
+    it('must implement destroy', function (done) {
+
+        let flashVPAID = new VPAIDFlashToJS(flashWrapper1, function () {
+
+            flashVPAID.loadAdUnit('random.swf', function (erro, adUnit) {
+
+                let callback1 = sinon.spy();
+                let callback2 = sinon.spy();
+
+                let counter = after(2, function () {
+                    assert(!callback1.called);
+                    assert(!callback2.called);
+                    done();
+                });
+
+
+                [
+                    'adLinear',
+                    'adExpanded'
+                ].forEach(function (methodName) {
+                    sinon.stub(flashVPAID.el, methodName, function (argsData) {
+                        setTimeout( function () {
+                            window[VPAID_FLASH_HANDLER](flashVPAID.getFlashID(), 'method', methodName, argsData[0], null, true);
+                            counter();
+                        }, 0);
+                    });
+                    adUnit[methodName](noop);
+                });
+
+
+                adUnit.on('AdSizeChange', callback1);
+                adUnit.on('AdPaused', callback2);
+
+                flashVPAID.destroy();
                 done();
             });
 

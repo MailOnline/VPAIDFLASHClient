@@ -1,4 +1,4 @@
-let utils = require('../js/utils.js');
+let utils = require('../../js/utils.js');
 
 describe('utils.js api', function()  {
 

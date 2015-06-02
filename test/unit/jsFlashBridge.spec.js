@@ -1,8 +1,8 @@
-let JSFlashBridge = require('../js/jsFlashBridge.js').JSFlashBridge;
-let registry = require('../js/jsFlashBridgeRegistry.js');
-let addFlashMethodsToEl = require('./testHelper.js').addFlashMethodsToEl;
-let noop = require('./testHelper.js').noop;
-let after = require('./testHelper.js').after;
+let JSFlashBridge = require('../../js/jsFlashBridge.js').JSFlashBridge;
+let registry = require('../../js/jsFlashBridgeRegistry.js');
+let addFlashMethodsToEl = require('../testHelper.js').addFlashMethodsToEl;
+let noop = require('../testHelper.js').noop;
+let after = require('../testHelper.js').after;
 
 describe('jsFlashBridge.js api', function()  {
     let el;

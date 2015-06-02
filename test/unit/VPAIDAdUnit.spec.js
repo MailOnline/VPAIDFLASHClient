@@ -1,6 +1,6 @@
-let JSFlashBridge = require('../js/jsFlashBridge.js').JSFlashBridge;
-let VPAIDAdUnit = require('../js/VPAIDAdUnit.js').VPAIDAdUnit;
-let noop = require('./testHelper.js').noop;
+let JSFlashBridge = require('../../js/jsFlashBridge.js').JSFlashBridge;
+let VPAIDAdUnit = require('../../js/VPAIDAdUnit.js').VPAIDAdUnit;
+let noop = require('../testHelper.js').noop;
 
 describe('VPAIDAdUnit.js api', function() {
     let adUnit;

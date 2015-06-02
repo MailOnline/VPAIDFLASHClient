@@ -18,8 +18,9 @@ var buffer = require('vinyl-buffer');
 var assign = require('lodash').assign;
 
 //test
-var karma = require('gulp-karma');
+var karma = require('karma').server;
 
+var testPath = 'test/**/**.js';
 var binPath = './bin';
 var mainJS = 'VPAIDFlashToJS.js';
 
@@ -30,7 +31,7 @@ var jsBuild = watchify(
             watchify.args,
             {
                 entries: ['./js/' + mainJS],
-                debug: true,
+                debug: true
             }
         )
     )
@@ -54,11 +55,12 @@ function bundle() {
 
 gulp.task('browserify', bundle);
 
-gulp.task('test', function () {
-    return gulp.src( ['bower_components/swfobject/swfobject/src/swfobject.js', 'js/**/*.js', 'test/*.js'] )
-        .pipe(karma({
-            configFile: __dirname + '/karma.conf.js'
-        }));
+gulp.task('test', function (done) {
+    karma.start({
+        configFile: __dirname + '/karma.conf.js'
+    }, function () {
+        done();
+    });
 });
 
 var flashFilesToMove = { files: ['VPAIDFlash.swf'], pathFrom: 'flash/bin-debug/', pathTo: binPath };
@@ -86,7 +88,7 @@ gulp.task('watch:demo', function() {
     jsBuild.on('update', bundle);
     gulp.watch(['demo/*.html', 'demo/*.css'], reload);
     gulp.watch([binPath + '/*.js'], ['test'], reload);
-    gulp.watch(['test/*.js'], ['test']);
+    gulp.watch([testPath], ['test']);
     gulp.watch(['flash/bin-debug/*.swf'], ['copy:flash'], reload);
 });
 
@@ -94,7 +96,8 @@ gulp.task('watch:demo', function() {
 //watch file changes
 gulp.task('watch:test', function() {
     jsBuild.on('update', bundle);
-    gulp.watch(['test/*.js'], ['test']);
+    gulp.watch([binPath + '/*.js'], ['test']);
+    gulp.watch([testPath], ['test']);
     gulp.watch(['flash/bin-debug/*.swf'], ['copy:flash', 'test']);
 });
 

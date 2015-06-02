@@ -1,18 +1,22 @@
 package
 {
 	import com.dailymail.vpaid.IVPAID;
+	import com.dailymail.vpaid.VPAIDEvent;
 	
 	import flash.display.Sprite;
+	import flash.utils.setTimeout;
 	
 	public class TestAd extends Sprite implements IVPAID
 	{
 		private var volume:Number = 0;
+		private var width:Number = 0;
+		private var height:Number = 0;
 		
 		public function TestAd()
 		{
 			super();
 		}
-		
+				
 		public function get adLinear():Boolean
 		{
 			return false;
@@ -20,12 +24,12 @@ package
 		
 		public function get adWidth():Number
 		{
-			return 0;
+			return width;
 		}
 		
 		public function get adHeight():Number
 		{
-			return 0;
+			return height;
 		}
 		
 		public function get adExpanded():Boolean
@@ -70,11 +74,14 @@ package
 		
 		public function handshakeVersion(playerVPAIDVersion:String):String
 		{
-			return '';
+			return '2.0';
 		}
 		
 		public function initAd(width:Number, height:Number, viewMode:String, desiredBitrate:Number, creativeData:String='', environmentVars:String=''):void
 		{
+			setTimeout(function ():void {
+				dispatchEvent(new VPAIDEvent(VPAIDEvent.AdLoaded, {}));
+			}, 1);
 		}
 		
 		public function resizeAd(width:Number, height:Number, viewMode:String):void
@@ -83,6 +90,9 @@ package
 		
 		public function startAd():void
 		{
+			setTimeout(function ():void {
+				dispatchEvent(new VPAIDEvent(VPAIDEvent.AdStarted, {}));
+			}, 1);
 		}
 		
 		public function stopAd():void
