@@ -1,4 +1,4 @@
-'use strict'
+'use strict';
 
 export function unique(prefix) {
     let count = -1;
