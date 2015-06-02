@@ -71,16 +71,30 @@ var VPAIDFlashToJS = (function () {
                 this._flash.destroy();
                 this._flash = null;
                 this.el = null;
-                if (this._adUnitLoad) {
-                    this._adUnitLoad._destroy();
-                    this._adUnitLoad = null;
-                }
+                this._destroyAdUnit();
                 this._destroyed = true;
             }
         }, {
             key: 'isDestroyed',
             value: function isDestroyed() {
                 return this._destroyed;
+            }
+        }, {
+            key: '_destroyAdUnit',
+            value: function _destroyAdUnit() {
+                if (!this._adUnit && !this._adUnitLoad) {
+                    throw new Error('Can\'t unload a adUnit that doesn\'t exist');
+                }
+
+                if (this._adUnitLoad) {
+                    this._adUnitLoad = null;
+                    this._flash.removeCallback(this._adUnitLoad);
+                }
+
+                if (this._adUnit) {
+                    this._adUnit._destroy();
+                    this._adUnit = null;
+                }
             }
         }, {
             key: 'loadAdUnit',
@@ -112,20 +126,8 @@ var VPAIDFlashToJS = (function () {
                 if (this._destroyed) {
                     throw new error('VPAIDFlashToJS is destroyed!');
                 }
-                if (!this._adUnit && !this._adUnitLoad) {
-                    throw new Error('Can\'t unload a adUnit that doesn\'t exist');
-                }
 
-                if (this._adUnitLoad) {
-                    this._adUnitLoad = null;
-                    this._flash.removeCallback(this._adUnitLoad);
-                }
-
-                if (this._adUnit) {
-                    this._adUnit._destroy();
-                    this._adUnit = null;
-                }
-
+                this._destroyAdUnit();
                 this._flash.callFlashMethod('unloadAdUnit', [], callback);
             }
         }, {
