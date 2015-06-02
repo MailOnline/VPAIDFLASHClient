@@ -21,14 +21,14 @@ describe('VPAIDFlashToJS <-> FlashVPAID.swf <-> VPAID_AD.swf', function()  {
         document.body.removeChild(flashWrapper2);
     });
 
-    it('VPAIDFlashToJS should load FlashVPAID', function(done) {
+    it('VPAIDFlashToJS must load FlashVPAID', function(done) {
         let vpaid = new VPAIDFlashToJS(flashWrapper1, function () {
             assert(true);
             done();
         });
     });
 
-    it('VPAIDFlashToJS should loadAdUnit', function(done) {
+    it('VPAIDFlashToJS must loadAdUnit', function(done) {
         let vpaid = new VPAIDFlashToJS(flashWrapper1, function () {
             vpaid.loadAdUnit(AD_URL, function(err, adUnit) {
                 assert.isDefined(adUnit);
@@ -46,7 +46,7 @@ describe('VPAIDFlashToJS <-> FlashVPAID.swf <-> VPAID_AD.swf', function()  {
             return vpaid;
         }
 
-        it('adUnit handshake should return version', function(done) {
+        it('adUnit handshake must return version', function(done) {
             let vpaid = createAndLoadVPaid(function (err, adUnit) {
                 adUnit.handshakeVersion('2.0', function (err, result) {
                     assert.isNull(err);
@@ -56,7 +56,7 @@ describe('VPAIDFlashToJS <-> FlashVPAID.swf <-> VPAID_AD.swf', function()  {
             });
         });
 
-        it('adUnit initAd should fire adLoaded', function(done) {
+        it('adUnit initAd must fire adLoaded', function(done) {
             createAndLoadVPaid(function(err, adUnit) {
                 adUnit.handshakeVersion('2.0', function (err, result) {
                     adUnit.on('AdLoaded', function (err, result) {
@@ -68,7 +68,7 @@ describe('VPAIDFlashToJS <-> FlashVPAID.swf <-> VPAID_AD.swf', function()  {
             });
         });
 
-        it('adUnit initAd should fire adStarted', function(done) {
+        it('adUnit initAd must fire adStarted', function(done) {
             createAndLoadVPaid(function(err, adUnit) {
                 adUnit.handshakeVersion('2.0', function (err, result) {
                     adUnit.on('AdLoaded', function (err, result) {
@@ -86,6 +86,30 @@ describe('VPAIDFlashToJS <-> FlashVPAID.swf <-> VPAID_AD.swf', function()  {
                     function startAd() {
                         adUnit.startAd();
                     }
+                });
+            });
+        });
+
+
+        describe('adUnit must unload', function (done) {
+            it('unload must work when the ad is still loading', function (done) {
+                let vpaid = new VPAIDFlashToJS(flashWrapper1, function () {
+                    let onAd = sinon.spy();
+                    vpaid.loadAdUnit(AD_URL, onAd);
+                    vpaid.unloadAdUnit(function (err, result) {
+                        assert(!onAd.called);
+                        assert.isNull(err);
+                        done();
+                    });
+                });
+            });
+
+            it('unload must work when the ad is already loaded', function (done) {
+                let vpaid = createAndLoadVPaid(function(err, adUnit) {
+                    vpaid.unloadAdUnit(function (err, result) {
+                        assert.isNull(err);
+                        done();
+                    });
                 });
             });
         });
