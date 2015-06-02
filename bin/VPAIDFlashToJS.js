@@ -550,7 +550,7 @@ var JSFlashBridge = (function () {
             var callbackID = '';
             // if no callback, some methods the return is void so they don't need callback
             if (callback) {
-                var callbackID = '' + this._uniqueMethodIdentifier() + '_' + methodName;
+                callbackID = '' + this._uniqueMethodIdentifier() + '_' + methodName;
                 this._callbacks.add(callbackID, callback);
             }
 

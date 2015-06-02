@@ -41,7 +41,7 @@ export class JSFlashBridge {
         var callbackID = '';
         // if no callback, some methods the return is void so they don't need callback
         if (callback) {
-            var callbackID = `${this._uniqueMethodIdentifier()}_${methodName}`;
+            callbackID = `${this._uniqueMethodIdentifier()}_${methodName}`;
             this._callbacks.add(callbackID, callback);
         }
 
@@ -166,5 +166,5 @@ window[VPAID_FLASH_HANDLER] = (flashID, type, event, callID, error, data) => {
             instance._trigger(event, error, data);
         }
     }
-}
+};
 
