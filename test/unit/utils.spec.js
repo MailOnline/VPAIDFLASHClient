@@ -28,5 +28,39 @@ describe('utils.js api', function()  {
         let parentElement = document.createElement('div');
         assert.equal(utils.createElementWithID(parentElement, 'hello').parentElement, parentElement, 'must return a HTMLElement that is a child of the element used in the arguments');
     });
+
+    describe('callbackTimeout', function () {
+        it('must be implemented', function() {
+            assert.isFunction(utils.callbackTimeout, 'must be a function');
+            assert.isFunction(utils.callbackTimeout(0, function () {}, function () {}), 'must return a function');
+        });
+
+        it('must timeout', function (done) {
+            let success = sinon.spy();
+            let timeout = sinon.spy();
+            let callback = utils.callbackTimeout(0, success, timeout);
+
+            setTimeout(function () {
+                callback();
+                assert(timeout.calledOnce, 'must call only once the timeout');
+                assert(!success.called, 'mustn\'t call this function when timeout fired');
+                done();
+            }, 0);
+        });
+
+        it('mustn\'t timeout', function (done) {
+            let success = sinon.spy();
+            let timeout = sinon.spy();
+            let callback = utils.callbackTimeout(0, success, timeout);
+            callback();
+
+            setTimeout(function () {
+                assert(!timeout.called, 'mustn\'t call this function when the callback is called');
+                assert(success.called, 'must call this function when callback is called');
+                done();
+            }, 0);
+        });
+    });
+
 });
 

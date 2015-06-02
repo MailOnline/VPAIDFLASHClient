@@ -13,6 +13,7 @@ var VPAIDFlashToJS = (function () {
     var VPAIDAdUnit = require('./VPAIDAdUnit').VPAIDAdUnit;
 
     var noop = require('./utils').noop;
+    var callbackTimeout = require('./utils').callbackTimeout;
     var isPositiveInt = require('./utils').isPositiveInt;
     var createElementWithID = require('./utils').createElementWithID;
     var uniqueVPAID = require('./utils').unique('vpaid');
@@ -24,15 +25,13 @@ var VPAIDFlashToJS = (function () {
             var swfConfig = arguments[2] === undefined ? { data: 'VPAIDFlash.swf', width: 800, height: 400 } : arguments[2];
             var version = arguments[3] === undefined ? '9' : arguments[3];
             var params = arguments[4] === undefined ? { wmode: 'transparent', salign: 'tl', align: 'left', allowScriptAccess: 'always', scale: 'noScale', allowFullScreen: 'true', quality: 'high' } : arguments[4];
-            var debug = arguments[5] === undefined ? false : arguments[5];
+            var vpaidOptions = arguments[5] === undefined ? { debug: false, timeout: 10000 } : arguments[5];
 
             _classCallCheck(this, VPAIDFlashToJS);
 
             if (!swfobject) throw new Error('no swfobject in global scope. check: https://github.com/swfobject/swfobject or https://code.google.com/p/swfobject/');
-
             this._vpaidParentEl = vpaidParentEl;
             this._flashID = uniqueVPAID();
-            this._load = callback || noop;
             this._destroyed = false;
 
             //validate the height
@@ -42,11 +41,27 @@ var VPAIDFlashToJS = (function () {
             createElementWithID(vpaidParentEl, this._flashID);
 
             params.movie = swfConfig.data;
-            params.FlashVars = 'flashid=' + this._flashID + '&handler=' + JSFlashBridge.VPAID_FLASH_HANDLER + '&debug=' + debug + '&salign=' + params.salign;
+            params.FlashVars = 'flashid=' + this._flashID + '&handler=' + JSFlashBridge.VPAID_FLASH_HANDLER + '&debug=' + vpaidOptions.debug + '&salign=' + params.salign;
 
-            if (swfobject.hasFlashPlayerVersion(version)) {
+            var error = undefined;
+            if (!swfobject.hasFlashPlayerVersion(version)) {
+                error = { msg: 'user don\'t support flash or doesn\'t have the minimum required version of flash', version: version };
+            } else {
                 this.el = swfobject.createSWF(swfConfig, params, this._flashID);
-                this._flash = new JSFlashBridge(this.el, swfConfig.data, this._flashID, swfConfig.width, swfConfig.height, callback || noop);
+                if (this.el) {
+
+                    this._flash = new JSFlashBridge(this.el, swfConfig.data, this._flashID, swfConfig.width, swfConfig.height, callbackTimeout(vpaidOptions.timeout, callback, function () {
+                        callback({ msg: 'vpaid flash load timeout', timeout: vpaidOptions.timeout });
+                    }));
+                } else {
+                    error = { msg: 'swfobject failed to create object in element' };
+                }
+            }
+
+            if (error) {
+                setTimeout(function () {
+                    callback(error);
+                }, 0);
             }
         }
 
@@ -56,8 +71,10 @@ var VPAIDFlashToJS = (function () {
                 this._flash.destroy();
                 this._flash = null;
                 this.el = null;
-                this._adUnitLoad._destroy();
-                this._adUnitLoad = null;
+                if (this._adUnitLoad) {
+                    this._adUnitLoad._destroy();
+                    this._adUnitLoad = null;
+                }
                 this._destroyed = true;
             }
         }, {
@@ -70,6 +87,9 @@ var VPAIDFlashToJS = (function () {
             value: function loadAdUnit(adURL, callback) {
                 var _this = this;
 
+                if (this._destroyed) {
+                    throw new error('VPAIDFlashToJS is destroyed!');
+                }
                 if (this._adUnit) {
                     throw new error('AdUnit still exists');
                 }
@@ -89,6 +109,9 @@ var VPAIDFlashToJS = (function () {
             value: function unloadAdUnit() {
                 var callback = arguments[0] === undefined ? undefined : arguments[0];
 
+                if (this._destroyed) {
+                    throw new error('VPAIDFlashToJS is destroyed!');
+                }
                 if (!this._adUnit) {
                     throw new Error('Can\'t unload a adUnit that doesn\'t exist');
                 }
@@ -885,6 +908,7 @@ Object.defineProperty(exports, '__esModule', {
 });
 exports.unique = unique;
 exports.noop = noop;
+exports.callbackTimeout = callbackTimeout;
 exports.createElementWithID = createElementWithID;
 exports.isPositiveInt = isPositiveInt;
 'use strict';
@@ -897,6 +921,20 @@ function unique(prefix) {
 }
 
 function noop() {}
+
+function callbackTimeout(timer, onSuccess, onTimeout) {
+
+    var timeout = setTimeout(function () {
+
+        onSuccess = noop;
+        onTimeout();
+    }, timer);
+
+    return function () {
+        clearTimeout(timeout);
+        onSuccess.apply(this, arguments);
+    };
+}
 
 function createElementWithID(parent, id) {
     var nEl = document.createElement('div');

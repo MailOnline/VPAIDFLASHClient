@@ -6,6 +6,7 @@ let JSFlashBridge = require('./jsFlashBridge').JSFlashBridge;
 let VPAIDAdUnit = require('./VPAIDAdUnit').VPAIDAdUnit;
 
 let noop = require('./utils').noop;
+let callbackTimeout = require('./utils').callbackTimeout;
 let isPositiveInt = require('./utils').isPositiveInt;
 let createElementWithID = require('./utils').createElementWithID;
 let uniqueVPAID = require('./utils').unique('vpaid');
@@ -13,13 +14,11 @@ let uniqueVPAID = require('./utils').unique('vpaid');
 const ERROR = 'error';
 
 class VPAIDFlashToJS {
-    constructor (vpaidParentEl, callback, swfConfig = {data: 'VPAIDFlash.swf', width: 800, height: 400}, version = '9', params = { wmode: 'transparent', salign: 'tl', align: 'left', allowScriptAccess: 'always', scale: 'noScale', allowFullScreen: 'true', quality: 'high'}, debug = false) {
+    constructor (vpaidParentEl, callback, swfConfig = {data: 'VPAIDFlash.swf', width: 800, height: 400}, version = '9', params = { wmode: 'transparent', salign: 'tl', align: 'left', allowScriptAccess: 'always', scale: 'noScale', allowFullScreen: 'true', quality: 'high'}, vpaidOptions = { debug: false, timeout: 10000 }) {
 
         if (!swfobject) throw new Error('no swfobject in global scope. check: https://github.com/swfobject/swfobject or https://code.google.com/p/swfobject/');
-
         this._vpaidParentEl = vpaidParentEl;
         this._flashID = uniqueVPAID();
-        this._load =  callback || noop;
         this._destroyed = false;
 
         //validate the height
@@ -29,11 +28,27 @@ class VPAIDFlashToJS {
         createElementWithID(vpaidParentEl, this._flashID);
 
         params.movie = swfConfig.data;
-        params.FlashVars = `flashid=${this._flashID}&handler=${JSFlashBridge.VPAID_FLASH_HANDLER}&debug=${debug}&salign=${params.salign}`;
+        params.FlashVars = `flashid=${this._flashID}&handler=${JSFlashBridge.VPAID_FLASH_HANDLER}&debug=${vpaidOptions.debug}&salign=${params.salign}`;
 
-        if (swfobject.hasFlashPlayerVersion(version)) {
+        let error;
+        if (!swfobject.hasFlashPlayerVersion(version)) {
+            error = {msg:'user don\'t support flash or doesn\'t have the minimum required version of flash', version: version};
+        } else {
             this.el = swfobject.createSWF(swfConfig, params, this._flashID);
-            this._flash = new JSFlashBridge(this.el, swfConfig.data, this._flashID, swfConfig.width, swfConfig.height, callback || noop);
+            if (this.el) {
+
+                this._flash = new JSFlashBridge(this.el, swfConfig.data, this._flashID, swfConfig.width, swfConfig.height, callbackTimeout(vpaidOptions.timeout, callback, () => {
+                    callback({msg: 'vpaid flash load timeout', timeout: vpaidOptions.timeout });
+                }));
+            } else {
+                error = {msg: 'swfobject failed to create object in element'};
+            }
+        }
+
+        if (error) {
+            setTimeout(() => {
+                callback(error);
+            }, 0);
         }
 
     }
@@ -42,8 +57,10 @@ class VPAIDFlashToJS {
         this._flash.destroy();
         this._flash = null;
         this.el = null;
-        this._adUnitLoad._destroy();
-        this._adUnitLoad = null;
+        if (this._adUnitLoad) {
+            this._adUnitLoad._destroy();
+            this._adUnitLoad = null;
+        }
         this._destroyed = true;
     }
 
@@ -52,6 +69,9 @@ class VPAIDFlashToJS {
     }
 
     loadAdUnit(adURL, callback) {
+        if (this._destroyed) {
+            throw new error('VPAIDFlashToJS is destroyed!');
+        }
         if (this._adUnit) {
             throw new error('AdUnit still exists');
         }
@@ -67,6 +87,9 @@ class VPAIDFlashToJS {
         this._flash.callFlashMethod('loadAdUnit', [adURL], this._adUnitLoad);
     }
     unloadAdUnit(callback = undefined) {
+        if (this._destroyed) {
+            throw new error('VPAIDFlashToJS is destroyed!');
+        }
         if (!this._adUnit) {
             throw new Error("Can't unload a adUnit that doesn't exist");
         }

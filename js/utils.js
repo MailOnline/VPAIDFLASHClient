@@ -11,6 +11,22 @@ export function noop() {
 }
 
 
+export function callbackTimeout(timer, onSuccess, onTimeout) {
+
+    let timeout = setTimeout(() => {
+
+        onSuccess = noop;
+        onTimeout();
+
+    }, timer);
+
+    return function () {
+        clearTimeout(timeout);
+        onSuccess.apply(this, arguments);
+    };
+}
+
+
 export function createElementWithID(parent, id) {
     var nEl = document.createElement('div');
     nEl.id = id;
