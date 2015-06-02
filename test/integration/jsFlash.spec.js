@@ -76,7 +76,7 @@ describe('VPAIDFlashToJS <-> FlashVPAID.swf <-> VPAID_AD.swf', function()  {
                         if (!err) startAd();
                     });
 
-                    adUnit.on('AdLoaded', function (err, result) {
+                    adUnit.on('AdStarted', function (err, result) {
                         assert.isNull(err);
                         done();
                     });
