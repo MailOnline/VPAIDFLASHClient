@@ -6,16 +6,20 @@ let ALL_VPAID_METHODS = Object.getOwnPropertyNames(IVPAIDAdUnit.prototype).filte
 export class VPAIDAdUnit extends IVPAIDAdUnit {
     constructor (flash) {
         super();
+        this._destroyed = false;
         this._flash = flash;
     }
 
     _destroy() {
+        this._destroyed = true;
         ALL_VPAID_METHODS.forEach((methodName) => {
             this._flash.removeCallbackByMethodName(methodName);
         });
         IVPAIDAdUnit.EVENTS.forEach((event) => {
             this._flash.offEvent(event);
         });
+
+        this._flash = null;
     }
 
     on(eventName, callback) {

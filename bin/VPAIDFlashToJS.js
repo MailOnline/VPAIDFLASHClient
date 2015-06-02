@@ -306,6 +306,7 @@ var VPAIDAdUnit = (function (_IVPAIDAdUnit) {
         _classCallCheck(this, VPAIDAdUnit);
 
         _get(Object.getPrototypeOf(VPAIDAdUnit.prototype), 'constructor', this).call(this);
+        this._destroyed = false;
         this._flash = flash;
     }
 
@@ -316,12 +317,15 @@ var VPAIDAdUnit = (function (_IVPAIDAdUnit) {
         value: function _destroy() {
             var _this2 = this;
 
+            this._destroyed = true;
             ALL_VPAID_METHODS.forEach(function (methodName) {
                 _this2._flash.removeCallbackByMethodName(methodName);
             });
             IVPAIDAdUnit.EVENTS.forEach(function (event) {
                 _this2._flash.offEvent(event);
             });
+
+            this._flash = null;
         }
     }, {
         key: 'on',

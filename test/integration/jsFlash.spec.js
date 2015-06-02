@@ -108,9 +108,20 @@ describe('VPAIDFlashToJS <-> FlashVPAID.swf <-> VPAID_AD.swf', function()  {
                 let vpaid = createAndLoadVPaid(function(err, adUnit) {
                     vpaid.unloadAdUnit(function (err, result) {
                         assert.isNull(err);
+                        assert(adUnit._destroyed);
+                        assert.isNull(adUnit._flash);
                         done();
                     });
                 });
+            });
+        });
+
+        it('must destroy', function (done) {
+            let vpaid = createAndLoadVPaid(function(err, adUnit) {
+                vpaid.destroy();
+                assert(adUnit._destroyed);
+                assert.isNull(adUnit._flash);
+                done();
             });
         });
 

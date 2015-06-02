@@ -139,7 +139,7 @@ describe('VPAIDFlashToJs.js api', function()  {
 
         let flashVPAID = new VPAIDFlashToJS(flashWrapper1, function () {
 
-            flashVPAID.loadAdUnit('random.swf', function (erro, adUnit) {
+            flashVPAID.loadAdUnit('random.swf', function (error, adUnit) {
 
                 let callback1 = sinon.spy();
                 let callback2 = sinon.spy();
