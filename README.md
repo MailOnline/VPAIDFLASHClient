@@ -1,3 +1,7 @@
+FlashVPAID
+==========
+[![Code Climate](https://codeclimate.com/github/MailOnline/flashVPAID/badges/gpa.svg)](https://codeclimate.com/github/MailOnline/flashVPAID)
+
 About
 ===============
 JS + Flash wrapper for [VPAID](http://www.iab.net/vpaid).
