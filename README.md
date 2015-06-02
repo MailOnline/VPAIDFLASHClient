@@ -123,3 +123,8 @@ function flashVPAIDWrapperLoaded(err, result) {
 
 for the api of VPAIDFlashToJS check [VPAIDFlashToJS.js](js/flashVPAID.js), for adUnit api check [IVPAIDAdUnit.js](js/IVPAIDAdUnit.js).
 
+License
+=======
+licensed under the MIT License, Version 2.0. [View the license file](LICENSE.md)
+
+Copyright &copy; 2015 MailOnline
