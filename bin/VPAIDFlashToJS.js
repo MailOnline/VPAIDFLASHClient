@@ -19,13 +19,13 @@ var VPAIDFlashToJS = (function () {
     var uniqueVPAID = require('./utils').unique('vpaid');
 
     var ERROR = 'error';
+    var FLASH_VERSION = '10.1.0';
 
     var VPAIDFlashToJS = (function () {
         function VPAIDFlashToJS(vpaidParentEl, callback) {
             var swfConfig = arguments[2] === undefined ? { data: 'VPAIDFlash.swf', width: 800, height: 400 } : arguments[2];
-            var version = arguments[3] === undefined ? '9' : arguments[3];
-            var params = arguments[4] === undefined ? { wmode: 'transparent', salign: 'tl', align: 'left', allowScriptAccess: 'always', scale: 'noScale', allowFullScreen: 'true', quality: 'high' } : arguments[4];
-            var vpaidOptions = arguments[5] === undefined ? { debug: false, timeout: 10000 } : arguments[5];
+            var params = arguments[3] === undefined ? { wmode: 'transparent', salign: 'tl', align: 'left', allowScriptAccess: 'always', scale: 'noScale', allowFullScreen: 'true', quality: 'high' } : arguments[3];
+            var vpaidOptions = arguments[4] === undefined ? { debug: false, timeout: 10000 } : arguments[4];
 
             _classCallCheck(this, VPAIDFlashToJS);
 
@@ -44,8 +44,8 @@ var VPAIDFlashToJS = (function () {
             params.FlashVars = 'flashid=' + this._flashID + '&handler=' + JSFlashBridge.VPAID_FLASH_HANDLER + '&debug=' + vpaidOptions.debug + '&salign=' + params.salign;
 
             var error = undefined;
-            if (!swfobject.hasFlashPlayerVersion(version)) {
-                error = { msg: 'user don\'t support flash or doesn\'t have the minimum required version of flash', version: version };
+            if (!VPAIDFlashToJS.isSupported()) {
+                error = { msg: 'user don\'t support flash or doesn\'t have the minimum required version of flash', version: FLASH_VERSION };
             } else {
                 this.el = swfobject.createSWF(swfConfig, params, this._flashID);
                 if (this.el) {
@@ -144,6 +144,14 @@ var VPAIDFlashToJS = (function () {
 
         return VPAIDFlashToJS;
     })();
+
+    Object.defineProperty(VPAIDFlashToJS, 'isSupported', {
+        writable: false,
+        configurable: false,
+        value: function value() {
+            return swfobject.hasFlashPlayerVersion(FLASH_VERSION);
+        }
+    });
 
     window.VPAIDFlashToJS = VPAIDFlashToJS;
 

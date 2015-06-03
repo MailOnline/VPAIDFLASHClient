@@ -12,9 +12,10 @@ let createElementWithID = require('./utils').createElementWithID;
 let uniqueVPAID = require('./utils').unique('vpaid');
 
 const ERROR = 'error';
+const FLASH_VERSION = '10.1.0';
 
 class VPAIDFlashToJS {
-    constructor (vpaidParentEl, callback, swfConfig = {data: 'VPAIDFlash.swf', width: 800, height: 400}, version = '9', params = { wmode: 'transparent', salign: 'tl', align: 'left', allowScriptAccess: 'always', scale: 'noScale', allowFullScreen: 'true', quality: 'high'}, vpaidOptions = { debug: false, timeout: 10000 }) {
+    constructor (vpaidParentEl, callback, swfConfig = {data: 'VPAIDFlash.swf', width: 800, height: 400}, params = { wmode: 'transparent', salign: 'tl', align: 'left', allowScriptAccess: 'always', scale: 'noScale', allowFullScreen: 'true', quality: 'high'}, vpaidOptions = { debug: false, timeout: 10000 }) {
 
         if (!swfobject) throw new Error('no swfobject in global scope. check: https://github.com/swfobject/swfobject or https://code.google.com/p/swfobject/');
         this._vpaidParentEl = vpaidParentEl;
@@ -31,8 +32,8 @@ class VPAIDFlashToJS {
         params.FlashVars = `flashid=${this._flashID}&handler=${JSFlashBridge.VPAID_FLASH_HANDLER}&debug=${vpaidOptions.debug}&salign=${params.salign}`;
 
         let error;
-        if (!swfobject.hasFlashPlayerVersion(version)) {
-            error = {msg:'user don\'t support flash or doesn\'t have the minimum required version of flash', version: version};
+        if (!VPAIDFlashToJS.isSupported()) {
+            error = {msg:'user don\'t support flash or doesn\'t have the minimum required version of flash', version: FLASH_VERSION};
         } else {
             this.el = swfobject.createSWF(swfConfig, params, this._flashID);
             if (this.el) {
@@ -114,6 +115,14 @@ class VPAIDFlashToJS {
         return this._flash.getFlashURL();
     }
 }
+
+Object.defineProperty(VPAIDFlashToJS, 'isSupported', {
+    writable: false,
+    configurable: false,
+    value: () => {
+        return swfobject.hasFlashPlayerVersion(FLASH_VERSION);
+    }
+});
 
 window.VPAIDFlashToJS = VPAIDFlashToJS;
 
