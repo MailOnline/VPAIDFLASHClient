@@ -964,7 +964,7 @@ function createElementWithID(parent, id) {
 }
 
 function isPositiveInt(newVal, oldVal) {
-    return Number.isSafeInteger(newVal) && newVal > 0 ? newVal : oldVal;
+    return !isNaN(parseFloat(newVal)) && isFinite(newVal) && newVal > 0 ? newVal : oldVal;
 }
 
 },{}]},{},[1])

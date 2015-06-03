@@ -36,6 +36,6 @@ export function createElementWithID(parent, id) {
 }
 
 export function isPositiveInt(newVal, oldVal) {
-    return Number.isSafeInteger(newVal) && newVal > 0 ? newVal : oldVal;
+    return !isNaN(parseFloat(newVal)) && isFinite(newVal) && newVal > 0 ? newVal : oldVal;
 }
 
