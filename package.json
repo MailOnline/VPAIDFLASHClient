@@ -1,5 +1,5 @@
 {
-  "name": "flash-vpaid",
+  "name": "flashVPAID",
   "version": "0.0.3",
   "devDependencies": {
     "babelify": "^6.1.0",
