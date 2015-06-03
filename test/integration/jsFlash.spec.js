@@ -20,6 +20,16 @@ describe('VPAIDFlashToJS <-> FlashVPAID.swf <-> VPAID_AD.swf', function()  {
         document.body.removeChild(flashWrapper2);
     });
 
+
+    it('must handle gracefully when createSWF fails', function () {
+        var elNotInDOM = document.createElement('div');
+        let vpaid = new VPAIDFlashToJS(elNotInDOM, function (err, result) {
+            assert.isNotNull(err);
+            assert.match(err.msg, /^swfobject failed to create/);
+        });
+
+    });
+
     it('VPAIDFlashToJS must load FlashVPAID', function(done) {
         let vpaid = new VPAIDFlashToJS(flashWrapper1, function () {
             assert(true);

@@ -29,7 +29,10 @@ var VPAIDFlashToJS = (function () {
 
             _classCallCheck(this, VPAIDFlashToJS);
 
-            if (!swfobject) throw new Error('no swfobject in global scope. check: https://github.com/swfobject/swfobject or https://code.google.com/p/swfobject/');
+            if (!swfobject) {
+                return onError({ msg: 'no swfobject in global scope. check: https://github.com/swfobject/swfobject or https://code.google.com/p/swfobject/' });
+            }
+
             this._vpaidParentEl = vpaidParentEl;
             this._flashID = uniqueVPAID();
             this._destroyed = false;
@@ -43,25 +46,25 @@ var VPAIDFlashToJS = (function () {
             params.movie = swfConfig.data;
             params.FlashVars = 'flashid=' + this._flashID + '&handler=' + JSFlashBridge.VPAID_FLASH_HANDLER + '&debug=' + vpaidOptions.debug + '&salign=' + params.salign;
 
-            var error = undefined;
             if (!VPAIDFlashToJS.isSupported()) {
-                error = { msg: 'user don\'t support flash or doesn\'t have the minimum required version of flash', version: FLASH_VERSION };
-            } else {
-                this.el = swfobject.createSWF(swfConfig, params, this._flashID);
-                if (this.el) {
-
-                    this._flash = new JSFlashBridge(this.el, swfConfig.data, this._flashID, swfConfig.width, swfConfig.height, callbackTimeout(vpaidOptions.timeout, callback, function () {
-                        callback({ msg: 'vpaid flash load timeout', timeout: vpaidOptions.timeout });
-                    }));
-                } else {
-                    error = { msg: 'swfobject failed to create object in element' };
-                }
+                return onError({ msg: 'user don\'t support flash or doesn\'t have the minimum required version of flash', version: FLASH_VERSION });
             }
 
-            if (error) {
+            this.el = swfobject.createSWF(swfConfig, params, this._flashID);
+
+            if (!this.el) {
+                return onError({ msg: 'swfobject failed to create object in element' });
+            }
+
+            this._flash = new JSFlashBridge(this.el, swfConfig.data, this._flashID, swfConfig.width, swfConfig.height, callbackTimeout(vpaidOptions.timeout, callback, function () {
+                callback({ msg: 'vpaid flash load timeout', timeout: vpaidOptions.timeout });
+            }));
+
+            function onError(error) {
                 setTimeout(function () {
                     callback(error);
                 }, 0);
+                return this;
             }
         }
 

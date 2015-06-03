@@ -42,6 +42,56 @@ describe('VPAIDFlashToJs.js api', function()  {
         document.body.removeChild(flashWrapper2);
     });
 
+
+    describe('swfobject', function() {
+        describe('when no swfobject', function () {
+            beforeEach(function () {
+                window.temp = window.swfobject;
+                window.swfobject = null;
+            });
+            afterEach(function () {
+                window.swfobject = window.temp;
+                delete window.temp;
+            });
+
+            it('must handle gracefully', function () {
+                let flashVPAID = new VPAIDFlashToJS(flashWrapper1, function (err, result) {
+                    assert.isNotNull(err);
+                    assert.match(err.msg, /^no swfobject/);
+                });
+            });
+        });
+
+        it('must handle gracefully when no supported flash', function () {
+            swfobject.hasFlashPlayerVersion.restore();
+
+            sinon.stub(swfobject, 'hasFlashPlayerVersion', function () {
+                return false;
+            });
+
+            let flashVPAID = new VPAIDFlashToJS(flashWrapper1, function (err, result) {
+                assert.isNotNull(err);
+                assert.match(err.msg, /^user don't support flash/);
+            });
+
+        });
+
+        it('must handle gracefully when createSWF fails', function () {
+            swfobject.createSWF.restore();
+
+            sinon.stub(swfobject, 'createSWF', function () {
+                return;
+            });
+
+            let flashVPAID = new VPAIDFlashToJS(flashWrapper1, function (err, result) {
+                assert.isNotNull(err);
+                assert.match(err.msg, /^swfobject failed to create/);
+            });
+
+        });
+
+    });
+
     it('must fire callback when vpaid flash wrapper is loaded', function (done) {
 
         let callback = sinon.spy(function () {
