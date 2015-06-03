@@ -1,6 +1,7 @@
 FlashVPAID
 ==========
 [![Code Climate](https://codeclimate.com/github/MailOnline/flashVPAID/badges/gpa.svg)](https://codeclimate.com/github/MailOnline/flashVPAID)
+[![Dependency Status](https://gemnasium.com/MailOnline/flashVPAID.svg)](https://gemnasium.com/MailOnline/flashVPAID)
 
 About
 ===============
