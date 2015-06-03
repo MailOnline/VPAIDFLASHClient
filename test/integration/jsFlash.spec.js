@@ -1,7 +1,6 @@
 let VPAIDFlashToJS = require('../../js/VPAIDFlashToJS.js');
 let VPAID_FLASH_HANDLER = require('../../js/jsFlashBridge.js').JSFlashBridge.VPAID_FLASH_HANDLER;
 let VPAIDAdUnit = require('../../js/VPAIDAdUnit.js').VPAIDAdUnit;
-let after = require('../testHelper.js').after;
 let addFlashMethodsToEl = require('../testHelper.js').addFlashMethodsToEl;
 
 describe('VPAIDFlashToJS <-> FlashVPAID.swf <-> VPAID_AD.swf', function()  {
@@ -44,6 +43,21 @@ describe('VPAIDFlashToJS <-> FlashVPAID.swf <-> VPAID_AD.swf', function()  {
                 vpaid.loadAdUnit(AD_URL, onLoad);
             });
             return vpaid;
+        }
+
+        function createLoadAndStartVPaid(onStart) {
+            let vpaid = createAndLoadVPaid(function (err, adUnit) {
+                adUnit.handshakeVersion('2.0', function(err, result) {
+                    adUnit.on('AdLoaded', function (err, result) {
+                        if (!err) adUnit.startAd();
+                        else onStart(err);
+                    });
+                    adUnit.on('AdStarted', function () {
+                        onStart(err, adUnit);
+                    });
+                    adUnit.initAd(300, 300, 'normal', -1, '', '');
+                });
+            });
         }
 
         it('adUnit handshake must return version', function(done) {
@@ -122,6 +136,20 @@ describe('VPAIDFlashToJS <-> FlashVPAID.swf <-> VPAID_AD.swf', function()  {
                 assert(adUnit._destroyed);
                 assert.isNull(adUnit._flash);
                 done();
+            });
+        });
+
+        it('must get/set volume', function(done) {
+            let vpaid = createLoadAndStartVPaid(function (err, adUnit) {
+                assert.isNull(err);
+                const newVolume = .84;
+
+                adUnit.setAdVolume(newVolume, function () {
+                    adUnit.getAdVolume(function (err, volume) {
+                        assert.equal(newVolume, volume);
+                        done();
+                    });
+                });
             });
         });
 
