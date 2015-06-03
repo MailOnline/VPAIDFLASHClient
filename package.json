@@ -1,6 +1,6 @@
 {
   "name": "flashVPAID",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "devDependencies": {
     "babelify": "^6.1.0",
     "browser-sync": "^2.7.1",
