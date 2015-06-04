@@ -6,4 +6,5 @@ before_install:
   - sudo apt-get install -qq flashplugin-installer
   - npm install -g bower
   - bower install
+  - sh -e /etc/init.d/xvfb start
 
