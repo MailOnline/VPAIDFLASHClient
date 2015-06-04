@@ -2,6 +2,8 @@ language: node_js
 node_js:
   - 0.12.2
 before_install:
+  - sudo apt-get update -qq
+  - sudo apt-get install -qq flashplugin-installer
   - npm install -g bower
   - bower install
   - export CHROME_BIN=chromium-browser
