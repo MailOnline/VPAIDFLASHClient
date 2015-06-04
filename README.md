@@ -24,7 +24,8 @@ Because some of the ad's are in flash, this projects will allow to expose the ap
 TODO
 ===============
   - try to implement flex unit tests
-  - make unit test to js api - [started]
+  - compile flash without needing to use flashbuilder
+  - create test coverage (not done yet because of [karma coverage - issue #123](https://github.com/karma-runner/karma-coverage/issues/123))
 
 JS
 ==

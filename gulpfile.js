@@ -55,7 +55,20 @@ function bundle() {
 
 gulp.task('browserify', bundle);
 
-gulp.task('test', function (done) {
+gulp.task('test:ci', function (done) {
+    karma.start({
+        configFile: __dirname + '/karma.conf.js',
+        browsers: ['Chrome_travis_ci'],
+        customLaunchers: {
+          Chrome_travis_ci: {
+            base: 'Chrome',
+            flags: ['--no-sandbox']
+          }
+        }
+    }, done);
+});
+
+gulp.task('test:dev', function (done) {
     karma.start({
         configFile: __dirname + '/karma.conf.js'
     }, function () {
@@ -87,8 +100,8 @@ function mvFiles(cfg, done) {
 gulp.task('watch:demo', function() {
     jsBuild.on('update', bundle);
     gulp.watch(['demo/*.html', 'demo/*.css'], reload);
-    gulp.watch([binPath + '/*.js'], ['test'], reload);
-    gulp.watch([testPath], ['test']);
+    gulp.watch([binPath + '/*.js'], ['test:dev'], reload);
+    gulp.watch([testPath], ['test:dev']);
     gulp.watch(['flash/bin-debug/*.swf'], ['copy:flash'], reload);
 });
 
@@ -96,9 +109,9 @@ gulp.task('watch:demo', function() {
 //watch file changes
 gulp.task('watch:test', function() {
     jsBuild.on('update', bundle);
-    gulp.watch([binPath + '/*.js'], ['test']);
-    gulp.watch([testPath], ['test']);
-    gulp.watch(['flash/bin-debug/*.swf'], ['copy:flash', 'test']);
+    gulp.watch([binPath + '/*.js'], ['test:dev']);
+    gulp.watch([testPath], ['test:dev']);
+    gulp.watch(['flash/bin-debug/*.swf'], ['copy:flash', 'test:dev']);
 });
 
 
@@ -115,5 +128,5 @@ gulp.task('serve', ['browserify', 'copy:flash', 'watch:demo'], function () {
     });
 });
 
-gulp.task('default', ['test', 'browserify', 'watch:test']);
+gulp.task('default', ['test:dev', 'browserify', 'watch:test']);
 
