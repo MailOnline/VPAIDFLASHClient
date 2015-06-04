@@ -65,7 +65,8 @@ Running the project
   - install nodejs, bower and gulp
   - `npm install` and `bower install` to install all dependencies
   - `gulp serve` or `npm start` to start build script and a demo page should be open in default browser
-  - `npm test` to run only the tests
+  - `gulp` to watch, bundle and run tests
+  - `npm test` or `gulp test:ci` task used by the server
 
 Example of the usage
 ==========================================
