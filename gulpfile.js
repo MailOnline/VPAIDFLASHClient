@@ -58,13 +58,7 @@ gulp.task('browserify', bundle);
 gulp.task('test:ci', function (done) {
     karma.start({
         configFile: __dirname + '/karma.conf.js',
-        browsers: ['Chrome_travis_ci'],
-        customLaunchers: {
-          Chrome_travis_ci: {
-            base: 'Chrome',
-            flags: ['--no-sandbox']
-          }
-        }
+        browsers: ['Firefox']
     }, done);
 });
 
