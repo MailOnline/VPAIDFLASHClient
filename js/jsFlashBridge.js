@@ -1,5 +1,6 @@
 let unique = require('./utils').unique;
 let isPositiveInt = require('./utils').isPositiveInt;
+let stringEndsWith = require('./utils').stringEndsWith;
 let SingleValueRegistry = require('./registry').SingleValueRegistry;
 let MultipleValuesRegistry = require('./registry').MultipleValuesRegistry;
 const registry = require('./jsFlashBridgeRegistry');
@@ -71,7 +72,7 @@ export class JSFlashBridge {
 
     removeCallbackByMethodName(suffix) {
         this._callbacks.filterKeys((key) => {
-            return key.endsWith(suffix);
+            return stringEndsWith(key, suffix);
         }).forEach((key) => {
             this._callbacks.remove(key);
         });

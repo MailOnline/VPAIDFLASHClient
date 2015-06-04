@@ -62,5 +62,31 @@ describe('utils.js api', function()  {
         });
     });
 
+    describe('stringEndsWith', function () {
+        describe('if browser doesn\'t implement endsWith', function () {
+            let temp;
+            beforeEach(function () {
+                temp = String.prototype.endsWith;
+                delete String.prototype.endsWith;
+            });
+
+            afterEach(function () {
+                String.prototype.endsWith = temp;
+            });
+
+            it('must still work', function () {
+                assert(utils.stringEndsWith('test_cool', 'cool'));
+                assert(!utils.stringEndsWith('test_coolx_test', 'coolx'));
+                assert(utils.stringEndsWith('test_coolx', 'coolx'));
+            });
+        });
+
+        it('must be implemented', function () {
+            assert(utils.stringEndsWith('test_cool', 'cool'));
+            assert(!utils.stringEndsWith('test_coolx_test', 'coolx'));
+            assert(utils.stringEndsWith('test_coolx', 'coolx'));
+        });
+    });
+
 });
 

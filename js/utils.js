@@ -39,3 +39,21 @@ export function isPositiveInt(newVal, oldVal) {
     return !isNaN(parseFloat(newVal)) && isFinite(newVal) && newVal > 0 ? newVal : oldVal;
 }
 
+let endsWith = (function () {
+    if (String.prototype.endsWith) return String.prototype.endsWith;
+    return function endsWith (searchString, position) {
+        var subjectString = this.toString();
+        if (position === undefined || position > subjectString.length) {
+            position = subjectString.length;
+        }
+        position -= searchString.length;
+        var lastIndex = subjectString.indexOf(searchString, position);
+        return lastIndex !== -1 && lastIndex === position;
+    }
+})();
+
+export function stringEndsWith(string, search) {
+    return endsWith.call(string, search);
+}
+
+

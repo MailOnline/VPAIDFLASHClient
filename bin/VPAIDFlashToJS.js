@@ -1,11 +1,11 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+//if this code already run once don't do anything
 'use strict';
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
-//if this code already run once don't do anything
 var VPAIDFlashToJS = (function () {
     if (window.VPAIDFlashToJS) return;
 
@@ -164,6 +164,7 @@ var VPAIDFlashToJS = (function () {
 module.exports = VPAIDFlashToJS;
 
 },{"./VPAIDAdUnit":3,"./jsFlashBridge":4,"./utils":7}],2:[function(require,module,exports){
+//simple representation of the API
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -173,8 +174,6 @@ Object.defineProperty(exports, '__esModule', {
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
-
-//simple representation of the API
 
 var IVPAIDAdUnit = (function () {
     function IVPAIDAdUnit() {
@@ -299,9 +298,7 @@ Object.defineProperty(exports, '__esModule', {
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-var _get = function get(_x15, _x16, _x17) { var _again = true; _function: while (_again) { desc = parent = getter = undefined; _again = false; var object = _x15,
-    property = _x16,
-    receiver = _x17; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x15 = parent; _x16 = property; _x17 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+var _get = function get(_x15, _x16, _x17) { var _again = true; _function: while (_again) { var object = _x15, property = _x16, receiver = _x17; desc = parent = getter = undefined; _again = false; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x15 = parent; _x16 = property; _x17 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
@@ -326,14 +323,14 @@ var VPAIDAdUnit = (function (_IVPAIDAdUnit) {
     _createClass(VPAIDAdUnit, [{
         key: '_destroy',
         value: function _destroy() {
-            var _this2 = this;
+            var _this = this;
 
             this._destroyed = true;
             ALL_VPAID_METHODS.forEach(function (methodName) {
-                _this2._flash.removeCallbackByMethodName(methodName);
+                _this._flash.removeCallbackByMethodName(methodName);
             });
             IVPAIDAdUnit.EVENTS.forEach(function (event) {
-                _this2._flash.offEvent(event);
+                _this._flash.offEvent(event);
             });
 
             this._flash = null;
@@ -509,6 +506,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 var unique = require('./utils').unique;
 var isPositiveInt = require('./utils').isPositiveInt;
+var stringEndsWith = require('./utils').stringEndsWith;
 var SingleValueRegistry = require('./registry').SingleValueRegistry;
 var MultipleValuesRegistry = require('./registry').MultipleValuesRegistry;
 var registry = require('./jsFlashBridgeRegistry');
@@ -593,7 +591,7 @@ var JSFlashBridge = (function () {
             var _this = this;
 
             this._callbacks.filterKeys(function (key) {
-                return key.endsWith(suffix);
+                return stringEndsWith(key, suffix);
             }).forEach(function (key) {
                 _this._callbacks.remove(key);
             });
@@ -930,7 +928,7 @@ exports.noop = noop;
 exports.callbackTimeout = callbackTimeout;
 exports.createElementWithID = createElementWithID;
 exports.isPositiveInt = isPositiveInt;
-'use strict';
+exports.stringEndsWith = stringEndsWith;
 
 function unique(prefix) {
     var count = -1;
@@ -965,6 +963,23 @@ function createElementWithID(parent, id) {
 
 function isPositiveInt(newVal, oldVal) {
     return !isNaN(parseFloat(newVal)) && isFinite(newVal) && newVal > 0 ? newVal : oldVal;
+}
+
+var endsWith = (function () {
+    if (String.prototype.endsWith) return String.prototype.endsWith;
+    return function endsWith(searchString, position) {
+        var subjectString = this.toString();
+        if (position === undefined || position > subjectString.length) {
+            position = subjectString.length;
+        }
+        position -= searchString.length;
+        var lastIndex = subjectString.indexOf(searchString, position);
+        return lastIndex !== -1 && lastIndex === position;
+    };
+})();
+
+function stringEndsWith(string, search) {
+    return endsWith.call(string, search);
 }
 
 },{}]},{},[1])
