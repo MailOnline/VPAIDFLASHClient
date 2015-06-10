@@ -58,10 +58,12 @@ class VPAIDFlashToJS {
     }
 
     destroy () {
-        this._flash.destroy();
-        this._flash = null;
-        this.el = null;
         this._destroyAdUnit();
+        if (this._flash) {
+            this._flash.destroy();
+            this._flash = null;
+        }
+        this.el = null;
         this._destroyed = true;
     }
 
