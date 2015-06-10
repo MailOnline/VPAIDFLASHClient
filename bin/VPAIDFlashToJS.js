@@ -87,10 +87,6 @@ var VPAIDFlashToJS = (function () {
         }, {
             key: '_destroyAdUnit',
             value: function _destroyAdUnit() {
-                if (!this._adUnit && !this._adUnitLoad) {
-                    throw new Error('Can\'t unload a adUnit that doesn\'t exist');
-                }
-
                 if (this._adUnitLoad) {
                     this._adUnitLoad = null;
                     this._flash.removeCallback(this._adUnitLoad);

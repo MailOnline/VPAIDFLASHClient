@@ -58,6 +58,7 @@ describe('VPAIDFlashToJs.js api', function()  {
                 let flashVPAID = new VPAIDFlashToJS(flashWrapper1, function (err, result) {
                     assert.isNotNull(err);
                     assert.match(err.msg, /^no swfobject/);
+                    flashVPAID.destroy();
                 });
             });
         });
