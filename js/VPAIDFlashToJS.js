@@ -17,7 +17,7 @@ const FLASH_VERSION = '10.1.0';
 class VPAIDFlashToJS {
     constructor (vpaidParentEl, callback, swfConfig = {data: 'VPAIDFlash.swf', width: 800, height: 400}, params = { wmode: 'transparent', salign: 'tl', align: 'left', allowScriptAccess: 'always', scale: 'noScale', allowFullScreen: 'true', quality: 'high'}, vpaidOptions = { debug: false, timeout: 10000 }) {
 
-        if (!swfobject) {
+        if (!window.swfobject) {
             return onError({msg: 'no swfobject in global scope. check: https://github.com/swfobject/swfobject or https://code.google.com/p/swfobject/'});
         }
 
