@@ -359,7 +359,7 @@ var VPAIDFlashToJS = (function () {
 
             _classCallCheck(this, VPAIDFlashToJS);
 
-            if (!swfobject) {
+            if (!window.swfobject) {
                 return onError({ msg: 'no swfobject in global scope. check: https://github.com/swfobject/swfobject or https://code.google.com/p/swfobject/' });
             }
 
