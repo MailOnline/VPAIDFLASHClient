@@ -160,8 +160,8 @@ describe('VPAIDFlashToJs.js api', function()  {
             flashVPAID.loadAdUnit('random.swf', function (erro, adUnit) {
 
                 [
-                    'adLinear',
-                    'adExpanded'
+                    'getAdLinear',
+                    'getAdExpanded'
                 ].forEach(function (methodName) {
                     sinon.stub(flashVPAID.el, methodName, function (argsData) {
                         setTimeout( function () {
@@ -203,8 +203,8 @@ describe('VPAIDFlashToJs.js api', function()  {
 
 
                 [
-                    'adLinear',
-                    'adExpanded'
+                    'getAdLinear',
+                    'getAdExpanded'
                 ].forEach(function (methodName) {
                     sinon.stub(flashVPAID.el, methodName, function (argsData) {
                         setTimeout( function () {
@@ -271,12 +271,12 @@ describe('VPAIDFlashToJs.js api', function()  {
 
     (function () {
         let booleanGetters = [
-            'adLinear',
-            'adExpanded',
-            'adSkippableState',
-            'adRemainingTime',
-            'adCompanions',
-            'adIcons'
+            'getAdLinear',
+            'getAdExpanded',
+            'getAdSkippableState',
+            'getAdRemainingTime',
+            'getAdCompanions',
+            'getAdIcons'
         ];
 
         booleanGetters.forEach(function (method) {

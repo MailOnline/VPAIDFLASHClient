@@ -55,8 +55,6 @@ describe('VPAIDAdUnit.js api', function() {
         'resumeAd',
         'expandAd',
         'collapseAd',
-        'skipAd',
-        'adLinear',
         'skipAd'
     ].forEach(function (methodName) {
         it('must implement ' + methodName, function () {
@@ -68,16 +66,16 @@ describe('VPAIDAdUnit.js api', function() {
 
 
     [
-        'adLinear',
-        'adWidth',
-        'adHeight',
-        'adExpanded',
-        'adSkippableState',
-        'adRemainingTime',
-        'adDuration',
+        'getAdLinear',
+        'getAdWidth',
+        'getAdHeight',
+        'getAdExpanded',
+        'getAdSkippableState',
+        'getAdRemainingTime',
+        'getAdDuration',
         'getAdVolume',
-        'adCompanions',
-        'adIcons'
+        'getAdCompanions',
+        'getAdIcons'
     ].forEach(function (methodName) {
         it('must implement ' + methodName, function () {
             let flashMethod = sinon.stub(flash, 'callFlashMethod');
@@ -85,6 +83,12 @@ describe('VPAIDAdUnit.js api', function() {
             assert(flashMethod.calledWith(methodName, [], noop));
         });
     });
+
+    it('must implement setAdVolume', function () {
+        let flashMethod = sinon.stub(flash, 'callFlashMethod');
+        adUnit.setAdVolume(.5, noop);
+        assert(flashMethod.calledWith('setAdVolume', [.5], noop));
+    })
 
 });
 

@@ -18,17 +18,17 @@ export class IVPAIDAdUnit {
     skipAd(callback = undefined) {}
 
     //properties that will be treat as async methods
-    adLinear(callback) {}
-    adWidth(callback) {}
-    adHeight(callback) {}
-    adExpanded(callback) {}
-    adSkippableState(callback) {}
-    adRemainingTime(callback) {}
-    adDuration(callback) {}
+    getAdLinear(callback) {}
+    getAdWidth(callback) {}
+    getAdHeight(callback) {}
+    getAdExpanded(callback) {}
+    getAdSkippableState(callback) {}
+    getAdRemainingTime(callback) {}
+    getAdDuration(callback) {}
     setAdVolume(soundVolume, callback = undefined) {}
     getAdVolume(callback) {}
-    adCompanions(callback) {}
-    adIcons(callback) {}
+    getAdCompanions(callback) {}
+    getAdIcons(callback) {}
 }
 
 Object.defineProperty(IVPAIDAdUnit, 'EVENTS', {
@@ -39,10 +39,10 @@ Object.defineProperty(IVPAIDAdUnit, 'EVENTS', {
         'AdStarted',
         'AdStopped',
         'AdSkipped',
-        'AdSkippableStateChange',
-        'AdSizeChange',
+        'AdSkippableStateChange', // VPAID 2.0 new event
+        'AdSizeChange', // VPAID 2.0 new event
         'AdLinearChange',
-        'AdDurationChange',
+        'AdDurationChange', // VPAID 2.0 new event
         'AdExpandedChange',
         'AdRemainingTimeChange', // [Deprecated in 2.0] but will be still fired for backwards compatibility
         'AdVolumeChange',
@@ -53,7 +53,7 @@ Object.defineProperty(IVPAIDAdUnit, 'EVENTS', {
         'AdVideoThirdQuartile',
         'AdVideoComplete',
         'AdClickThru',
-        'AdInteraction',
+        'AdInteraction', // VPAID 2.0 new event
         'AdUserAcceptInvitation',
         'AdUserMinimize',
         'AdUserClose',

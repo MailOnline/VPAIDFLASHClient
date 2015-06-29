@@ -85,13 +85,14 @@ describe('jsFlashBridge.js api', function()  {
 
     it('must implement callFlashMethod', function (done) {
         var instance = new JSFlashBridge(el, 'url', EL_ID, 15, 10, noop);
+        var METHOD_NAME = 'getAdIcons';
         assert.isFunction(instance.setSize);
 
-        var flashMethod = sinon.stub(el, 'adIcons');
+        var flashMethod = sinon.stub(el, METHOD_NAME);
         flashMethod.onSecondCall().throws();
         flashMethod.onThirdCall().throws();
 
-        instance.callFlashMethod('adIcons', [], noop);
+        instance.callFlashMethod(METHOD_NAME, [], noop);
         assert(flashMethod.calledOnce);
 
         var callback1 = sinon.spy();
@@ -101,19 +102,19 @@ describe('jsFlashBridge.js api', function()  {
             done();
         });
 
-        instance.callFlashMethod('adIcons', [], callback1);
+        instance.callFlashMethod(METHOD_NAME, [], callback1);
         instance.on('error', callback2)
-        instance.callFlashMethod('adIcons', []);
+        instance.callFlashMethod(METHOD_NAME, []);
     });
 
     it('must register callback and call it', function (done) {
-        var methodName = 'adIcons';
+        var METHOD_NAME = 'getAdIcons';
         var instance = new JSFlashBridge(el, 'url', EL_ID, 15, 10, noop);
 
-        sinon.stub(el, methodName, function (argsData) {
+        sinon.stub(el, METHOD_NAME, function (argsData) {
             let callBackID = argsData[0];
             setTimeout(function () {
-                window[JSFlashBridge.VPAID_FLASH_HANDLER](EL_ID, 'method', methodName, callBackID, null, false);
+                window[JSFlashBridge.VPAID_FLASH_HANDLER](EL_ID, 'method', METHOD_NAME, callBackID, null, false);
             }, 0);
         });
 
@@ -123,21 +124,21 @@ describe('jsFlashBridge.js api', function()  {
         });
 
         assert.equal(instance._callbacks.size(), 0);
-        instance.callFlashMethod(methodName, [], callback);
+        instance.callFlashMethod(METHOD_NAME, [], callback);
         assert.equal(instance._callbacks.size(), 1);
     });
 
     it('must implement _callCallback', function(done) {
-        var methodName = 'adIcons';
+        var METHOD_NAME = 'getAdIcons';
         var instance = new JSFlashBridge(el, 'url', EL_ID, 15, 10, noop);
         assert.isFunction(instance._callCallback);
 
         var callback = sinon.stub(instance, '_callCallback', function () {
-            assert(callback.calledWith(methodName));
+            assert(callback.calledWith(METHOD_NAME));
             done();
         });
 
-        instance.callFlashMethod(methodName, [], noop);
+        instance.callFlashMethod(METHOD_NAME, [], noop);
     });
 
     [
@@ -161,20 +162,20 @@ describe('jsFlashBridge.js api', function()  {
 
 
     it('must implement _trigger', function(done) {
-        var eventName = 'someEvent';
+        var EVENT_NAME = 'someEvent';
         var instance = new JSFlashBridge(el, 'url', EL_ID, 15, 10, noop);
         assert.isFunction(instance._trigger);
 
         var callback = sinon.stub(instance, '_trigger', function () {
-            assert(callback.calledWith(eventName, null, true));
+            assert(callback.calledWith(EVENT_NAME, null, true));
             done();
         });
 
-        window[JSFlashBridge.VPAID_FLASH_HANDLER](EL_ID, 'event', eventName, '', null, true);
+        window[JSFlashBridge.VPAID_FLASH_HANDLER](EL_ID, 'event', EVENT_NAME, '', null, true);
     });
 
     it('must implement triggered event should call all listeners', function(done) {
-        let eventName = 'someEvent';
+        let EVENT_NAME = 'someEvent';
         let instance = new JSFlashBridge(el, 'url', EL_ID, 15, 10, noop);
         let total = 10;
         let callbacks = [];
@@ -192,10 +193,10 @@ describe('jsFlashBridge.js api', function()  {
         }
 
         callbacks.forEach(function (callback) {
-            instance.on(eventName, callback);
+            instance.on(EVENT_NAME, callback);
         });
 
-        window[JSFlashBridge.VPAID_FLASH_HANDLER](EL_ID, 'event', eventName, '', null, true);
+        window[JSFlashBridge.VPAID_FLASH_HANDLER](EL_ID, 'event', EVENT_NAME, '', null, true);
     });
 
 });

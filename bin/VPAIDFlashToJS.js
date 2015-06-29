@@ -74,28 +74,28 @@ var IVPAIDAdUnit = (function () {
             var callback = arguments[0] === undefined ? undefined : arguments[0];
         }
     }, {
-        key: 'adLinear',
+        key: 'getAdLinear',
 
         //properties that will be treat as async methods
-        value: function adLinear(callback) {}
+        value: function getAdLinear(callback) {}
     }, {
-        key: 'adWidth',
-        value: function adWidth(callback) {}
+        key: 'getAdWidth',
+        value: function getAdWidth(callback) {}
     }, {
-        key: 'adHeight',
-        value: function adHeight(callback) {}
+        key: 'getAdHeight',
+        value: function getAdHeight(callback) {}
     }, {
-        key: 'adExpanded',
-        value: function adExpanded(callback) {}
+        key: 'getAdExpanded',
+        value: function getAdExpanded(callback) {}
     }, {
-        key: 'adSkippableState',
-        value: function adSkippableState(callback) {}
+        key: 'getAdSkippableState',
+        value: function getAdSkippableState(callback) {}
     }, {
-        key: 'adRemainingTime',
-        value: function adRemainingTime(callback) {}
+        key: 'getAdRemainingTime',
+        value: function getAdRemainingTime(callback) {}
     }, {
-        key: 'adDuration',
-        value: function adDuration(callback) {}
+        key: 'getAdDuration',
+        value: function getAdDuration(callback) {}
     }, {
         key: 'setAdVolume',
         value: function setAdVolume(soundVolume) {
@@ -105,11 +105,11 @@ var IVPAIDAdUnit = (function () {
         key: 'getAdVolume',
         value: function getAdVolume(callback) {}
     }, {
-        key: 'adCompanions',
-        value: function adCompanions(callback) {}
+        key: 'getAdCompanions',
+        value: function getAdCompanions(callback) {}
     }, {
-        key: 'adIcons',
-        value: function adIcons(callback) {}
+        key: 'getAdIcons',
+        value: function getAdIcons(callback) {}
     }]);
 
     return IVPAIDAdUnit;
@@ -120,8 +120,12 @@ exports.IVPAIDAdUnit = IVPAIDAdUnit;
 Object.defineProperty(IVPAIDAdUnit, 'EVENTS', {
     writable: false,
     configurable: false,
-    value: ['AdLoaded', 'AdStarted', 'AdStopped', 'AdSkipped', 'AdSkippableStateChange', 'AdSizeChange', 'AdLinearChange', 'AdDurationChange', 'AdExpandedChange', 'AdRemainingTimeChange', // [Deprecated in 2.0] but will be still fired for backwards compatibility
-    'AdVolumeChange', 'AdImpression', 'AdVideoStart', 'AdVideoFirstQuartile', 'AdVideoMidpoint', 'AdVideoThirdQuartile', 'AdVideoComplete', 'AdClickThru', 'AdInteraction', 'AdUserAcceptInvitation', 'AdUserMinimize', 'AdUserClose', 'AdPaused', 'AdPlaying', 'AdLog', 'AdError']
+    value: ['AdLoaded', 'AdStarted', 'AdStopped', 'AdSkipped', 'AdSkippableStateChange', // VPAID 2.0 new event
+    'AdSizeChange', // VPAID 2.0 new event
+    'AdLinearChange', 'AdDurationChange', // VPAID 2.0 new event
+    'AdExpandedChange', 'AdRemainingTimeChange', // [Deprecated in 2.0] but will be still fired for backwards compatibility
+    'AdVolumeChange', 'AdImpression', 'AdVideoStart', 'AdVideoFirstQuartile', 'AdVideoMidpoint', 'AdVideoThirdQuartile', 'AdVideoComplete', 'AdClickThru', 'AdInteraction', // VPAID 2.0 new event
+    'AdUserAcceptInvitation', 'AdUserMinimize', 'AdUserClose', 'AdPaused', 'AdPlaying', 'AdLog', 'AdError']
 });
 
 },{}],2:[function(require,module,exports){
@@ -263,41 +267,41 @@ var VPAIDAdUnit = (function (_IVPAIDAdUnit) {
             this._flash.callFlashMethod('skipAd', [], callback);
         }
     }, {
-        key: 'adLinear',
+        key: 'getAdLinear',
 
         //properties that will be treat as async methods
-        value: function adLinear(callback) {
-            this._flash.callFlashMethod('adLinear', [], callback);
+        value: function getAdLinear(callback) {
+            this._flash.callFlashMethod('getAdLinear', [], callback);
         }
     }, {
-        key: 'adWidth',
-        value: function adWidth(callback) {
-            this._flash.callFlashMethod('adWidth', [], callback);
+        key: 'getAdWidth',
+        value: function getAdWidth(callback) {
+            this._flash.callFlashMethod('getAdWidth', [], callback);
         }
     }, {
-        key: 'adHeight',
-        value: function adHeight(callback) {
-            this._flash.callFlashMethod('adHeight', [], callback);
+        key: 'getAdHeight',
+        value: function getAdHeight(callback) {
+            this._flash.callFlashMethod('getAdHeight', [], callback);
         }
     }, {
-        key: 'adExpanded',
-        value: function adExpanded(callback) {
-            this._flash.callFlashMethod('adExpanded', [], callback);
+        key: 'getAdExpanded',
+        value: function getAdExpanded(callback) {
+            this._flash.callFlashMethod('getAdExpanded', [], callback);
         }
     }, {
-        key: 'adSkippableState',
-        value: function adSkippableState(callback) {
-            this._flash.callFlashMethod('adSkippableState', [], callback);
+        key: 'getAdSkippableState',
+        value: function getAdSkippableState(callback) {
+            this._flash.callFlashMethod('getAdSkippableState', [], callback);
         }
     }, {
-        key: 'adRemainingTime',
-        value: function adRemainingTime(callback) {
-            this._flash.callFlashMethod('adRemainingTime', [], callback);
+        key: 'getAdRemainingTime',
+        value: function getAdRemainingTime(callback) {
+            this._flash.callFlashMethod('getAdRemainingTime', [], callback);
         }
     }, {
-        key: 'adDuration',
-        value: function adDuration(callback) {
-            this._flash.callFlashMethod('adDuration', [], callback);
+        key: 'getAdDuration',
+        value: function getAdDuration(callback) {
+            this._flash.callFlashMethod('getAdDuration', [], callback);
         }
     }, {
         key: 'setAdVolume',
@@ -312,14 +316,14 @@ var VPAIDAdUnit = (function (_IVPAIDAdUnit) {
             this._flash.callFlashMethod('getAdVolume', [], callback);
         }
     }, {
-        key: 'adCompanions',
-        value: function adCompanions(callback) {
-            this._flash.callFlashMethod('adCompanions', [], callback);
+        key: 'getAdCompanions',
+        value: function getAdCompanions(callback) {
+            this._flash.callFlashMethod('getAdCompanions', [], callback);
         }
     }, {
-        key: 'adIcons',
-        value: function adIcons(callback) {
-            this._flash.callFlashMethod('adIcons', [], callback);
+        key: 'getAdIcons',
+        value: function getAdIcons(callback) {
+            this._flash.callFlashMethod('getAdIcons', [], callback);
         }
     }]);
 

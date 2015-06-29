@@ -70,40 +70,38 @@ export class VPAIDAdUnit extends IVPAIDAdUnit {
     }
 
     //properties that will be treat as async methods
-    adLinear(callback) {
-        this._flash.callFlashMethod('adLinear', [], callback);
+    getAdLinear(callback) {
+        this._flash.callFlashMethod('getAdLinear', [], callback);
     }
-    adWidth(callback) {
-        this._flash.callFlashMethod('adWidth', [], callback);
+    getAdWidth(callback) {
+        this._flash.callFlashMethod('getAdWidth', [], callback);
     }
-    adHeight(callback) {
-        this._flash.callFlashMethod('adHeight', [], callback);
+    getAdHeight(callback) {
+        this._flash.callFlashMethod('getAdHeight', [], callback);
     }
-    adExpanded(callback) {
-        this._flash.callFlashMethod('adExpanded', [], callback);
+    getAdExpanded(callback) {
+        this._flash.callFlashMethod('getAdExpanded', [], callback);
     }
-    adSkippableState(callback) {
-        this._flash.callFlashMethod('adSkippableState', [], callback);
+    getAdSkippableState(callback) {
+        this._flash.callFlashMethod('getAdSkippableState', [], callback);
     }
-    adRemainingTime(callback) {
-        this._flash.callFlashMethod('adRemainingTime', [], callback);
+    getAdRemainingTime(callback) {
+        this._flash.callFlashMethod('getAdRemainingTime', [], callback);
     }
-    adDuration(callback) {
-        this._flash.callFlashMethod('adDuration', [], callback);
+    getAdDuration(callback) {
+        this._flash.callFlashMethod('getAdDuration', [], callback);
     }
-
     setAdVolume(volume, callback = undefined) {
         this._flash.callFlashMethod('setAdVolume', [volume], callback);
     }
     getAdVolume(callback) {
         this._flash.callFlashMethod('getAdVolume', [], callback);
     }
-
-    adCompanions(callback) {
-        this._flash.callFlashMethod('adCompanions', [], callback);
+    getAdCompanions(callback) {
+        this._flash.callFlashMethod('getAdCompanions', [], callback);
     }
-    adIcons(callback) {
-        this._flash.callFlashMethod('adIcons', [], callback);
+    getAdIcons(callback) {
+        this._flash.callFlashMethod('getAdIcons', [], callback);
     }
 }
 
