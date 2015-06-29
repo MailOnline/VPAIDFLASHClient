@@ -21,7 +21,7 @@ Because some of the ad's are in flash, this projects will allow to expose the ap
   - expose ad Unit interface to outside
   - using the **uniqueid** to identify the swf
 
-The goals of VPAIDFLASHClient are:
+The goals of **VPAIDFLASHClient** are:
   - common interface for VPAID in different technologies [HTML5](https://github.com/MailOnline/VPAIDHTML5Client) and [FLASH](https://github.com/MailOnline/VPAIDFLASHClient).
   - handle how to load the VPAID adUnit
   - be a simple and "stupid" implementation of VPAID
