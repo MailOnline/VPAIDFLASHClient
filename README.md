@@ -1,7 +1,6 @@
 VPAIDFLASHClient
 ==========
 [![Code Climate](https://codeclimate.com/github/MailOnline/VPAIDFLASHClient/badges/gpa.svg)](https://codeclimate.com/github/MailOnline/VPAIDFLASHClient)
-[![Dependency Status](https://gemnasium.com/MailOnline/VPAIDFLASHClient.svg)](https://gemnasium.com/MailOnline/VPAIDFLASHClient)
 [![Build Status](https://travis-ci.org/MailOnline/VPAIDFLASHClient.svg?branch=master)](https://travis-ci.org/MailOnline/VPAIDFLASHClient)
 
 About
