@@ -1,8 +1,8 @@
-FlashVPAID
+VPAIDFLASHClient
 ==========
-[![Code Climate](https://codeclimate.com/github/MailOnline/flashVPAID/badges/gpa.svg)](https://codeclimate.com/github/MailOnline/flashVPAID)
-[![Dependency Status](https://gemnasium.com/MailOnline/flashVPAID.svg)](https://gemnasium.com/MailOnline/flashVPAID)
-[![Build Status](https://travis-ci.org/MailOnline/flashVPAID.svg?branch=master)](https://travis-ci.org/MailOnline/flashVPAID)
+[![Code Climate](https://codeclimate.com/github/MailOnline/VPAIDFLASHClient/badges/gpa.svg)](https://codeclimate.com/github/MailOnline/VPAIDFLASHClient)
+[![Dependency Status](https://gemnasium.com/MailOnline/VPAIDFLASHClient.svg)](https://gemnasium.com/MailOnline/VPAIDFLASHClient)
+[![Build Status](https://travis-ci.org/MailOnline/VPAIDFLASHClient.svg?branch=master)](https://travis-ci.org/MailOnline/VPAIDFLASHClient)
 
 About
 ===============
@@ -50,7 +50,7 @@ The flash code was compiled with [FlashBuilder](http://www.adobe.com/uk/products
 
 Debug
 =====
-  - when creating a VPAIDFlasToJs instance the last parameter is debug, if this flag is set to true, will create a visual textfield that allows to show errors
+  - when creating a VPAIDFLASHClient instance the last parameter is debug, if this flag is set to true, will create a visual textfield that allows to show errors
   - as well if the js+flash is working all errors catch by the VPAIDFlash.swf will be sent to js
   - other error's can be caugth with Flash debugger
 
@@ -73,7 +73,7 @@ Example of the usage
 ==========================================
 
 ```javascript
-var flashVPaid = new VPAIDFlashToJS(element, flashVPAIDWrapperLoaded);
+var flashVPaid = new VPAIDFLASHClient(element, flashVPAIDWrapperLoaded);
 function flashVPAIDWrapperLoaded(err, result) {
     if (err) {
         //handle error here
@@ -114,8 +114,8 @@ function flashVPAIDWrapperLoaded(err, result) {
         }
 
         function checkAdProperties() {
-            adUnit.adIcons(function (err, result) {
-                console.log('adIcons', result);
+            adUnit.getAdIcons(function (err, result) {
+                console.log('getAdIcons', result);
             });
             adUnit.setAdVolume(10, function (err, result) {
                 console.log('setAdVolume', result);
@@ -129,7 +129,7 @@ function flashVPAIDWrapperLoaded(err, result) {
 }
 ```
 
-for the api of VPAIDFlashToJS check [VPAIDFlashToJS.js](js/flashVPAID.js), for adUnit api check [IVPAIDAdUnit.js](js/IVPAIDAdUnit.js).
+for the api of VPAIDFLASHClient check [VPAIDFLASHClient.js](js/VPAIDFLASHClient.js), for adUnit api check [IVPAIDAdUnit.js](js/IVPAIDAdUnit.js).
 
 License
 =======

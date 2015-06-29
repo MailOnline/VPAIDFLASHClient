@@ -1,3 +1,5 @@
+'use strict';
+
 let IVPAIDAdUnit = require('./IVPAIDAdUnit').IVPAIDAdUnit;
 let ALL_VPAID_METHODS = Object.getOwnPropertyNames(IVPAIDAdUnit.prototype).filter(function (property) {
     return ['constructor'].indexOf(property) === -1;

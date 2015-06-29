@@ -1,3 +1,5 @@
+'use strict';
+
 export class MultipleValuesRegistry {
     constructor () {
         this._registries = {};

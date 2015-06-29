@@ -4,14 +4,14 @@
 		<title>SWFObject 2 dynamic publishing example page</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 		<script type="text/javascript" src="/swfobject.js"></script>
-		<script type="text/javascript" src="/VPAIDFlashToJS.js"></script>
+		<script type="text/javascript" src="/VPAIDFLASHClient.js"></script>
 	</head>
 	<body>
 		<div id="myContent">
 			<h1>Alternative content</h1>
         </div>
         <script>
-            var flashVPaid = new VPAIDFlashToJS(myContent, flashVPAIDWrapperLoaded);
+            var flashVPaid = new VPAIDFLASHClient(myContent, flashVPAIDWrapperLoaded);
             function flashVPAIDWrapperLoaded(err, success) {
                 if (err) return;
                 //var adURL = 'http://cdn.innovid.com/2.62.8110/platform/vpaid/VPAIDIRollPackage.swf?configURL=http%3A%2F%2Fstatic.innovid.com%2Firoll%2Fconfig%2F1hl7lc.xml%3Fcb%3D787766d7-ebab-3656-c24f-0ddebab645e9&secure=false';
@@ -30,7 +30,6 @@
                     });
                     console.log('adUnitLoaded');
 
-
                     function initAd(err, result) {
                         console.log('handShake', err, result);
                         adUnit.initAd(800, 400, 'normal', -1, '', '', function (err) {
@@ -46,8 +45,8 @@
                     }
 
                     function checkAdProperties() {
-                        adUnit.adIcons(function (err, result) {
-                            console.log('adIcons', result);
+                        adUnit.getAdIcons(function (err, result) {
+                            console.log('getAdIcons', result);
                         });
                         adUnit.setAdVolume(10, function (err, result) {
                             console.log('setAdVolume', result);

@@ -1,5 +1,4 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-//simple representation of the API
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -9,6 +8,8 @@ Object.defineProperty(exports, '__esModule', {
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+//simple representation of the API
 
 var IVPAIDAdUnit = (function () {
     function IVPAIDAdUnit() {
@@ -137,7 +138,7 @@ Object.defineProperty(exports, '__esModule', {
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-var _get = function get(_x15, _x16, _x17) { var _again = true; _function: while (_again) { var object = _x15, property = _x16, receiver = _x17; desc = parent = getter = undefined; _again = false; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x15 = parent; _x16 = property; _x17 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+var _get = function get(_x15, _x16, _x17) { var _again = true; _function: while (_again) { var object = _x15, property = _x16, receiver = _x17; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x15 = parent; _x16 = property; _x17 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
@@ -333,167 +334,159 @@ var VPAIDAdUnit = (function (_IVPAIDAdUnit) {
 exports.VPAIDAdUnit = VPAIDAdUnit;
 
 },{"./IVPAIDAdUnit":1}],3:[function(require,module,exports){
-//if this code already run once don't do anything
 'use strict';
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
-var VPAIDFlashToJS = (function () {
-    if (window.VPAIDFlashToJS) return;
+var JSFlashBridge = require('./jsFlashBridge').JSFlashBridge;
+var VPAIDAdUnit = require('./VPAIDAdUnit').VPAIDAdUnit;
 
-    var JSFlashBridge = require('./jsFlashBridge').JSFlashBridge;
-    var VPAIDAdUnit = require('./VPAIDAdUnit').VPAIDAdUnit;
+var noop = require('./utils').noop;
+var callbackTimeout = require('./utils').callbackTimeout;
+var isPositiveInt = require('./utils').isPositiveInt;
+var createElementWithID = require('./utils').createElementWithID;
+var uniqueVPAID = require('./utils').unique('vpaid');
 
-    var noop = require('./utils').noop;
-    var callbackTimeout = require('./utils').callbackTimeout;
-    var isPositiveInt = require('./utils').isPositiveInt;
-    var createElementWithID = require('./utils').createElementWithID;
-    var uniqueVPAID = require('./utils').unique('vpaid');
+var ERROR = 'error';
+var FLASH_VERSION = '10.1.0';
 
-    var ERROR = 'error';
-    var FLASH_VERSION = '10.1.0';
+var VPAIDFLASHClient = (function () {
+    function VPAIDFLASHClient(vpaidParentEl, callback) {
+        var swfConfig = arguments[2] === undefined ? { data: 'VPAIDFlash.swf', width: 800, height: 400 } : arguments[2];
+        var params = arguments[3] === undefined ? { wmode: 'transparent', salign: 'tl', align: 'left', allowScriptAccess: 'always', scale: 'noScale', allowFullScreen: 'true', quality: 'high' } : arguments[3];
+        var vpaidOptions = arguments[4] === undefined ? { debug: false, timeout: 10000 } : arguments[4];
 
-    var VPAIDFlashToJS = (function () {
-        function VPAIDFlashToJS(vpaidParentEl, callback) {
-            var swfConfig = arguments[2] === undefined ? { data: 'VPAIDFlash.swf', width: 800, height: 400 } : arguments[2];
-            var params = arguments[3] === undefined ? { wmode: 'transparent', salign: 'tl', align: 'left', allowScriptAccess: 'always', scale: 'noScale', allowFullScreen: 'true', quality: 'high' } : arguments[3];
-            var vpaidOptions = arguments[4] === undefined ? { debug: false, timeout: 10000 } : arguments[4];
+        _classCallCheck(this, VPAIDFLASHClient);
 
-            _classCallCheck(this, VPAIDFlashToJS);
-
-            if (!window.swfobject) {
-                return onError({ msg: 'no swfobject in global scope. check: https://github.com/swfobject/swfobject or https://code.google.com/p/swfobject/' });
-            }
-
-            this._vpaidParentEl = vpaidParentEl;
-            this._flashID = uniqueVPAID();
-            this._destroyed = false;
-
-            //validate the height
-            swfConfig.width = isPositiveInt(swfConfig.width, 800);
-            swfConfig.height = isPositiveInt(swfConfig.height, 400);
-
-            createElementWithID(vpaidParentEl, this._flashID);
-
-            params.movie = swfConfig.data;
-            params.FlashVars = 'flashid=' + this._flashID + '&handler=' + JSFlashBridge.VPAID_FLASH_HANDLER + '&debug=' + vpaidOptions.debug + '&salign=' + params.salign;
-
-            if (!VPAIDFlashToJS.isSupported()) {
-                return onError({ msg: 'user don\'t support flash or doesn\'t have the minimum required version of flash', version: FLASH_VERSION });
-            }
-
-            this.el = swfobject.createSWF(swfConfig, params, this._flashID);
-
-            if (!this.el) {
-                return onError({ msg: 'swfobject failed to create object in element' });
-            }
-
-            this._flash = new JSFlashBridge(this.el, swfConfig.data, this._flashID, swfConfig.width, swfConfig.height, callbackTimeout(vpaidOptions.timeout, callback, function () {
-                callback({ msg: 'vpaid flash load timeout', timeout: vpaidOptions.timeout });
-            }));
-
-            function onError(error) {
-                setTimeout(function () {
-                    callback(error);
-                }, 0);
-                return this;
-            }
+        if (!window.swfobject) {
+            return onError({ msg: 'no swfobject in global scope. check: https://github.com/swfobject/swfobject or https://code.google.com/p/swfobject/' });
         }
 
-        _createClass(VPAIDFlashToJS, [{
-            key: 'destroy',
-            value: function destroy() {
-                this._destroyAdUnit();
-                if (this._flash) {
-                    this._flash.destroy();
-                    this._flash = null;
-                }
-                this.el = null;
-                this._destroyed = true;
-            }
-        }, {
-            key: 'isDestroyed',
-            value: function isDestroyed() {
-                return this._destroyed;
-            }
-        }, {
-            key: '_destroyAdUnit',
-            value: function _destroyAdUnit() {
-                if (this._adUnitLoad) {
-                    this._adUnitLoad = null;
-                    this._flash.removeCallback(this._adUnitLoad);
-                }
+        this._vpaidParentEl = vpaidParentEl;
+        this._flashID = uniqueVPAID();
+        this._destroyed = false;
 
-                if (this._adUnit) {
-                    this._adUnit._destroy();
-                    this._adUnit = null;
-                }
-            }
-        }, {
-            key: 'loadAdUnit',
-            value: function loadAdUnit(adURL, callback) {
-                var _this = this;
+        //validate the height
+        swfConfig.width = isPositiveInt(swfConfig.width, 800);
+        swfConfig.height = isPositiveInt(swfConfig.height, 400);
 
-                if (this._destroyed) {
-                    throw new error('VPAIDFlashToJS is destroyed!');
-                }
-                if (this._adUnit) {
-                    throw new error('AdUnit still exists');
-                }
+        createElementWithID(vpaidParentEl, this._flashID);
 
-                this._adUnitLoad = function (err, message) {
-                    if (!err) {
-                        _this._adUnit = new VPAIDAdUnit(_this._flash);
-                    }
-                    _this._adUnitLoad = null;
-                    callback(err, _this._adUnit);
-                };
+        params.movie = swfConfig.data;
+        params.FlashVars = 'flashid=' + this._flashID + '&handler=' + JSFlashBridge.VPAID_FLASH_HANDLER + '&debug=' + vpaidOptions.debug + '&salign=' + params.salign;
 
-                this._flash.callFlashMethod('loadAdUnit', [adURL], this._adUnitLoad);
-            }
-        }, {
-            key: 'unloadAdUnit',
-            value: function unloadAdUnit() {
-                var callback = arguments[0] === undefined ? undefined : arguments[0];
-
-                if (this._destroyed) {
-                    throw new error('VPAIDFlashToJS is destroyed!');
-                }
-
-                this._destroyAdUnit();
-                this._flash.callFlashMethod('unloadAdUnit', [], callback);
-            }
-        }, {
-            key: 'getFlashID',
-            value: function getFlashID() {
-                return this._flash.getFlashID();
-            }
-        }, {
-            key: 'getFlashURL',
-            value: function getFlashURL() {
-                return this._flash.getFlashURL();
-            }
-        }]);
-
-        return VPAIDFlashToJS;
-    })();
-
-    Object.defineProperty(VPAIDFlashToJS, 'isSupported', {
-        writable: false,
-        configurable: false,
-        value: function value() {
-            return swfobject.hasFlashPlayerVersion(FLASH_VERSION);
+        if (!VPAIDFLASHClient.isSupported()) {
+            return onError({ msg: 'user don\'t support flash or doesn\'t have the minimum required version of flash', version: FLASH_VERSION });
         }
-    });
 
-    window.VPAIDFlashToJS = VPAIDFlashToJS;
+        this.el = swfobject.createSWF(swfConfig, params, this._flashID);
 
-    return VPAIDFlashToJS;
+        if (!this.el) {
+            return onError({ msg: 'swfobject failed to create object in element' });
+        }
+
+        this._flash = new JSFlashBridge(this.el, swfConfig.data, this._flashID, swfConfig.width, swfConfig.height, callbackTimeout(vpaidOptions.timeout, callback, function () {
+            callback({ msg: 'vpaid flash load timeout', timeout: vpaidOptions.timeout });
+        }));
+
+        function onError(error) {
+            setTimeout(function () {
+                callback(error);
+            }, 0);
+            return this;
+        }
+    }
+
+    _createClass(VPAIDFLASHClient, [{
+        key: 'destroy',
+        value: function destroy() {
+            this._destroyAdUnit();
+            if (this._flash) {
+                this._flash.destroy();
+                this._flash = null;
+            }
+            this.el = null;
+            this._destroyed = true;
+        }
+    }, {
+        key: 'isDestroyed',
+        value: function isDestroyed() {
+            return this._destroyed;
+        }
+    }, {
+        key: '_destroyAdUnit',
+        value: function _destroyAdUnit() {
+            if (this._adUnitLoad) {
+                this._adUnitLoad = null;
+                this._flash.removeCallback(this._adUnitLoad);
+            }
+
+            if (this._adUnit) {
+                this._adUnit._destroy();
+                this._adUnit = null;
+            }
+        }
+    }, {
+        key: 'loadAdUnit',
+        value: function loadAdUnit(adURL, callback) {
+            var _this = this;
+
+            if (this._destroyed) {
+                throw new error('VPAIDFlashToJS is destroyed!');
+            }
+            if (this._adUnit) {
+                throw new error('AdUnit still exists');
+            }
+
+            this._adUnitLoad = function (err, message) {
+                if (!err) {
+                    _this._adUnit = new VPAIDAdUnit(_this._flash);
+                }
+                _this._adUnitLoad = null;
+                callback(err, _this._adUnit);
+            };
+
+            this._flash.callFlashMethod('loadAdUnit', [adURL], this._adUnitLoad);
+        }
+    }, {
+        key: 'unloadAdUnit',
+        value: function unloadAdUnit() {
+            var callback = arguments[0] === undefined ? undefined : arguments[0];
+
+            if (this._destroyed) {
+                throw new error('VPAIDFlashToJS is destroyed!');
+            }
+
+            this._destroyAdUnit();
+            this._flash.callFlashMethod('unloadAdUnit', [], callback);
+        }
+    }, {
+        key: 'getFlashID',
+        value: function getFlashID() {
+            return this._flash.getFlashID();
+        }
+    }, {
+        key: 'getFlashURL',
+        value: function getFlashURL() {
+            return this._flash.getFlashURL();
+        }
+    }]);
+
+    return VPAIDFLASHClient;
 })();
 
-module.exports = VPAIDFlashToJS;
+Object.defineProperty(VPAIDFLASHClient, 'isSupported', {
+    writable: false,
+    configurable: false,
+    value: function value() {
+        return swfobject.hasFlashPlayerVersion(FLASH_VERSION);
+    }
+});
+
+window.VPAIDFLASHClient = VPAIDFLASHClient;
+module.exports = VPAIDFLASHClient;
 
 },{"./VPAIDAdUnit":2,"./jsFlashBridge":4,"./utils":7}],4:[function(require,module,exports){
 'use strict';
@@ -561,7 +554,7 @@ var JSFlashBridge = (function () {
             var callbackID = '';
             // if no callback, some methods the return is void so they don't need callback
             if (callback) {
-                callbackID = '' + this._uniqueMethodIdentifier() + '_' + methodName;
+                callbackID = this._uniqueMethodIdentifier() + '_' + methodName;
                 this._callbacks.add(callbackID, callback);
             }
 
@@ -750,15 +743,15 @@ Object.defineProperty(JSFlashBridgeRegistry, 'removeInstanceByID', {
 module.exports = JSFlashBridgeRegistry;
 
 },{"./registry":6}],6:[function(require,module,exports){
-"use strict";
+'use strict';
 
-Object.defineProperty(exports, "__esModule", {
+Object.defineProperty(exports, '__esModule', {
     value: true
 });
 
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
 var MultipleValuesRegistry = (function () {
     function MultipleValuesRegistry() {
@@ -768,7 +761,7 @@ var MultipleValuesRegistry = (function () {
     }
 
     _createClass(MultipleValuesRegistry, [{
-        key: "add",
+        key: 'add',
         value: function add(id, value) {
             if (!this._registries[id]) {
                 this._registries[id] = [];
@@ -778,17 +771,17 @@ var MultipleValuesRegistry = (function () {
             }
         }
     }, {
-        key: "get",
+        key: 'get',
         value: function get(id) {
             return this._registries[id] || [];
         }
     }, {
-        key: "filterKeys",
+        key: 'filterKeys',
         value: function filterKeys(handler) {
             return Object.keys(this._registries).filter(handler);
         }
     }, {
-        key: "findByValue",
+        key: 'findByValue',
         value: function findByValue(value) {
             var _this = this;
 
@@ -800,7 +793,7 @@ var MultipleValuesRegistry = (function () {
             return keys;
         }
     }, {
-        key: "remove",
+        key: 'remove',
         value: function remove(key, value) {
             if (!this._registries[key]) {
                 return;
@@ -814,14 +807,14 @@ var MultipleValuesRegistry = (function () {
             return this._registries[key].splice(index, 1);
         }
     }, {
-        key: "removeByKey",
+        key: 'removeByKey',
         value: function removeByKey(id) {
             var old = this._registries[id];
             delete this._registries[id];
             return old;
         }
     }, {
-        key: "removeByValue",
+        key: 'removeByValue',
         value: function removeByValue(value) {
             var _this2 = this;
 
@@ -831,14 +824,14 @@ var MultipleValuesRegistry = (function () {
             });
         }
     }, {
-        key: "removeAll",
+        key: 'removeAll',
         value: function removeAll() {
             var old = this._registries;
             this._registries = {};
             return old;
         }
     }, {
-        key: "size",
+        key: 'size',
         value: function size() {
             return Object.keys(this._registries).length;
         }
@@ -857,22 +850,22 @@ var SingleValueRegistry = (function () {
     }
 
     _createClass(SingleValueRegistry, [{
-        key: "add",
+        key: 'add',
         value: function add(id, value) {
             this._registries[id] = value;
         }
     }, {
-        key: "get",
+        key: 'get',
         value: function get(id) {
             return this._registries[id];
         }
     }, {
-        key: "filterKeys",
+        key: 'filterKeys',
         value: function filterKeys(handler) {
             return Object.keys(this._registries).filter(handler);
         }
     }, {
-        key: "findByValue",
+        key: 'findByValue',
         value: function findByValue(value) {
             var _this3 = this;
 
@@ -884,14 +877,14 @@ var SingleValueRegistry = (function () {
             return keys;
         }
     }, {
-        key: "remove",
+        key: 'remove',
         value: function remove(id) {
             var old = this._registries[id];
             delete this._registries[id];
             return old;
         }
     }, {
-        key: "removeByValue",
+        key: 'removeByValue',
         value: function removeByValue(value) {
             var _this4 = this;
 
@@ -901,14 +894,14 @@ var SingleValueRegistry = (function () {
             });
         }
     }, {
-        key: "removeAll",
+        key: 'removeAll',
         value: function removeAll() {
             var old = this._registries;
             this._registries = {};
             return old;
         }
     }, {
-        key: "size",
+        key: 'size',
         value: function size() {
             return Object.keys(this._registries).length;
         }
@@ -935,7 +928,7 @@ exports.stringEndsWith = stringEndsWith;
 function unique(prefix) {
     var count = -1;
     return function (f) {
-        return '' + prefix + '_' + ++count;
+        return prefix + '_' + ++count;
     };
 }
 
@@ -987,4 +980,4 @@ function stringEndsWith(string, search) {
 },{}]},{},[3])
 
 
-//# sourceMappingURL=VPAIDFlashToJS.js.map
+//# sourceMappingURL=VPAIDFLASHClient.js.map

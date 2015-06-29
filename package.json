@@ -1,6 +1,13 @@
 {
-  "name": "flashVPAID",
-  "version": "0.0.7",
+  "name": "VPAIDFLASHClient",
+  "version": "0.0.8",
+  "author": "Luis da Silva <luis.dasilva@mailonline.co.uk>",
+  "homepage": "https://github.com/MailOnline/VPAIDFLASHClient",
+  "main": [ "bin/VPAIDFLASHClient.js", "bin/VPAIDFLASHClient.js.map", "build/VPAIDFlash.swf" ],
+  "bugs": {
+    "url": "https://github.com/MailOnline/VPAIDFLASHClient/issues"
+  },
+  "license": "MIT",
   "devDependencies": {
     "babelify": "^6.1.0",
     "browser-sync": "^2.7.1",

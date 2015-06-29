@@ -1,12 +1,12 @@
 {
-  "name": "flashVPAID",
-  "version": "0.0.7",
+  "name": "VPAIDFLASHClient",
+  "version": "0.0.8",
   "authors": [
     "Luis Silva <luis.dasilva@mailonline.co.uk>"
   ],
   "description": "",
-  "main": [ "build/VPAIDFlashToJS.js", "build/VPAIDFlashToJS.js.map", "build/VPAIDFlash.swf" ],
-  "license": "Private",
+  "main": [ "bin/VPAIDFLASHClient.js", "bin/VPAIDFLASHClient.js.map", "build/VPAIDFlash.swf" ],
+  "license": "MIT",
   "ignore": [
     "node_modules",
     "bower_components",

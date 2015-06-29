@@ -1,9 +1,9 @@
-let VPAIDFlashToJS = require('../../js/VPAIDFlashToJS.js');
+let VPAIDFLASHClient = require('../../js/VPAIDFLASHClient.js');
 let VPAID_FLASH_HANDLER = require('../../js/jsFlashBridge.js').JSFlashBridge.VPAID_FLASH_HANDLER;
 let VPAIDAdUnit = require('../../js/VPAIDAdUnit.js').VPAIDAdUnit;
 let addFlashMethodsToEl = require('../testHelper.js').addFlashMethodsToEl;
 
-describe('VPAIDFlashToJS <-> FlashVPAID.swf <-> VPAID_AD.swf', function()  {
+describe('VPAIDFLASHClient <-> FlashVPAID.swf <-> VPAID_AD.swf', function()  {
     let flashWrapper1, flashWrapper2;
     const AD_URL = 'TestAd.swf';
 
@@ -23,22 +23,22 @@ describe('VPAIDFlashToJS <-> FlashVPAID.swf <-> VPAID_AD.swf', function()  {
 
     it('must handle gracefully when createSWF fails', function () {
         var elNotInDOM = document.createElement('div');
-        let vpaid = new VPAIDFlashToJS(elNotInDOM, function (err, result) {
+        let vpaid = new VPAIDFLASHClient(elNotInDOM, function (err, result) {
             assert.isNotNull(err);
             assert.match(err.msg, /^swfobject failed to create/);
         });
 
     });
 
-    it('VPAIDFlashToJS must load FlashVPAID', function(done) {
-        let vpaid = new VPAIDFlashToJS(flashWrapper1, function () {
+    it('VPAIDFLASHClient must load FlashVPAID', function(done) {
+        let vpaid = new VPAIDFLASHClient(flashWrapper1, function () {
             assert(true);
             done();
         });
     });
 
-    it('VPAIDFlashToJS must loadAdUnit', function(done) {
-        let vpaid = new VPAIDFlashToJS(flashWrapper1, function () {
+    it('VPAIDFLASHClient must loadAdUnit', function(done) {
+        let vpaid = new VPAIDFLASHClient(flashWrapper1, function () {
             vpaid.loadAdUnit(AD_URL, function(err, adUnit) {
                 assert.isDefined(adUnit);
                 done();
@@ -49,7 +49,7 @@ describe('VPAIDFlashToJS <-> FlashVPAID.swf <-> VPAID_AD.swf', function()  {
 
     describe('adUnit', function () {
         function createAndLoadVPaid(onLoad) {
-            let vpaid = new VPAIDFlashToJS(flashWrapper1, function () {
+            let vpaid = new VPAIDFLASHClient(flashWrapper1, function () {
                 vpaid.loadAdUnit(AD_URL, onLoad);
             });
             return vpaid;
@@ -117,7 +117,7 @@ describe('VPAIDFlashToJS <-> FlashVPAID.swf <-> VPAID_AD.swf', function()  {
 
         describe('adUnit must unload', function (done) {
             it('unload must work when the ad is still loading', function (done) {
-                let vpaid = new VPAIDFlashToJS(flashWrapper1, function () {
+                let vpaid = new VPAIDFLASHClient(flashWrapper1, function () {
                     let onAd = sinon.spy();
                     vpaid.loadAdUnit(AD_URL, onAd);
                     vpaid.unloadAdUnit(function (err, result) {

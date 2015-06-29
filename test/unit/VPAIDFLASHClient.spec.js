@@ -1,11 +1,11 @@
-let VPAIDFlashToJS = require('../../js/VPAIDFlashToJS.js');
+let VPAIDFLASHClient = require('../../js/VPAIDFLASHClient.js');
 let VPAID_FLASH_HANDLER = require('../../js/jsFlashBridge.js').JSFlashBridge.VPAID_FLASH_HANDLER;
 let VPAIDAdUnit = require('../../js/VPAIDAdUnit.js').VPAIDAdUnit;
 let after = require('../testHelper.js').after;
 let addFlashMethodsToEl = require('../testHelper.js').addFlashMethodsToEl;
 
 
-describe('VPAIDFlashToJs.js api', function()  {
+describe('VPAIDFLASHClient.js api', function()  {
     let swfObjectCallback;
     let flashWrapper1, flashWrapper2;
     let noop = function () {};
@@ -55,7 +55,7 @@ describe('VPAIDFlashToJs.js api', function()  {
             });
 
             it('must handle gracefully', function () {
-                let flashVPAID = new VPAIDFlashToJS(flashWrapper1, function (err, result) {
+                let flashVPAID = new VPAIDFLASHClient(flashWrapper1, function (err, result) {
                     assert.isNotNull(err);
                     assert.match(err.msg, /^no swfobject/);
                     flashVPAID.destroy();
@@ -70,7 +70,7 @@ describe('VPAIDFlashToJs.js api', function()  {
                 return false;
             });
 
-            let flashVPAID = new VPAIDFlashToJS(flashWrapper1, function (err, result) {
+            let flashVPAID = new VPAIDFLASHClient(flashWrapper1, function (err, result) {
                 assert.isNotNull(err);
                 assert.match(err.msg, /^user don't support flash/);
             });
@@ -84,7 +84,7 @@ describe('VPAIDFlashToJs.js api', function()  {
                 return;
             });
 
-            let flashVPAID = new VPAIDFlashToJS(flashWrapper1, function (err, result) {
+            let flashVPAID = new VPAIDFLASHClient(flashWrapper1, function (err, result) {
                 assert.isNotNull(err);
                 assert.match(err.msg, /^swfobject failed to create/);
             });
@@ -100,7 +100,7 @@ describe('VPAIDFlashToJs.js api', function()  {
             done();
         });
 
-        let flashVPAID = new VPAIDFlashToJS(flashWrapper1, callback);
+        let flashVPAID = new VPAIDFLASHClient(flashWrapper1, callback);
 
     });
 
@@ -113,8 +113,8 @@ describe('VPAIDFlashToJs.js api', function()  {
             done();
         });
 
-        flashVPAID1 = new VPAIDFlashToJS(flashWrapper1, counter);
-        flashVPAID2 = new VPAIDFlashToJS(flashWrapper2, counter);
+        flashVPAID1 = new VPAIDFLASHClient(flashWrapper1, counter);
+        flashVPAID2 = new VPAIDFLASHClient(flashWrapper2, counter);
 
     });
 
@@ -130,16 +130,16 @@ describe('VPAIDFlashToJs.js api', function()  {
         });
 
         callback1 = sinon.spy(counter);
-        flashVPAID1 = new VPAIDFlashToJS(flashWrapper1, callback1);
+        flashVPAID1 = new VPAIDFLASHClient(flashWrapper1, callback1);
 
         callback2 = sinon.spy(counter);
-        flashVPAID2 = new VPAIDFlashToJS(flashWrapper1, callback2);
+        flashVPAID2 = new VPAIDFLASHClient(flashWrapper1, callback2);
 
     });
 
     it('must load adUnit', function (done) {
 
-        let flashVPAID = new VPAIDFlashToJS(flashWrapper1, function () {
+        let flashVPAID = new VPAIDFLASHClient(flashWrapper1, function () {
 
             let callback = sinon.spy(function (error, result) {
                 assert(callback.calledOnce);
@@ -155,7 +155,7 @@ describe('VPAIDFlashToJs.js api', function()  {
 
     it('must unload adUnit', function (done) {
 
-        let flashVPAID = new VPAIDFlashToJS(flashWrapper1, function () {
+        let flashVPAID = new VPAIDFLASHClient(flashWrapper1, function () {
 
             flashVPAID.loadAdUnit('random.swf', function (erro, adUnit) {
 
@@ -188,7 +188,7 @@ describe('VPAIDFlashToJs.js api', function()  {
 
     it('must implement destroy', function (done) {
 
-        let flashVPAID = new VPAIDFlashToJS(flashWrapper1, function () {
+        let flashVPAID = new VPAIDFLASHClient(flashWrapper1, function () {
 
             flashVPAID.loadAdUnit('random.swf', function (error, adUnit) {
 
@@ -228,7 +228,7 @@ describe('VPAIDFlashToJs.js api', function()  {
 
     it('must get the volume', function (done) {
 
-        let flashVPAID = new VPAIDFlashToJS(flashWrapper1, function () {
+        let flashVPAID = new VPAIDFLASHClient(flashWrapper1, function () {
             flashVPAID.loadAdUnit('random.swf', function (error, adUnit) {
 
                 sinon.stub(flashVPAID.el, 'getAdVolume', function (argsData) {
@@ -249,7 +249,7 @@ describe('VPAIDFlashToJs.js api', function()  {
 
     it('must set the volume', function (done) {
 
-        let flashVPAID = new VPAIDFlashToJS(flashWrapper1, function () {
+        let flashVPAID = new VPAIDFLASHClient(flashWrapper1, function () {
             flashVPAID.loadAdUnit('random.swf', function (error, adUnit) {
 
                 sinon.stub(flashVPAID.el, 'setAdVolume', function (argsData) {
@@ -282,7 +282,7 @@ describe('VPAIDFlashToJs.js api', function()  {
         booleanGetters.forEach(function (method) {
             it('must get ' + method, function (done) {
 
-                let flashVPAID = new VPAIDFlashToJS(flashWrapper1, function () {
+                let flashVPAID = new VPAIDFLASHClient(flashWrapper1, function () {
                     flashVPAID.loadAdUnit('random.swf', function (error, adUnit) {
 
                         let callback1, callback2, elCounter = 0;

@@ -1,3 +1,5 @@
+'use strict';
+
 let unique = require('./utils').unique;
 let isPositiveInt = require('./utils').isPositiveInt;
 let stringEndsWith = require('./utils').stringEndsWith;

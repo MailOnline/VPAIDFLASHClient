@@ -1,3 +1,5 @@
+'use strict';
+
 let SingleValueRegistry = require('./registry').SingleValueRegistry;
 let instances = new SingleValueRegistry();
 

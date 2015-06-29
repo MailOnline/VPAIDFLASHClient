@@ -1,3 +1,5 @@
+'use strict';
+
 //simple representation of the API
 export class IVPAIDAdUnit {
 

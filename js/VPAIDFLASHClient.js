@@ -1,6 +1,4 @@
-//if this code already run once don't do anything
-let VPAIDFlashToJS = (function () {
-if (window.VPAIDFlashToJS) return;
+'use strict';
 
 let JSFlashBridge = require('./jsFlashBridge').JSFlashBridge;
 let VPAIDAdUnit = require('./VPAIDAdUnit').VPAIDAdUnit;
@@ -14,7 +12,7 @@ let uniqueVPAID = require('./utils').unique('vpaid');
 const ERROR = 'error';
 const FLASH_VERSION = '10.1.0';
 
-class VPAIDFlashToJS {
+class VPAIDFLASHClient {
     constructor (vpaidParentEl, callback, swfConfig = {data: 'VPAIDFlash.swf', width: 800, height: 400}, params = { wmode: 'transparent', salign: 'tl', align: 'left', allowScriptAccess: 'always', scale: 'noScale', allowFullScreen: 'true', quality: 'high'}, vpaidOptions = { debug: false, timeout: 10000 }) {
 
         if (!window.swfobject) {
@@ -34,7 +32,7 @@ class VPAIDFlashToJS {
         params.movie = swfConfig.data;
         params.FlashVars = `flashid=${this._flashID}&handler=${JSFlashBridge.VPAID_FLASH_HANDLER}&debug=${vpaidOptions.debug}&salign=${params.salign}`;
 
-        if (!VPAIDFlashToJS.isSupported()) {
+        if (!VPAIDFLASHClient.isSupported()) {
             return onError({msg:'user don\'t support flash or doesn\'t have the minimum required version of flash', version: FLASH_VERSION});
         }
 
@@ -117,7 +115,7 @@ class VPAIDFlashToJS {
     }
 }
 
-Object.defineProperty(VPAIDFlashToJS, 'isSupported', {
+Object.defineProperty(VPAIDFLASHClient, 'isSupported', {
     writable: false,
     configurable: false,
     value: () => {
@@ -125,10 +123,6 @@ Object.defineProperty(VPAIDFlashToJS, 'isSupported', {
     }
 });
 
-window.VPAIDFlashToJS = VPAIDFlashToJS;
-
-return VPAIDFlashToJS;
-})();
-
-module.exports =  VPAIDFlashToJS;
+window.VPAIDFLASHClient = VPAIDFLASHClient;
+module.exports = VPAIDFLASHClient;
 

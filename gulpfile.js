@@ -22,7 +22,7 @@ var karma = require('karma').server;
 
 var testPath = 'test/**/**.js';
 var binPath = './bin';
-var mainJS = 'VPAIDFlashToJS.js';
+var mainJS = 'VPAIDFLASHClient.js';
 
 var jsBuild = watchify(
     browserify(
