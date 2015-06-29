@@ -4,6 +4,14 @@
   "author": "Luis da Silva <luis.dasilva@mailonline.co.uk>",
   "homepage": "https://github.com/MailOnline/VPAIDFLASHClient",
   "main": [ "bin/VPAIDFLASHClient.js", "bin/VPAIDFLASHClient.js.map", "build/VPAIDFlash.swf" ],
+  "description": "VPAID Flash for JS",
+  "keywords": [
+    "VPAID",
+    "Flash",
+    "JS",
+    "VIDEO",
+    "IAB"
+  ],
   "bugs": {
     "url": "https://github.com/MailOnline/VPAIDFLASHClient/issues"
   },
