@@ -15,8 +15,8 @@ const FLASH_VERSION = '10.1.0';
 class VPAIDFLASHClient {
     constructor (vpaidParentEl, callback, swfConfig = {data: 'VPAIDFlash.swf', width: 800, height: 400}, params = { wmode: 'transparent', salign: 'tl', align: 'left', allowScriptAccess: 'always', scale: 'noScale', allowFullScreen: 'true', quality: 'high'}, vpaidOptions = { debug: false, timeout: 10000 }) {
 
-        if (!window.swfobject) {
-            return onError({msg: 'no swfobject in global scope. check: https://github.com/swfobject/swfobject or https://code.google.com/p/swfobject/'});
+        if (!VPAIDFLASHClient.hasExternalDependencies()) {
+            return onError('no swfobject in global scope. check: https://github.com/swfobject/swfobject or https://code.google.com/p/swfobject/');
         }
 
         this._vpaidParentEl = vpaidParentEl;
@@ -33,22 +33,22 @@ class VPAIDFLASHClient {
         params.FlashVars = `flashid=${this._flashID}&handler=${JSFlashBridge.VPAID_FLASH_HANDLER}&debug=${vpaidOptions.debug}&salign=${params.salign}`;
 
         if (!VPAIDFLASHClient.isSupported()) {
-            return onError({msg:'user don\'t support flash or doesn\'t have the minimum required version of flash', version: FLASH_VERSION});
+            return onError('user don\'t support flash or doesn\'t have the minimum required version of flash ' + FLASH_VERSION);
         }
 
         this.el = swfobject.createSWF(swfConfig, params, this._flashID);
 
         if (!this.el) {
-            return onError({msg: 'swfobject failed to create object in element'});
+            return onError( 'swfobject failed to create object in element' );
         }
 
         this._flash = new JSFlashBridge(this.el, swfConfig.data, this._flashID, swfConfig.width, swfConfig.height, callbackTimeout(vpaidOptions.timeout, callback, () => {
-            callback({msg: 'vpaid flash load timeout', timeout: vpaidOptions.timeout });
+            callback( 'vpaid flash load timeout ' + vpaidOptions.timeout );
         }));
 
         function onError(error) {
             setTimeout(() => {
-                callback(error);
+                callback(new Error(error));
             }, 0);
             return this;
         }
@@ -115,13 +115,21 @@ class VPAIDFLASHClient {
     }
 }
 
-Object.defineProperty(VPAIDFLASHClient, 'isSupported', {
-    writable: false,
-    configurable: false,
-    value: () => {
-        return swfobject.hasFlashPlayerVersion(FLASH_VERSION);
-    }
+setStaticProperty('isSupported', () => {
+    return VPAIDFLASHClient.hasExternalDependencies() && swfobject.hasFlashPlayerVersion(FLASH_VERSION);
 });
+
+setStaticProperty('hasExternalDependencies', () => {
+    return !!window.swfobject;
+});
+
+function setStaticProperty(propertyName, value) {
+    Object.defineProperty(VPAIDFLASHClient, propertyName, {
+        writable: false,
+        configurable: false,
+        value: value
+    });
+}
 
 window.VPAIDFLASHClient = VPAIDFLASHClient;
 module.exports = VPAIDFLASHClient;

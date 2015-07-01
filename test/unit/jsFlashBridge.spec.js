@@ -93,7 +93,7 @@ describe('jsFlashBridge.js api', function()  {
         flashMethod.onThirdCall().throws();
 
         instance.callFlashMethod(METHOD_NAME, [], noop);
-        assert(flashMethod.calledOnce);
+        assert(flashMethod.calledOnce, 'was called?');
 
         var callback1 = sinon.spy();
         var callback2 = sinon.spy(function () {

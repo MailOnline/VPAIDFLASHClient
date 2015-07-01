@@ -25,7 +25,7 @@ describe('VPAIDFLASHClient <-> FlashVPAID.swf <-> VPAID_AD.swf', function()  {
         var elNotInDOM = document.createElement('div');
         let vpaid = new VPAIDFLASHClient(elNotInDOM, function (err, result) {
             assert.isNotNull(err);
-            assert.match(err.msg, /^swfobject failed to create/);
+            assert.match(err.message, /^swfobject failed to create/);
         });
 
     });

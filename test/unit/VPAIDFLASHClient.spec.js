@@ -9,6 +9,7 @@ describe('VPAIDFLASHClient.js api', function()  {
     let swfObjectCallback;
     let flashWrapper1, flashWrapper2;
     let noop = function () {};
+    var clock;
 
     beforeEach(function() {
         sinon.stub(swfobject, 'hasFlashPlayerVersion').returns(true);
@@ -31,6 +32,8 @@ describe('VPAIDFLASHClient.js api', function()  {
         flashWrapper2 = document.createElement('div');
         document.body.appendChild(flashWrapper1);
         document.body.appendChild(flashWrapper2);
+
+        clock = sinon.useFakeTimers();
     });
 
     afterEach(function () {
@@ -40,6 +43,8 @@ describe('VPAIDFLASHClient.js api', function()  {
 
         document.body.removeChild(flashWrapper1);
         document.body.removeChild(flashWrapper2);
+
+        clock.restore();
     });
 
 
@@ -54,13 +59,30 @@ describe('VPAIDFLASHClient.js api', function()  {
                 delete window.temp;
             });
 
+            it('hasExternalDependencies should return false', function () {
+                assert(!VPAIDFLASHClient.hasExternalDependencies());
+            });
+
+            it('isSupported should return false', function () {
+                assert(!VPAIDFLASHClient.isSupported());
+            });
+
             it('must handle gracefully', function () {
                 let flashVPAID = new VPAIDFLASHClient(flashWrapper1, function (err, result) {
-                    assert.isNotNull(err);
-                    assert.match(err.msg, /^no swfobject/);
+                    assert.match(err.message, /^no swfobject/, 'message should be no swfobject...');
                     flashVPAID.destroy();
                 });
+
+                clock.tick(100);
             });
+        });
+
+        it('hasExternalDependencies should return true', function () {
+            assert(VPAIDFLASHClient.hasExternalDependencies());
+        });
+
+        it('isSupported should return true', function () {
+            assert(VPAIDFLASHClient.isSupported());
         });
 
         it('must handle gracefully when no supported flash', function () {
@@ -72,9 +94,10 @@ describe('VPAIDFLASHClient.js api', function()  {
 
             let flashVPAID = new VPAIDFLASHClient(flashWrapper1, function (err, result) {
                 assert.isNotNull(err);
-                assert.match(err.msg, /^user don't support flash/);
+                assert.match(err.message, /^user don't support flash/);
             });
 
+            clock.tick(100);
         });
 
         it('must handle gracefully when createSWF fails', function () {
@@ -86,39 +109,40 @@ describe('VPAIDFLASHClient.js api', function()  {
 
             let flashVPAID = new VPAIDFLASHClient(flashWrapper1, function (err, result) {
                 assert.isNotNull(err);
-                assert.match(err.msg, /^swfobject failed to create/);
+                assert.match(err.message, /^swfobject failed to create/);
             });
 
+            clock.tick(100);
         });
 
     });
 
-    it('must fire callback when vpaid flash wrapper is loaded', function (done) {
+    it('must fire callback when vpaid flash wrapper is loaded', function () {
 
         let callback = sinon.spy(function () {
             assert(callback.calledWith(null, 'ok'));
-            done();
         });
 
         let flashVPAID = new VPAIDFLASHClient(flashWrapper1, callback);
 
+        clock.tick(100);
     });
 
-    it('must create elements with with a unique id', function (done) {
+    it('must create elements with with a unique id', function () {
         let flashVPAID1, flashVPAID2;
 
         let counter = after(2, function () {
             assert.equal(swfObjectCallback.getCall(0).args[2], flashVPAID1.el.id);
             assert.equal(swfObjectCallback.getCall(1).args[2], flashVPAID2.el.id);
-            done();
         });
 
         flashVPAID1 = new VPAIDFLASHClient(flashWrapper1, counter);
         flashVPAID2 = new VPAIDFLASHClient(flashWrapper2, counter);
 
+        clock.tick(100);
     });
 
-    it('must handle multiple load callbacks', function (done) {
+    it('must handle multiple load callbacks', function () {
         let flashVPAID1, flashVPAID2, callback1, callback2;
 
         let counter = after(2, function () {
@@ -126,7 +150,6 @@ describe('VPAIDFLASHClient.js api', function()  {
             assert(callback2.calledOnce);
             assert(callback1.calledWith(null, 'ok'));
             assert(callback2.calledWith(null, 'ok'));
-            done();
         });
 
         callback1 = sinon.spy(counter);
@@ -135,25 +158,27 @@ describe('VPAIDFLASHClient.js api', function()  {
         callback2 = sinon.spy(counter);
         flashVPAID2 = new VPAIDFLASHClient(flashWrapper1, callback2);
 
+        clock.tick(100);
     });
 
-    it('must load adUnit', function (done) {
+    it('must load adUnit', function () {
 
         let flashVPAID = new VPAIDFLASHClient(flashWrapper1, function () {
 
             let callback = sinon.spy(function (error, result) {
                 assert(callback.calledOnce);
                 assert.instanceOf(result, VPAIDAdUnit, 'callback result must return a adUnit');
-                done();
             });
 
             flashVPAID.loadAdUnit('random.swf', callback);
 
         });
+
+        clock.tick(100);
     });
 
 
-    it('must unload adUnit', function (done) {
+    it('must unload adUnit', function () {
 
         let flashVPAID = new VPAIDFLASHClient(flashWrapper1, function () {
 
@@ -180,13 +205,17 @@ describe('VPAIDFLASHClient.js api', function()  {
                 flashVPAID.unloadAdUnit();
                 assert.equal(flashVPAID._flash._callbacks.size(), 0, 'must remove all callbacks of adUnit');
                 assert.equal(flashVPAID._flash._handlers.size(), 0, 'must remove all adUnit events');
-                done();
+
+                clock.tick(100);
             });
 
+            clock.tick(100);
         });
+
+        clock.tick(100);
     });
 
-    it('must implement destroy', function (done) {
+    it('must implement destroy', function () {
 
         let flashVPAID = new VPAIDFLASHClient(flashWrapper1, function () {
 
@@ -198,35 +227,37 @@ describe('VPAIDFLASHClient.js api', function()  {
                 let counter = after(2, function () {
                     assert(!callback1.called);
                     assert(!callback2.called);
-                    done();
                 });
-
 
                 [
                     'getAdLinear',
                     'getAdExpanded'
                 ].forEach(function (methodName) {
+                    var id = flashVPAID.getFlashID();
                     sinon.stub(flashVPAID.el, methodName, function (argsData) {
                         setTimeout( function () {
-                            window[VPAID_FLASH_HANDLER](flashVPAID.getFlashID(), 'method', methodName, argsData[0], null, true);
+                            window[VPAID_FLASH_HANDLER](id, 'method', methodName, argsData[0], null, true);
                             counter();
                         }, 0);
                     });
                     adUnit[methodName](noop);
                 });
 
-
                 adUnit.on('AdSizeChange', callback1);
                 adUnit.on('AdPaused', callback2);
 
                 flashVPAID.destroy();
-                done();
+
+                clock.tick(100);
             });
 
+            clock.tick(100);
         });
+
+        clock.tick(100);
     });
 
-    it('must get the volume', function (done) {
+    it('must get the volume', function () {
 
         let flashVPAID = new VPAIDFLASHClient(flashWrapper1, function () {
             flashVPAID.loadAdUnit('random.swf', function (error, adUnit) {
@@ -239,34 +270,42 @@ describe('VPAIDFLASHClient.js api', function()  {
                 let callback = sinon.spy(function () {
                     assert(callback.calledOnce);
                     assert(callback.calledWith(null, .8));
-                    done();
                 });
 
                 adUnit.getAdVolume(callback);
+
+                clock.tick(100);
             });
+
+            clock.tick(100);
         });
+
+        clock.tick(100);
     });
 
-    it('must set the volume', function (done) {
+    it('must set the volume', function () {
 
         let flashVPAID = new VPAIDFLASHClient(flashWrapper1, function () {
             flashVPAID.loadAdUnit('random.swf', function (error, adUnit) {
 
                 sinon.stub(flashVPAID.el, 'setAdVolume', function (argsData) {
-                    window[VPAID_FLASH_HANDLER].apply(null, [flashVPAID.getFlashID(), 'method', 'setAdVolume'].concat(argsData));
+                    window[VPAID_FLASH_HANDLER].apply(null, [flashVPAID.getFlashID(), 'method', 'setAdVolume', null].concat(argsData));
                 });
 
                 var callback = sinon.spy(function () {
-                    assert(callback.calledOnce());
-                    assert(callback.calledWith(null, .5));
-                    done();
+                    assert(callback.calledOnce, 'was called only once');
+                    assert(callback.calledWith(null, .5), 'was called with null, and .5');
                 });
 
                 adUnit.setAdVolume(.5, callback);
-              done();
+
+                clock.tick(100);
             });
+
+            clock.tick(100);
         });
 
+        clock.tick(100);
     });
 
     (function () {
@@ -280,7 +319,7 @@ describe('VPAIDFLASHClient.js api', function()  {
         ];
 
         booleanGetters.forEach(function (method) {
-            it('must get ' + method, function (done) {
+            it('must get ' + method, function () {
 
                 let flashVPAID = new VPAIDFLASHClient(flashWrapper1, function () {
                     flashVPAID.loadAdUnit('random.swf', function (error, adUnit) {
@@ -296,7 +335,6 @@ describe('VPAIDFLASHClient.js api', function()  {
                             assert(callback2.calledOnce);
                             assert(callback1.calledWith(null, false));
                             assert(callback2.calledWith(null, true));
-                            done();
                         });
 
                         callback1 = sinon.spy(counter);
@@ -305,10 +343,13 @@ describe('VPAIDFLASHClient.js api', function()  {
                         adUnit[method](callback1);
                         adUnit[method](callback2);
 
-                      done();
+                        clock.tick(100);
                     });
+
+                    clock.tick(100);
                 });
 
+                clock.tick(100);
             });
         });
     })();
