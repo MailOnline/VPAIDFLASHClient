@@ -23,7 +23,6 @@ class VPAIDFLASHClient {
         this._flashID = uniqueVPAID();
         this._destroyed = false;
 
-        //validate the height
         swfConfig.width = isPositiveInt(swfConfig.width, 800);
         swfConfig.height = isPositiveInt(swfConfig.height, 400);
 
@@ -85,9 +84,13 @@ class VPAIDFLASHClient {
         if (this._destroyed) {
             throw new error('VPAIDFlashToJS is destroyed!');
         }
+
+        //TODO unload previous adUnit
         if (this._adUnit) {
             throw new error('AdUnit still exists');
         }
+
+        //TODO allow to call this method even if the flash wasn't loaded
 
         this._adUnitLoad = (err, message) => {
             if (!err) {
