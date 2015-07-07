@@ -13,7 +13,8 @@ module.exports = function (karma) {
         'js/**/*.js',
         'test/unit/*.js',
         'test/integration/*.js',
-        { pattern: 'flash/bin-debug/*.swf', included: false, served: true }
+        { pattern: 'demo/*.swf', included: false, served: true },
+        { pattern: 'bin/*.swf', included: false, served: true }
     ],
     colors: true,
     exclude: [],
@@ -65,8 +66,8 @@ module.exports = function (karma) {
       'Chrome'
     ],
     proxies: {
-        '/VPAIDFlash.swf': '/base/flash/bin-debug/VPAIDFlash.swf',
-        '/TestAd.swf': '/base/flash/bin-debug/TestAd.swf'
+        '/VPAIDFlash.swf': '/base/bin/VPAIDFlash.swf',
+        '/TestAd.swf': '/base/demo/TestAd.swf'
     }
   });
 };

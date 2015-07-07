@@ -32,7 +32,6 @@ check [videosjs-vast-vpaid](https://github.com/MailOnline/videojs-vast-vpaid) if
 TODO
 ===============
   - try to implement flex unit tests
-  - compile flash without needing to use flashbuilder
   - create test coverage (not done yet because of [karma coverage - issue #123](https://github.com/karma-runner/karma-coverage/issues/123))
 
 JS
@@ -49,7 +48,7 @@ The project uses:
 Flash
 ==============
 
-The flash code was compiled with [FlashBuilder](http://www.adobe.com/uk/products/flash-builder.html), but can be as compiled with [FlashDevelop](http://www.flashdevelop.org/) or with [Flex SDK](http://www.adobe.com/devnet/flex/flex-sdk-download.html).
+Flash is compiled using [Flex SDK](http://www.adobe.com/devnet/flex/flex-sdk-download.html).
 
 3rd party
 ---------
@@ -71,7 +70,9 @@ Running the project
 ===================
 
   - install nodejs, bower and gulp
-  - `npm install` and `bower install` to install all dependencies
+  - `npm install` will to install all dependencies
+  - `bower install` will install swfobject, if you run `npm install` will execute as well `bower install` using `postinstall`
+  - `./flexSDK.sh` will install in `vendor` folder flex sdk that will allow to compile flash without needing flash, flash builder or flashDevelop
   - `gulp serve` or `npm start` to start build script and a demo page should be open in default browser
   - `gulp` to watch, bundle and run tests
   - `npm test` or `gulp test:ci` task used by the server

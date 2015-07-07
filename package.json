@@ -3,7 +3,11 @@
   "version": "0.0.8",
   "author": "Luis da Silva <luis.dasilva@mailonline.co.uk>",
   "homepage": "https://github.com/MailOnline/VPAIDFLASHClient",
-  "main": [ "bin/VPAIDFLASHClient.js", "bin/VPAIDFLASHClient.js.map", "build/VPAIDFlash.swf" ],
+  "main": [
+    "bin/VPAIDFLASHClient.js",
+    "bin/VPAIDFLASHClient.js.map",
+    "bin/VPAIDFlash.swf"
+  ],
   "description": "VPAID Flash for JS",
   "keywords": [
     "VPAID",
@@ -23,6 +27,7 @@
     "chai": "2.3.0",
     "del": "^1.1.1",
     "gulp": "^3.8.11",
+    "gulp-shell": "^0.4.2",
     "gulp-sourcemaps": "^1.5.2",
     "gulp-util": "^3.0.4",
     "karma": "^0.12.31",
@@ -43,6 +48,7 @@
   },
   "scripts": {
     "start": "gulp serve",
-    "test": "gulp test:ci"
+    "test": "gulp test:ci",
+    "postinstall": "bower install | ./flexSDK.sh"
   }
 }

@@ -2,4 +2,10 @@ bower_components
 node_modules
 .DS_Store
 npm-debug.log
+flash/bin-debug
+flash/bin
+flash/.settings
+flash/.actionScriptProperties
+flash/.project
+vendor
 

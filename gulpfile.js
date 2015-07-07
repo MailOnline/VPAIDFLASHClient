@@ -4,6 +4,7 @@ var gulp = require('gulp');
 var del = require('del');
 var watchify = require('watchify');
 var gutil = require('gulp-util');
+var _ = require('lodash');
 
 //server and autoreload
 var browserSync = require('browser-sync');
@@ -15,11 +16,18 @@ var babelify = require('babelify');
 var source = require('vinyl-source-stream');
 var sourcemaps = require('gulp-sourcemaps');
 var buffer = require('vinyl-buffer');
-var assign = require('lodash').assign;
+var assign = _.assign;
+
+//flash compile
+var shell = require('gulp-shell');
+var flashSrcPath = 'flash/src';
+var flexSDK = './vendor/bin/mxmlc';
+var mainFlash = 'VPAIDFlash';
 
 //test
 var karma = require('karma').server;
 
+var demoPath = './demo';
 var testPath = 'test/**/**.js';
 var binPath = './bin';
 var mainJS = 'VPAIDFLASHClient.js';
@@ -70,25 +78,34 @@ gulp.task('test:dev', function (done) {
     });
 });
 
-var flashFilesToMove = { files: ['VPAIDFlash.swf'], pathFrom: 'flash/bin-debug/', pathTo: binPath };
+gulp.task('compile:flash', function () {
+    var files = [ {path: flashSrcPath + '/com/dailymail/vpaid/' + mainFlash + '.as', fileOutputPath: binPath + '/' + mainFlash + '.swf'}, {path: flashSrcPath + '/TestAd.as', fileOutputPath: demoPath + '/TestAd.swf'} ];
 
-//copy swf files and update demo
-gulp.task('copy:flash', mvFiles.bind(null, flashFilesToMove));
-
-function mvFiles(cfg, done) {
-    var filesToMv = cfg.files.map(function (file) {
-        return cfg.pathFrom + file;
-    });
-    var filesToDel = cfg.files.map(function (file) {
-        return cfg.pathTo + file;
-    });
-    del(filesToDel, function () {
-        gulp.src(filesToMv)
-            .pipe(gulp.dest(cfg.pathTo))
-            .on('end', done);
-    });
-}
-
+    return gulp.src(
+        files.map(function (file) {
+            return file.path;
+        }), {read: false})
+        .pipe(
+            shell(
+                [
+                    '<%= mxmlc %> -output <%= fileOutput(file.path) %> <%= file.path %> -compiler.source-path <%= srcPath %> -library-path+=<%= libFile %> -target-player=<%= flashVersion %>'
+                ],
+                {
+                    templateData: {
+                        fileOutput: function (filePath) {
+                            return _.find(files, function(file) {
+                                return filePath.indexOf(file.path) > -1;
+                            }).fileOutputPath;
+                        },
+                        mxmlc: flexSDK,
+                        srcPath: flashSrcPath,
+                        libFile: 'flash/vendor/bulk_loader.swc',
+                        flashVersion: '10.1.0'
+                    }
+                }
+            )
+        );
+})
 
 //watch file changes
 gulp.task('watch:demo', function() {
@@ -96,7 +113,7 @@ gulp.task('watch:demo', function() {
     gulp.watch(['demo/*.html', 'demo/*.css'], reload);
     gulp.watch([binPath + '/*.js'], ['test:dev'], reload);
     gulp.watch([testPath], ['test:dev']);
-    gulp.watch(['flash/bin-debug/*.swf'], ['copy:flash'], reload);
+    gulp.watch(['flash/src/**/*.as'], ['compile:flash', 'test:dev'], reload);
 });
 
 
@@ -105,18 +122,17 @@ gulp.task('watch:test', function() {
     jsBuild.on('update', bundle);
     gulp.watch([binPath + '/*.js'], ['test:dev']);
     gulp.watch([testPath], ['test:dev']);
-    gulp.watch(['flash/bin-debug/*.swf'], ['copy:flash', 'test:dev']);
+    gulp.watch(['flash/src/**/*.as'], ['compile:flash', 'test:dev']);
 });
 
 
 //create the static server
-gulp.task('serve', ['browserify', 'copy:flash', 'watch:demo'], function () {
+gulp.task('serve', ['browserify', 'compile:flash', 'watch:demo'], function () {
     browserSync({
         server: {
             baseDir: ['demo', binPath],
             routes: {
-                '/swfobject.js':        'bower_components/swfobject/swfobject/src/swfobject.js',
-                '/TestAd.swf':          'flash/bin-debug/TestAd.swf'
+                '/swfobject.js':        'bower_components/swfobject/swfobject/src/swfobject.js'
             }
         }
     });

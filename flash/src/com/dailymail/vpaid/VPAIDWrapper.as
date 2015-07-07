@@ -2,12 +2,12 @@ package com.dailymail.vpaid
 {
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
-	
+
 	public class VPAIDWrapper extends EventDispatcher implements IVPAID
 	{
 		private var ad:*;
-		
-		public function VPAIDWrapper(ad)
+
+		public function VPAIDWrapper(ad:*)
 		{
 			super();
 			if(ad.hasOwnProperty('getVPAID')) {
@@ -16,77 +16,77 @@ package com.dailymail.vpaid
 				this.ad = ad;
 			}
 		}
-		
+
 		public function get adLinear():Boolean
 		{
 			return ad.adLinear();
 		}
-		
+
 		public function get adWidth():Number
 		{
 			return ad.adWidth();
 		}
-		
+
 		public function get adHeight():Number
 		{
 			return ad.adHeight();
 		}
-		
+
 		public function get adExpanded():Boolean
 		{
 			return ad.adExpanded();
 		}
-		
+
 		public function get adSkippableState():Boolean
 		{
 			return ad.adSkippableState();
 		}
-		
+
 		public function get adRemainingTime():Number
 		{
 			return ad.adSkippableState();
 		}
-		
+
 		public function get adDuration():Number
 		{
 			return ad.adDuration;
 		}
-		
+
 		public function get adVolume():Number
 		{
 			return ad.adVolume;
 		}
-		
+
 		public function set adVolume(volume:Number):void
 		{
 			ad.adVolume = volume;
 		}
-		
+
 		public function get adCompanions():String
 		{
 			return ad.adCompanions;
 		}
-		
+
 		public function get adIcons():Boolean
 		{
 			return ad.adIcons;
 		}
-		
+
 		public function handshakeVersion(playerVPAIDVersion:String):String
 		{
 			return ad.handshakeVersion(playerVPAIDVersion);
 		}
-		
+
 		public function initAd(width:Number, height:Number, viewMode:String, desiredBitrate:Number, creativeData:String='', environmentVars:String=''):void
 		{
 			ad.initAd(width, height, viewMode, desiredBitrate, creativeData, environmentVars);
 		}
-		
+
 		public function resizeAd(width:Number, height:Number, viewMode:String):void
 		{
 			ad.resizeAd(width, height, viewMode);
 		}
-		
+
 		public function startAd():void
 		{
 			ad.startAd();
