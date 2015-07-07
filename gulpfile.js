@@ -63,7 +63,7 @@ function bundle() {
 
 gulp.task('browserify', bundle);
 
-gulp.task('test:ci', function (done) {
+gulp.task('test:ci', ['compile:flash'], function (done) {
     karma.start({
         configFile: __dirname + '/karma.conf.js',
         browsers: ['Firefox']
