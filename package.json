@@ -8,6 +8,10 @@
     "bin/VPAIDFLASHClient.js.map",
     "bin/VPAIDFlash.swf"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/MailOnline/VPAIDFLASHClient.git"
+  },
   "description": "VPAID Flash for JS",
   "keywords": [
     "VPAID",
