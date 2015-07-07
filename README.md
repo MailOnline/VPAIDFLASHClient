@@ -1,5 +1,6 @@
 VPAIDFLASHClient
-==========
+================
+[![bitHound Score](https://www.bithound.io/github/MailOnline/VPAIDFLASHClient/badges/score.svg?)](https://www.bithound.io/github/MailOnline/VPAIDFLASHClient)
 [![Code Climate](https://codeclimate.com/github/MailOnline/VPAIDFLASHClient/badges/gpa.svg)](https://codeclimate.com/github/MailOnline/VPAIDFLASHClient)
 [![Build Status](https://travis-ci.org/MailOnline/VPAIDFLASHClient.svg?branch=master)](https://travis-ci.org/MailOnline/VPAIDFLASHClient)
 [![devDependency Status](https://david-dm.org/Mailonline/VPAIDFLASHClient/dev-status.svg)](https://david-dm.org/Mailonline/VPAIDFLASHClient#info=devDependencies)
