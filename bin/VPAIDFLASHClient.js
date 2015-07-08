@@ -436,12 +436,10 @@ var VPAIDFLASHClient = (function () {
                 throw new error('VPAIDFlashToJS is destroyed!');
             }
 
-            //TODO unload previous adUnit
             if (this._adUnit) {
                 throw new error('AdUnit still exists');
             }
 
-            //TODO allow to call this method even if the flash wasn't loaded
 
             this._adUnitLoad = function (err, message) {
                 if (!err) {
@@ -610,7 +608,6 @@ var JSFlashBridge = (function () {
     }, {
         key: '_trigger',
         value: function _trigger(eventName, err, result) {
-            //TODO: check if forEach and isArray is added to the browser with babeljs
             this._handlers.get(eventName).forEach(function (callback) {
                 setTimeout(function () {
                     callback(err, result);
@@ -796,7 +793,6 @@ var MultipleValuesRegistry = (function () {
         value: function findByValue(value) {
             var _this = this;
 
-            //TODO: check if keys and find is added to the browser with babeljs
             var keys = Object.keys(this._registries).filter(function (key) {
                 return _this._registries[key].indexOf(value) !== -1;
             });
@@ -880,7 +876,6 @@ var SingleValueRegistry = (function () {
         value: function findByValue(value) {
             var _this3 = this;
 
-            //TODO: check if keys is added to the browser with babeljs
             var keys = Object.keys(this._registries).filter(function (key) {
                 return _this3._registries[key] === value;
             });

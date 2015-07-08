@@ -85,7 +85,6 @@ export class JSFlashBridge {
     }
 
     _trigger(eventName, err, result) {
-        //TODO: check if forEach and isArray is added to the browser with babeljs
         this._handlers.get(eventName).forEach(function (callback) {
             setTimeout(function () {
                 callback(err, result);
