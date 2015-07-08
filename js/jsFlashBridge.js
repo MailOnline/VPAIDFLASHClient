@@ -19,7 +19,8 @@ export class JSFlashBridge {
         this._handlers = new MultipleValuesRegistry();
         this._callbacks = new SingleValueRegistry();
         this._uniqueMethodIdentifier = unique(this._flashID);
-        this._loadHandShake = loadHandShake;
+        this._ready = false;
+        this._handShakeHandler = loadHandShake;
 
         registry.addInstance(this._flashID, this);
     }
@@ -112,6 +113,14 @@ export class JSFlashBridge {
         this._callbacks.remove(callbackID);
     }
 
+    _handShake(err, data) {
+        this._ready = true;
+        if (this._handShakeHandler) {
+            this._handShakeHandler(err, data);
+            delete this._handShakeHandler;
+        }
+    }
+
     //methods like properties specific to this implementation of VPAID
     getSize() {
         return {width: this._width, height: this._height};
@@ -140,6 +149,9 @@ export class JSFlashBridge {
     getFlashURL() {
         return this._flashURL;
     }
+    isReady() {
+        return this._ready;
+    }
     destroy() {
         this.offAll();
         this.removeAllCallbacks();
@@ -160,7 +172,7 @@ window[VPAID_FLASH_HANDLER] = (flashID, type, event, callID, error, data) => {
     let instance = registry.getInstanceByID(flashID);
     if (!instance) return;
     if (event === 'handShake') {
-        instance._loadHandShake(error, data);
+        instance._handShake(error, data);
     } else {
         if (type !== 'event') {
             instance._callCallback(event, callID, error, data);

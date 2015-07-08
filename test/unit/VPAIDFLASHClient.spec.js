@@ -161,13 +161,14 @@ describe('VPAIDFLASHClient.js api', function()  {
         clock.tick(100);
     });
 
-    it('must load adUnit', function () {
+    it('must load adUnit', function (done) {
 
         let flashVPAID = new VPAIDFLASHClient(flashWrapper1, function () {
 
             let callback = sinon.spy(function (error, result) {
                 assert(callback.calledOnce);
                 assert.instanceOf(result, VPAIDAdUnit, 'callback result must return a adUnit');
+                done();
             });
 
             flashVPAID.loadAdUnit('random.swf', callback);

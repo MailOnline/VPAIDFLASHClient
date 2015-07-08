@@ -46,6 +46,35 @@ describe('VPAIDFLASHClient <-> FlashVPAID.swf <-> VPAID_AD.swf', function()  {
         });
     });
 
+    it('must allow to load adUnit even if the flash is not loaded', function(done) {
+        let vpaid = new VPAIDFLASHClient(flashWrapper1);
+
+        let callback = sinon.spy(function (err, result) {
+            assert.isNull(err);
+            assert(callback.calledOnce);
+            assert.instanceOf(result, VPAIDAdUnit, 'callback result must return a adUnit');
+            done();
+        });
+
+        vpaid.loadAdUnit(AD_URL, callback);
+    });
+
+    it('must allow to load adUnit even if the flash is not loaded, but should only call the lastest one', function(done) {
+        let vpaid = new VPAIDFLASHClient(flashWrapper1);
+
+        let callback1 = sinon.spy();
+
+        let callback2 = sinon.spy(function (err, result) {
+            assert.isNull(err);
+            assert.equal(callback1.callCount, 0);
+            assert(callback2.calledOnce);
+            assert.instanceOf(result, VPAIDAdUnit, 'callback result must return a adUnit');
+            done();
+        });
+
+        vpaid.loadAdUnit(AD_URL, callback1);
+        vpaid.loadAdUnit(AD_URL, callback2);
+    });
 
     describe('adUnit', function () {
         function createAndLoadVPaid(onLoad) {
@@ -120,6 +149,28 @@ describe('VPAIDFLASHClient <-> FlashVPAID.swf <-> VPAID_AD.swf', function()  {
                 let vpaid = new VPAIDFLASHClient(flashWrapper1, function () {
                     let onAd = sinon.spy();
                     vpaid.loadAdUnit(AD_URL, onAd);
+                    vpaid.unloadAdUnit(function (err, adUnit) {
+                        assert(!onAd.called);
+                        assert.isNull(err);
+                        assert.isNotNull(adUnit);
+                        done();
+                    });
+                });
+            });
+
+            it('must unload previous adUnit when the request to load another adUnit', function (done) {
+                let vpaid = new VPAIDFLASHClient(flashWrapper1, function () {
+                    let onAd = sinon.spy();
+                    vpaid.loadAdUnit(AD_URL, function(err, firstAdUnit) {
+                        assert.isNull(err);
+
+                        vpaid.loadAdUnit(AD_URL, function(err, secondAdUnit) {
+                            assert.isNull(err);
+                            assert(firstAdUnit.isDestroyed());
+                            assert(!secondAdUnit.isDestroyed());
+                        });
+                    });
+
                     vpaid.unloadAdUnit(function (err, result) {
                         assert(!onAd.called);
                         assert.isNull(err);
@@ -138,16 +189,36 @@ describe('VPAIDFLASHClient <-> FlashVPAID.swf <-> VPAID_AD.swf', function()  {
                     });
                 });
             });
-        });
 
-        it('must destroy', function (done) {
-            let vpaid = createAndLoadVPaid(function(err, adUnit) {
-                vpaid.destroy();
-                assert(adUnit._destroyed);
-                assert.isNull(adUnit._flash);
-                done();
+            it('unload must remove pending loading', function() {
+                let vpaid = new VPAIDFLASHClient(flashWrapper1);
+                vpaid.loadAdUnit(AD_URL, sinon.spy());
+                assert.isObject(vpaid._loadLater);
+                vpaid.unloadAdUnit();
+                assert.isUndefined(vpaid._loadLater);
             });
         });
+
+        describe('destroy', function() {
+            it('must destroy', function (done) {
+                let vpaid = createAndLoadVPaid(function(err, adUnit) {
+                    vpaid.destroy();
+                    assert(adUnit._destroyed);
+                    assert.isNull(adUnit._flash);
+                    done();
+                });
+            });
+
+            it('must destroy', function () {
+                let vpaid = new VPAIDFLASHClient(flashWrapper1);
+                vpaid.loadAdUnit(AD_URL, sinon.spy());
+                assert.isObject(vpaid._loadLater);
+                vpaid.destroy();
+                assert(vpaid.isDestroyed());
+                assert.isUndefined(vpaid._loadLater);
+            });
+        });
+
 
         it('must get/set volume', function(done) {
             let vpaid = createLoadAndStartVPaid(function (err, adUnit) {

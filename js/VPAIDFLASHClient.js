@@ -22,6 +22,7 @@ class VPAIDFLASHClient {
         this._vpaidParentEl = vpaidParentEl;
         this._flashID = uniqueVPAID();
         this._destroyed = false;
+        callback = callback || noop;
 
         swfConfig.width = isPositiveInt(swfConfig.width, 800);
         swfConfig.height = isPositiveInt(swfConfig.height, 400);
@@ -41,9 +42,16 @@ class VPAIDFLASHClient {
             return onError( 'swfobject failed to create object in element' );
         }
 
-        this._flash = new JSFlashBridge(this.el, swfConfig.data, this._flashID, swfConfig.width, swfConfig.height, callbackTimeout(vpaidOptions.timeout, callback, () => {
-            callback( 'vpaid flash load timeout ' + vpaidOptions.timeout );
-        }));
+        var handler = callbackTimeout(vpaidOptions.timeout,
+            (err, data) => {
+                $loadPendedAdUnit.call(this);
+                callback(err, data);
+            }, () => {
+                callback( 'vpaid flash load timeout ' + vpaidOptions.timeout );
+            }
+        );
+
+        this._flash = new JSFlashBridge(this.el, swfConfig.data, this._flashID, swfConfig.width, swfConfig.height, handler);
 
         function onError(error) {
             setTimeout(() => {
@@ -56,6 +64,7 @@ class VPAIDFLASHClient {
 
     destroy () {
         this._destroyAdUnit();
+
         if (this._flash) {
             this._flash.destroy();
             this._flash = null;
@@ -69,6 +78,8 @@ class VPAIDFLASHClient {
     }
 
     _destroyAdUnit() {
+        delete this._loadLater;
+
         if (this._adUnitLoad) {
             this._adUnitLoad = null;
             this._flash.removeCallback(this._adUnitLoad);
@@ -81,39 +92,39 @@ class VPAIDFLASHClient {
     }
 
     loadAdUnit(adURL, callback) {
-        if (this._destroyed) {
-            throw new error('VPAIDFlashToJS is destroyed!');
-        }
+        $throwIfDestroyed.call(this);
 
-        //TODO unload previous adUnit
         if (this._adUnit) {
-            throw new error('AdUnit still exists');
+            this._destroyAdUnit();
         }
 
-        //TODO allow to call this method even if the flash wasn't loaded
+        if (this._flash.isReady()) {
+            this._adUnitLoad = (err, message) => {
+                if (!err) {
+                    this._adUnit = new VPAIDAdUnit(this._flash);
+                }
+                this._adUnitLoad = null;
+                callback(err, this._adUnit);
+            };
 
-        this._adUnitLoad = (err, message) => {
-            if (!err) {
-                this._adUnit = new VPAIDAdUnit(this._flash);
-            }
-            this._adUnitLoad = null;
-            callback(err, this._adUnit);
-        };
-
-        this._flash.callFlashMethod('loadAdUnit', [adURL], this._adUnitLoad);
+            this._flash.callFlashMethod('loadAdUnit', [adURL], this._adUnitLoad);
+        }else {
+            this._loadLater = {url: adURL, callback};
+        }
     }
+
     unloadAdUnit(callback = undefined) {
-        if (this._destroyed) {
-            throw new error('VPAIDFlashToJS is destroyed!');
-        }
+        $throwIfDestroyed.call(this);
 
         this._destroyAdUnit();
         this._flash.callFlashMethod('unloadAdUnit', [], callback);
     }
     getFlashID() {
+        $throwIfDestroyed.call(this);
         return this._flash.getFlashID();
     }
     getFlashURL() {
+        $throwIfDestroyed.call(this);
         return this._flash.getFlashURL();
     }
 }
@@ -125,6 +136,19 @@ setStaticProperty('isSupported', () => {
 setStaticProperty('hasExternalDependencies', () => {
     return !!window.swfobject;
 });
+
+function $throwIfDestroyed() {
+    if(this._destroyed) {
+        throw new error('VPAIDFlashToJS is destroyed!');
+    }
+}
+
+function $loadPendedAdUnit() {
+    if (this._loadLater) {
+        this.loadAdUnit(this._loadLater.url, this._loadLater.callback);
+        delete this._loadLater;
+    }
+}
 
 function setStaticProperty(propertyName, value) {
     Object.defineProperty(VPAIDFLASHClient, propertyName, {

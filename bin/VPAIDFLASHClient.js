@@ -176,6 +176,11 @@ var VPAIDAdUnit = (function (_IVPAIDAdUnit) {
             this._flash = null;
         }
     }, {
+        key: 'isDestroyed',
+        value: function isDestroyed() {
+            return this._destroyed;
+        }
+    }, {
         key: 'on',
         value: function on(eventName, callback) {
             this._flash.on(eventName, callback);
@@ -355,6 +360,9 @@ var FLASH_VERSION = '10.1.0';
 var VPAIDFLASHClient = (function () {
     function VPAIDFLASHClient(vpaidParentEl, callback) {
         var swfConfig = arguments[2] === undefined ? { data: 'VPAIDFlash.swf', width: 800, height: 400 } : arguments[2];
+
+        var _this = this;
+
         var params = arguments[3] === undefined ? { wmode: 'transparent', salign: 'tl', align: 'left', allowScriptAccess: 'always', scale: 'noScale', allowFullScreen: 'true', quality: 'high' } : arguments[3];
         var vpaidOptions = arguments[4] === undefined ? { debug: false, timeout: 10000 } : arguments[4];
 
@@ -367,6 +375,7 @@ var VPAIDFLASHClient = (function () {
         this._vpaidParentEl = vpaidParentEl;
         this._flashID = uniqueVPAID();
         this._destroyed = false;
+        callback = callback || noop;
 
         swfConfig.width = isPositiveInt(swfConfig.width, 800);
         swfConfig.height = isPositiveInt(swfConfig.height, 400);
@@ -386,9 +395,14 @@ var VPAIDFLASHClient = (function () {
             return onError('swfobject failed to create object in element');
         }
 
-        this._flash = new JSFlashBridge(this.el, swfConfig.data, this._flashID, swfConfig.width, swfConfig.height, callbackTimeout(vpaidOptions.timeout, callback, function () {
+        var handler = callbackTimeout(vpaidOptions.timeout, function (err, data) {
+            $loadPendedAdUnit.call(_this);
+            callback(err, data);
+        }, function () {
             callback('vpaid flash load timeout ' + vpaidOptions.timeout);
-        }));
+        });
+
+        this._flash = new JSFlashBridge(this.el, swfConfig.data, this._flashID, swfConfig.width, swfConfig.height, handler);
 
         function onError(error) {
             setTimeout(function () {
@@ -402,6 +416,7 @@ var VPAIDFLASHClient = (function () {
         key: 'destroy',
         value: function destroy() {
             this._destroyAdUnit();
+
             if (this._flash) {
                 this._flash.destroy();
                 this._flash = null;
@@ -417,6 +432,8 @@ var VPAIDFLASHClient = (function () {
     }, {
         key: '_destroyAdUnit',
         value: function _destroyAdUnit() {
+            delete this._loadLater;
+
             if (this._adUnitLoad) {
                 this._adUnitLoad = null;
                 this._flash.removeCallback(this._adUnitLoad);
@@ -430,35 +447,34 @@ var VPAIDFLASHClient = (function () {
     }, {
         key: 'loadAdUnit',
         value: function loadAdUnit(adURL, callback) {
-            var _this = this;
+            var _this2 = this;
 
-            if (this._destroyed) {
-                throw new error('VPAIDFlashToJS is destroyed!');
-            }
+            $throwIfDestroyed.call(this);
 
             if (this._adUnit) {
-                throw new error('AdUnit still exists');
+                this._destroyAdUnit();
             }
 
+            if (this._flash.isReady()) {
+                this._adUnitLoad = function (err, message) {
+                    if (!err) {
+                        _this2._adUnit = new VPAIDAdUnit(_this2._flash);
+                    }
+                    _this2._adUnitLoad = null;
+                    callback(err, _this2._adUnit);
+                };
 
-            this._adUnitLoad = function (err, message) {
-                if (!err) {
-                    _this._adUnit = new VPAIDAdUnit(_this._flash);
-                }
-                _this._adUnitLoad = null;
-                callback(err, _this._adUnit);
-            };
-
-            this._flash.callFlashMethod('loadAdUnit', [adURL], this._adUnitLoad);
+                this._flash.callFlashMethod('loadAdUnit', [adURL], this._adUnitLoad);
+            } else {
+                this._loadLater = { url: adURL, callback: callback };
+            }
         }
     }, {
         key: 'unloadAdUnit',
         value: function unloadAdUnit() {
             var callback = arguments[0] === undefined ? undefined : arguments[0];
 
-            if (this._destroyed) {
-                throw new error('VPAIDFlashToJS is destroyed!');
-            }
+            $throwIfDestroyed.call(this);
 
             this._destroyAdUnit();
             this._flash.callFlashMethod('unloadAdUnit', [], callback);
@@ -466,11 +482,13 @@ var VPAIDFLASHClient = (function () {
     }, {
         key: 'getFlashID',
         value: function getFlashID() {
+            $throwIfDestroyed.call(this);
             return this._flash.getFlashID();
         }
     }, {
         key: 'getFlashURL',
         value: function getFlashURL() {
+            $throwIfDestroyed.call(this);
             return this._flash.getFlashURL();
         }
     }]);
@@ -485,6 +503,19 @@ setStaticProperty('isSupported', function () {
 setStaticProperty('hasExternalDependencies', function () {
     return !!window.swfobject;
 });
+
+function $throwIfDestroyed() {
+    if (this._destroyed) {
+        throw new error('VPAIDFlashToJS is destroyed!');
+    }
+}
+
+function $loadPendedAdUnit() {
+    if (this._loadLater) {
+        this.loadAdUnit(this._loadLater.url, this._loadLater.callback);
+        delete this._loadLater;
+    }
+}
 
 function setStaticProperty(propertyName, value) {
     Object.defineProperty(VPAIDFLASHClient, propertyName, {
@@ -529,7 +560,8 @@ var JSFlashBridge = (function () {
         this._handlers = new MultipleValuesRegistry();
         this._callbacks = new SingleValueRegistry();
         this._uniqueMethodIdentifier = unique(this._flashID);
-        this._loadHandShake = loadHandShake;
+        this._ready = false;
+        this._handShakeHandler = loadHandShake;
 
         registry.addInstance(this._flashID, this);
     }
@@ -636,6 +668,15 @@ var JSFlashBridge = (function () {
             this._callbacks.remove(callbackID);
         }
     }, {
+        key: '_handShake',
+        value: function _handShake(err, data) {
+            this._ready = true;
+            if (this._handShakeHandler) {
+                this._handShakeHandler(err, data);
+                delete this._handShakeHandler;
+            }
+        }
+    }, {
         key: 'getSize',
 
         //methods like properties specific to this implementation of VPAID
@@ -681,6 +722,11 @@ var JSFlashBridge = (function () {
             return this._flashURL;
         }
     }, {
+        key: 'isReady',
+        value: function isReady() {
+            return this._ready;
+        }
+    }, {
         key: 'destroy',
         value: function destroy() {
             this.offAll();
@@ -707,7 +753,7 @@ window[VPAID_FLASH_HANDLER] = function (flashID, type, event, callID, error, dat
     var instance = registry.getInstanceByID(flashID);
     if (!instance) return;
     if (event === 'handShake') {
-        instance._loadHandShake(error, data);
+        instance._handShake(error, data);
     } else {
         if (type !== 'event') {
             instance._callCallback(event, callID, error, data);

@@ -24,6 +24,10 @@ export class VPAIDAdUnit extends IVPAIDAdUnit {
         this._flash = null;
     }
 
+    isDestroyed () {
+        return this._destroyed;
+    }
+
     on(eventName, callback) {
         this._flash.on(eventName, callback);
     }
