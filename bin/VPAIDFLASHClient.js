@@ -641,9 +641,9 @@ var JSFlashBridge = (function () {
         key: '_trigger',
         value: function _trigger(eventName, event) {
             this._handlers.get(eventName).forEach(function (callback) {
-                setTimeout(function () {
-                    callback(event);
-                }, 0);
+                //setTimeout(function () {
+                callback(event);
+                //}, 0);
             });
         }
     }, {

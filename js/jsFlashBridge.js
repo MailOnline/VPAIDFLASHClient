@@ -87,9 +87,9 @@ export class JSFlashBridge {
 
     _trigger(eventName, event) {
         this._handlers.get(eventName).forEach(function (callback) {
-            setTimeout(function () {
+            //setTimeout(function () {
                 callback(event);
-            }, 0);
+            //}, 0);
         });
     }
 
