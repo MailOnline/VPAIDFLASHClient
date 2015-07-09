@@ -87,12 +87,11 @@ describe('VPAIDFLASHClient <-> FlashVPAID.swf <-> VPAID_AD.swf', function()  {
         function createLoadAndStartVPaid(onStart) {
             let vpaid = createAndLoadVPaid(function (err, adUnit) {
                 adUnit.handshakeVersion('2.0', function(err, result) {
-                    adUnit.on('AdLoaded', function (err, result) {
-                        if (!err) adUnit.startAd();
-                        else onStart(err);
+                    adUnit.on('AdLoaded', function (result) {
+                        adUnit.startAd();
                     });
                     adUnit.on('AdStarted', function () {
-                        onStart(err, adUnit);
+                        onStart(adUnit);
                     });
                     adUnit.initAd(300, 300, 'normal', -1, '', '');
                 });
@@ -112,8 +111,7 @@ describe('VPAIDFLASHClient <-> FlashVPAID.swf <-> VPAID_AD.swf', function()  {
         it('adUnit initAd must fire adLoaded', function(done) {
             createAndLoadVPaid(function(err, adUnit) {
                 adUnit.handshakeVersion('2.0', function (err, result) {
-                    adUnit.on('AdLoaded', function (err, result) {
-                        assert.isNull(err);
+                    adUnit.on('AdLoaded', function () {
                         done();
                     });
                     adUnit.initAd(300, 300, 'normal', -1, '', '');
@@ -124,13 +122,11 @@ describe('VPAIDFLASHClient <-> FlashVPAID.swf <-> VPAID_AD.swf', function()  {
         it('adUnit initAd must fire adStarted', function(done) {
             createAndLoadVPaid(function(err, adUnit) {
                 adUnit.handshakeVersion('2.0', function (err, result) {
-                    adUnit.on('AdLoaded', function (err, result) {
-                        assert.isNull(err);
-                        if (!err) startAd();
+                    adUnit.on('AdLoaded', function (result) {
+                        startAd();
                     });
 
-                    adUnit.on('AdStarted', function (err, result) {
-                        assert.isNull(err);
+                    adUnit.on('AdStarted', function (result) {
                         done();
                     });
 
@@ -221,8 +217,7 @@ describe('VPAIDFLASHClient <-> FlashVPAID.swf <-> VPAID_AD.swf', function()  {
 
 
         it('must get/set volume', function(done) {
-            let vpaid = createLoadAndStartVPaid(function (err, adUnit) {
-                assert.isNull(err);
+            let vpaid = createLoadAndStartVPaid(function (adUnit) {
                 const newVolume = .84;
 
                 adUnit.setAdVolume(newVolume, function () {

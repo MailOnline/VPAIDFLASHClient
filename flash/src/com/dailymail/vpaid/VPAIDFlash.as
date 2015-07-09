@@ -17,7 +17,7 @@ package com.dailymail.vpaid
 	public class VPAIDFlash extends Sprite
 	{
 		private const NO_AD:String = 'noAd';
-		private const ERROR:String = 'error';
+		private const ERROR:String = 'adError';
 
 		private var textField:TextField;
 

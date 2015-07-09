@@ -7,7 +7,7 @@ let SingleValueRegistry = require('./registry').SingleValueRegistry;
 let MultipleValuesRegistry = require('./registry').MultipleValuesRegistry;
 const registry = require('./jsFlashBridgeRegistry');
 const VPAID_FLASH_HANDLER = 'vpaid_video_flash_handler';
-const ERROR = 'error';
+const ERROR = 'AdError';
 
 export class JSFlashBridge {
     constructor (el, flashURL, flashID, width, height, loadHandShake) {
@@ -64,7 +64,7 @@ export class JSFlashBridge {
             } else {
 
                 //if there isn't any callback to return error use error event handler
-                this._trigger(ERROR, [e]);
+                this._trigger(ERROR, e);
             }
         }
     }
@@ -85,10 +85,10 @@ export class JSFlashBridge {
         return this._callbacks.removeAll();
     }
 
-    _trigger(eventName, err, result) {
+    _trigger(eventName, event) {
         this._handlers.get(eventName).forEach(function (callback) {
             setTimeout(function () {
-                callback(err, result);
+                callback(event);
             }, 0);
         });
     }
@@ -101,7 +101,7 @@ export class JSFlashBridge {
         //but if there exist an error, fire the error event
         if (!callback) {
             if (err && callbackID === '') {
-                this.trigger(ERROR, err, result);
+                this.trigger(ERROR, err);
             }
             return;
         }
@@ -177,7 +177,7 @@ window[VPAID_FLASH_HANDLER] = (flashID, type, event, callID, error, data) => {
         if (type !== 'event') {
             instance._callCallback(event, callID, error, data);
         } else {
-            instance._trigger(event, error, data);
+            instance._trigger(event, data);
         }
     }
 };

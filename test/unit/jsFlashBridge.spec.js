@@ -103,7 +103,7 @@ describe('jsFlashBridge.js api', function()  {
         });
 
         instance.callFlashMethod(METHOD_NAME, [], callback1);
-        instance.on('error', callback2)
+        instance.on('AdError', callback2);
         instance.callFlashMethod(METHOD_NAME, []);
     });
 
@@ -167,7 +167,7 @@ describe('jsFlashBridge.js api', function()  {
         assert.isFunction(instance._trigger);
 
         var callback = sinon.stub(instance, '_trigger', function () {
-            assert(callback.calledWith(EVENT_NAME, null, true));
+            assert(callback.calledWith(EVENT_NAME, true));
             done();
         });
 
@@ -183,7 +183,7 @@ describe('jsFlashBridge.js api', function()  {
         let counter = after(total, function () {
             callbacks.forEach(function (callback) {
                 assert(callback.calledOnce);
-                assert(callback.calledWith(null, true));
+                assert(callback.calledWith(true));
             });
             done();
         });

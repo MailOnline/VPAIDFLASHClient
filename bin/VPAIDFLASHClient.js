@@ -546,7 +546,7 @@ var SingleValueRegistry = require('./registry').SingleValueRegistry;
 var MultipleValuesRegistry = require('./registry').MultipleValuesRegistry;
 var registry = require('./jsFlashBridgeRegistry');
 var VPAID_FLASH_HANDLER = 'vpaid_video_flash_handler';
-var ERROR = 'error';
+var ERROR = 'AdError';
 
 var JSFlashBridge = (function () {
     function JSFlashBridge(el, flashURL, flashID, width, height, loadHandShake) {
@@ -612,7 +612,7 @@ var JSFlashBridge = (function () {
                 } else {
 
                     //if there isn't any callback to return error use error event handler
-                    this._trigger(ERROR, [e]);
+                    this._trigger(ERROR, e);
                 }
             }
         }
@@ -639,10 +639,10 @@ var JSFlashBridge = (function () {
         }
     }, {
         key: '_trigger',
-        value: function _trigger(eventName, err, result) {
+        value: function _trigger(eventName, event) {
             this._handlers.get(eventName).forEach(function (callback) {
                 setTimeout(function () {
-                    callback(err, result);
+                    callback(event);
                 }, 0);
             });
         }
@@ -656,7 +656,7 @@ var JSFlashBridge = (function () {
             //but if there exist an error, fire the error event
             if (!callback) {
                 if (err && callbackID === '') {
-                    this.trigger(ERROR, err, result);
+                    this.trigger(ERROR, err);
                 }
                 return;
             }
@@ -758,7 +758,7 @@ window[VPAID_FLASH_HANDLER] = function (flashID, type, event, callID, error, dat
         if (type !== 'event') {
             instance._callCallback(event, callID, error, data);
         } else {
-            instance._trigger(event, error, data);
+            instance._trigger(event, data);
         }
     }
 };
