@@ -641,9 +641,14 @@ var JSFlashBridge = (function () {
         key: '_trigger',
         value: function _trigger(eventName, event) {
             this._handlers.get(eventName).forEach(function (callback) {
-                //setTimeout(function () {
-                callback(event);
-                //}, 0);
+                //clickThru has to be sync, if not will be block by the popupblocker
+                if (eventName === 'AdClickThru') {
+                    callback(event);
+                } else {
+                    setTimeout(function () {
+                        callback(event);
+                    }, 0);
+                }
             });
         }
     }, {

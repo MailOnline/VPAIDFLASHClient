@@ -87,9 +87,14 @@ export class JSFlashBridge {
 
     _trigger(eventName, event) {
         this._handlers.get(eventName).forEach(function (callback) {
-            //setTimeout(function () {
+            //clickThru has to be sync, if not will be block by the popupblocker
+            if (eventName === 'AdClickThru') {
                 callback(event);
-            //}, 0);
+            } else {
+                setTimeout(function () {
+                    callback(event);
+                }, 0);
+            }
         });
     }
 
