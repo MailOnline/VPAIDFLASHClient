@@ -5,6 +5,7 @@ var del = require('del');
 var watchify = require('watchify');
 var gutil = require('gulp-util');
 var _ = require('lodash');
+var runSequence = require('run-sequence');
 
 //server and autoreload
 var browserSync = require('browser-sync');
@@ -105,7 +106,17 @@ gulp.task('compile:flash', function () {
                 }
             )
         );
-})
+});
+
+gulp.task('compileFlashAndTest', function(done) {
+  runSequence(
+      'compile:flash',
+      'test:dev',
+      function (err) {
+        done(err);
+      }
+  );
+});
 
 //watch file changes
 gulp.task('watch:demo', function() {
@@ -113,7 +124,7 @@ gulp.task('watch:demo', function() {
     gulp.watch(['demo/*.html', 'demo/*.css'], reload);
     gulp.watch([binPath + '/*.js'], ['test:dev'], reload);
     gulp.watch([testPath], ['test:dev']);
-    gulp.watch(['flash/src/**/*.as'], ['compile:flash', 'test:dev'], reload);
+    gulp.watch(['flash/src/**/*.as'], ['compileFlashAndTest'], reload);
 });
 
 
@@ -122,7 +133,7 @@ gulp.task('watch:test', function() {
     jsBuild.on('update', bundle);
     gulp.watch([binPath + '/*.js'], ['test:dev']);
     gulp.watch([testPath], ['test:dev']);
-    gulp.watch(['flash/src/**/*.as'], ['compile:flash', 'test:dev']);
+    gulp.watch(['flash/src/**/*.as'], ['compileFlashAndTest'], reload);
 });
 
 
