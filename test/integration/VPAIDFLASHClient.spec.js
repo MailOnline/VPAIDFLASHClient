@@ -229,6 +229,27 @@ describe('VPAIDFLASHClient <-> FlashVPAID.swf <-> VPAID_AD.swf', function()  {
             });
         });
 
+
+        [
+            'getAdLinear',
+            'getAdExpanded',
+            'getAdSkippableState',
+            'getAdRemainingTime',
+            'getAdCompanions',
+            'getAdIcons',
+            'getAdWidth',
+            'getAdHeight'
+        ].forEach(function (getter) {
+            it('must get ' + getter, function (done) {
+                let vpaid = createLoadAndStartVPaid(function (adUnit) {
+                    adUnit[getter](function (err, value) {
+                        assert.equal(value, false);
+                        assert.isNull(err);
+                        done();
+                    });
+                });
+            });
+        });
     });
 
 });

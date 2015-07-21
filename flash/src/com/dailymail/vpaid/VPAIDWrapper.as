@@ -19,32 +19,32 @@ package com.dailymail.vpaid
 
 		public function get adLinear():Boolean
 		{
-			return ad.adLinear();
+			return ad.adLinear;
 		}
 
 		public function get adWidth():Number
 		{
-			return ad.adWidth();
+			return ad.adWidth;
 		}
 
 		public function get adHeight():Number
 		{
-			return ad.adHeight();
+			return ad.adHeight;
 		}
 
 		public function get adExpanded():Boolean
 		{
-			return ad.adExpanded();
+			return ad.adExpanded;
 		}
 
 		public function get adSkippableState():Boolean
 		{
-			return ad.adSkippableState();
+			return ad.adSkippableState;
 		}
 
 		public function get adRemainingTime():Number
 		{
-			return ad.adSkippableState();
+			return ad.adRemainingTime;
 		}
 
 		public function get adDuration():Number

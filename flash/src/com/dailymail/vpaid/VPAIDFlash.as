@@ -127,29 +127,28 @@ package com.dailymail.vpaid
 			var callbacks:Array = new Array(
 
 				//methods
-				{event: 'handshakeVersion', handler: proxyAdMethod, 			type: 'method'},
-				{event: 'initAd', 			handler: proxyAdMethod, 			type: 'method'},
-				{event: 'resizeAd', 		handler: proxyAdMethod, 			type: 'method'},
-				{event: 'startAd', 			handler: proxyAdMethod, 			type: 'method'},
-				{event: 'stopAd', 			handler: proxyAdMethod, 			type: 'method'},
-				{event: 'pauseAd', 			handler: proxyAdMethod, 			type: 'method'},
-				{event: 'resumeAd', 		handler: proxyAdMethod, 			type: 'method'},
-				{event: 'expandAd', 		handler: proxyAdMethod, 			type: 'method'},
-				{event: 'collapseAd', 		handler: proxyAdMethod, 			type: 'method'},
-				{event: 'skipAd', 			handler: proxyAdMethod, 			type: 'method'},
+				{event: 'handshakeVersion',     handler: proxyAdMethod,             type: 'method'},
+				{event: 'initAd',               handler: proxyAdMethod,             type: 'method'},
+				{event: 'resizeAd',             handler: proxyAdMethod,             type: 'method'},
+				{event: 'startAd',              handler: proxyAdMethod,             type: 'method'},
+				{event: 'stopAd',               handler: proxyAdMethod,             type: 'method'},
+				{event: 'pauseAd',              handler: proxyAdMethod,             type: 'method'},
+				{event: 'resumeAd',             handler: proxyAdMethod,             type: 'method'},
+				{event: 'expandAd',             handler: proxyAdMethod,             type: 'method'},
+				{event: 'collapseAd',           handler: proxyAdMethod,             type: 'method'},
+				{event: 'skipAd',               handler: proxyAdMethod,             type: 'method'},
 				//properties that will be handled
-				{event: 'adLinear', 		handler: proxyAdGetterProperty,		type: 'property'},
-				{event: 'adWidth', 			handler: proxyAdGetterProperty, 	type: 'property'},
-				{event: 'adHeight', 		handler: proxyAdGetterProperty, 	type: 'property'},
-				{event: 'adExpanded', 		handler: proxyAdGetterProperty, 	type: 'property'},
-				{event: 'adSkippableState', handler: proxyAdGetterProperty, 	type: 'property'},
-				{event: 'adRemainingTime', 	handler: proxyAdGetterProperty, 	type: 'property'},
-				{event: 'adDuration', 		handler: proxyAdGetterProperty, 	type: 'property'},
-				{event: 'adVolume', 		handler: proxyAdGetterProperty, 	type: 'property'},
-				{event: 'getAdVolume', 		handler: proxyAdGetterProperty, 	type: 'property', mapAction: 'adVolume'},
-				{event: 'setAdVolume', 		handler: proxyAdSetterProperty, 	type: 'property', mapAction: 'adVolume'},
-				{event: 'adCompanions', 	handler: proxyAdGetterProperty, 	type: 'property'},
-				{event: 'adIcons', 			handler: proxyAdGetterProperty, 	type: 'property'}
+				{event: 'getAdLinear',          handler: proxyAdGetterProperty,     type: 'property', mapAction: 'adLinear'},
+				{event: 'getAdWidth',           handler: proxyAdGetterProperty,     type: 'property', mapAction: 'adWidth'},
+				{event: 'getAdHeight',          handler: proxyAdGetterProperty,     type: 'property', mapAction: 'adHeight'},
+				{event: 'getAdExpanded',        handler: proxyAdGetterProperty,     type: 'property', mapAction: 'adExpanded'},
+				{event: 'getAdSkippableState',  handler: proxyAdGetterProperty,     type: 'property', mapAction: 'adSkippableState'},
+				{event: 'getAdRemainingTime',   handler: proxyAdGetterProperty,     type: 'property', mapAction: 'adRemainingTime'},
+				{event: 'getAdDuration',        handler: proxyAdGetterProperty,     type: 'property', mapAction: 'adDuration'},
+				{event: 'getAdVolume',          handler: proxyAdGetterProperty,     type: 'property', mapAction: 'adVolume'},
+				{event: 'setAdVolume',          handler: proxyAdSetterProperty,     type: 'property', mapAction: 'adVolume'},
+				{event: 'getAdCompanions',      handler: proxyAdGetterProperty,     type: 'property', mapAction: 'adCompanions'},
+				{event: 'getAdIcons',           handler: proxyAdGetterProperty,     type: 'property', mapAction: 'adIcons'}
 			);
 
 			//special callbacks
@@ -179,7 +178,7 @@ package com.dailymail.vpaid
 				safeCall(adAction, function (err:Error, result:*):void {
 					callInterface(actionType, actionName, callbackID, err, result);
 				});
-			}else {
+			} else {
 				callInterface(actionType, actionName, callbackID, NO_AD, null);
 			}
 		}
@@ -202,7 +201,7 @@ package com.dailymail.vpaid
 			var result:*;
 			try {
 				result = func();
-			}catch (e:Error) {
+			} catch (e:Error) {
 				err = e;
 			}
 			done(err, result);
