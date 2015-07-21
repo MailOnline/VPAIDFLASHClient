@@ -138,7 +138,7 @@ gulp.task('watch:test', function() {
 
 
 //create the static server
-gulp.task('serve', ['browserify', 'compile:flash', 'watch:demo'], function () {
+gulp.task('serve', ['browserify', 'compileFlashAndTest', 'watch:demo'], function () {
     browserSync({
         server: {
             baseDir: ['demo', binPath],
