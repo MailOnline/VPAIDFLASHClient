@@ -89,7 +89,7 @@ gulp.task('compile:flash', function () {
         .pipe(
             shell(
                 [
-                    '<%= mxmlc %> -output <%= fileOutput(file.path) %> <%= file.path %> -compiler.source-path <%= srcPath %> -library-path+=<%= libFile %> -target-player=<%= flashVersion %>'
+                    '<%= mxmlc %> -output <%= fileOutput(file.path) %> <%= file.path %> -compiler.source-path <%= srcPath %> -target-player=<%= flashVersion %>'
                 ],
                 {
                     templateData: {
@@ -100,7 +100,6 @@ gulp.task('compile:flash', function () {
                         },
                         mxmlc: flexSDK,
                         srcPath: flashSrcPath,
-                        libFile: 'flash/vendor/bulk_loader.swc',
                         flashVersion: '10.1.0'
                     }
                 }

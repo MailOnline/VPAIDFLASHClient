@@ -1,18 +1,16 @@
 package com.dailymail.vpaid
 {
 	import com.dailymail.vpaid.VPAIDWrapper;
+    import com.dailymail.vpaid.LoaderFacade;
 
 	import flash.display.DisplayObject;
 	import flash.display.LoaderInfo;
 	import flash.display.Sprite;
-	import flash.events.ErrorEvent;
 	import flash.events.Event;
+    import flash.events.TextEvent;
 	import flash.external.ExternalInterface;
 	import flash.text.TextField;
 	import flash.text.TextFormat;
-
-	import br.com.stimuli.loading.BulkLoader;
-	import br.com.stimuli.loading.loadingtypes.LoadingItem;
 
 	public class VPAIDFlash extends Sprite
 	{
@@ -25,7 +23,7 @@ package com.dailymail.vpaid
 		private var flashID:String;
 
 		private var adURL:String;
-		private var adLoader:BulkLoader;
+        private var loader:LoaderFacade;
 		private var adContent:DisplayObject;
 		private var vpaidWrapper:VPAIDWrapper;
 
@@ -43,7 +41,8 @@ package com.dailymail.vpaid
 
 			logDebug("paramObj.handler:" + jsHandler + ", paramObj.flashid:" + paramObj.flashid);
 
-			adLoader = new BulkLoader('adLoader', 1);
+            loader = new LoaderFacade();
+            addChild(loader);
 			if (ExternalInterface.available) {
 				ExternalInterface.marshallExceptions = paramObj.marshallExceptions === 'true';
 
@@ -78,19 +77,20 @@ package com.dailymail.vpaid
 		private function loadAdUnit(callID:String, url:String):void {
 			adURL = url;
 			logDebug(url, true);
-			var loadItem:LoadingItem = adLoader.add(url, {maxTries: 1, type: BulkLoader.TYPE_MOVIECLIP});
-			loadItem.addEventListener(BulkLoader.ERROR, function (event:ErrorEvent):void {
-				onLoadAdUnitError(callID, event);
-			});
-			loadItem.addEventListener(BulkLoader.COMPLETE, function (event:Event):void {
-				onLoadAdUnit(callID, event);
-			});
-			if (!adLoader.isRunning) adLoader.start();
+            loader.load(
+                url,
+                function(e:Event):void {
+                    onLoadAdUnit(callID, e);
+                },
+                function(e:TextEvent):void {
+                    onLoadAdUnitError(callID, e);
+                }
+            );
 		}
 
+
 		private function onLoadAdUnit(callID:String, evt:Event):void {
-			adContent = adLoader.getContent(adURL, true);
-			addChild(adContent);
+			adContent = loader.content;
 			vpaidWrapper = new VPAIDWrapper(adContent);
 			VPAIDEvent.ALL_EVENTS.forEach(function (event:*, index:int, arr:Array):void {
 				vpaidWrapper.addEventListener(event, dispatch);
@@ -98,28 +98,22 @@ package com.dailymail.vpaid
 			callInterface('method', 'loadAdUnit', callID, null, true);
 		}
 
-		private function onLoadAdUnitError(callID:String, evt:ErrorEvent):void {
+		private function onLoadAdUnitError(callID:String, evt:TextEvent):void {
 			logDebug(evt.text);
 			callInterface('method', 'loadAdUnit', callID, evt, true);
 		}
 
 		private function unloadAdUnit(callID:String):void {
-			//if is still being loaded
-			var loadItem:LoadingItem = adLoader.get(adURL);
-			if (loadItem) {
-				loadItem.cleanListeners();
-				loadItem.destroy();
-			}
-
 			//if is already loaded
 			if (vpaidWrapper) {
 				VPAIDEvent.ALL_EVENTS.forEach(function (event:*, index:int, arr:Array):void {
 					vpaidWrapper.removeEventListener(event, dispatch);
 				});
-				removeChild(adContent);
 				adContent = null;
 				vpaidWrapper = null;
 			}
+
+            loader.unload();
 			callInterface('method', 'unloadAdUnit', callID, null, true);
 		}
 

@@ -51,10 +51,6 @@ Flash
 
 Flash is compiled using [Flex SDK](http://www.adobe.com/devnet/flex/flex-sdk-download.html).
 
-3rd party
----------
-  - [BulkLoader](https://github.com/arthur-debert/BulkLoader) - BulkLoader is a minimal library written in Actionscript 3 (AS3) that aims to make loading and managing complex loading requirements easier and faster
-
 Debug
 =====
   - when creating a VPAIDFLASHClient instance the last parameter is debug, if this flag is set to true, will create a visual textfield that allows to show errors
