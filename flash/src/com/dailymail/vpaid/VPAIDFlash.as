@@ -11,6 +11,7 @@ package com.dailymail.vpaid
 	import flash.external.ExternalInterface;
 	import flash.text.TextField;
 	import flash.text.TextFormat;
+    import flash.system.Security;
 
 	public class VPAIDFlash extends Sprite
 	{
@@ -34,6 +35,10 @@ package com.dailymail.vpaid
 			jsHandler = paramObj.handler;
 			flashID = paramObj.flashid;
 			stage.align = paramObj.salign || stage.align;
+
+            //temporary fix test to check if will fix issues with different domains
+            Security.allowDomain("*");
+            Security.allowInsecureDomain("*");
 
 			if (paramObj.debug !== 'false') {
 				debugMode();
