@@ -58,7 +58,6 @@ export class JSFlashBridge {
         } catch (e) {
             if (callback) {
                 setTimeout(() => {
-                    console.log('helloooo');
                     if (this._callbacks.get(callbackID)) {
                         this._callbacks.remove(callbackID);
                         callback(e);
