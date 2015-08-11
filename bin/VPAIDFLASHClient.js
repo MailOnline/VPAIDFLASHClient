@@ -589,8 +589,6 @@ var JSFlashBridge = (function () {
     }, {
         key: 'callFlashMethod',
         value: function callFlashMethod(methodName) {
-            var _this = this;
-
             var args = arguments[1] === undefined ? [] : arguments[1];
             var callback = arguments[2] === undefined ? undefined : arguments[2];
 
@@ -607,12 +605,7 @@ var JSFlashBridge = (function () {
                 this._el[methodName]([callbackID].concat(args));
             } catch (e) {
                 if (callback) {
-                    setTimeout(function () {
-                        if (_this._callbacks.get(callbackID)) {
-                            _this._callbacks.remove(callbackID);
-                            callback(e);
-                        }
-                    }, 0);
+                    $asyncCallback.call(this, callbackID, e);
                 } else {
 
                     //if there isn't any callback to return error use error event handler
@@ -628,12 +621,12 @@ var JSFlashBridge = (function () {
     }, {
         key: 'removeCallbackByMethodName',
         value: function removeCallbackByMethodName(suffix) {
-            var _this2 = this;
+            var _this = this;
 
             this._callbacks.filterKeys(function (key) {
                 return stringEndsWith(key, suffix);
             }).forEach(function (key) {
-                _this2._callbacks.remove(key);
+                _this._callbacks.remove(key);
             });
         }
     }, {
@@ -644,7 +637,7 @@ var JSFlashBridge = (function () {
     }, {
         key: '_trigger',
         value: function _trigger(eventName, event) {
-            var _this3 = this;
+            var _this2 = this;
 
             this._handlers.get(eventName).forEach(function (callback) {
                 //clickThru has to be sync, if not will be block by the popupblocker
@@ -652,7 +645,7 @@ var JSFlashBridge = (function () {
                     callback(event);
                 } else {
                     setTimeout(function () {
-                        if (_this3._handlers.get(eventName)) {
+                        if (_this2._handlers.get(eventName).length > 0) {
                             callback(event);
                         }
                     }, 0);
@@ -662,7 +655,6 @@ var JSFlashBridge = (function () {
     }, {
         key: '_callCallback',
         value: function _callCallback(methodName, callbackID, err, result) {
-            var _this4 = this;
 
             var callback = this._callbacks.get(callbackID);
 
@@ -675,12 +667,7 @@ var JSFlashBridge = (function () {
                 return;
             }
 
-            setTimeout(function () {
-                if (_this4._callbacks.get(callbackID)) {
-                    _this4._callbacks.remove(callbackID);
-                    callback(err, result);
-                }
-            }, 0);
+            $asyncCallback.call(this, callbackID, err, result);
         }
     }, {
         key: '_handShake',
@@ -757,6 +744,18 @@ var JSFlashBridge = (function () {
 })();
 
 exports.JSFlashBridge = JSFlashBridge;
+
+function $asyncCallback(callbackID, err, result) {
+    var _this3 = this;
+
+    setTimeout(function () {
+        var callback = _this3._callbacks.get(callbackID);
+        if (callback) {
+            _this3._callbacks.remove(callbackID);
+            callback(err, result);
+        }
+    }, 0);
+}
 
 Object.defineProperty(JSFlashBridge, 'VPAID_FLASH_HANDLER', {
     writable: false,

@@ -47,7 +47,6 @@ describe('VPAIDFLASHClient.js api', function()  {
         clock.restore();
     });
 
-
     describe('swfobject', function() {
         describe('when no swfobject', function () {
             beforeEach(function () {

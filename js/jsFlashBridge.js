@@ -57,12 +57,7 @@ export class JSFlashBridge {
 
         } catch (e) {
             if (callback) {
-                setTimeout(() => {
-                    if (this._callbacks.get(callbackID)) {
-                        this._callbacks.remove(callbackID);
-                        callback(e);
-                    }
-                }, 0);
+                $asyncCallback.call(this, callbackID, e);
             } else {
 
                 //if there isn't any callback to return error use error event handler
@@ -94,7 +89,7 @@ export class JSFlashBridge {
                 callback(event);
             } else {
                 setTimeout(() => {
-                    if (this._handlers.get(eventName)) {
+                    if (this._handlers.get(eventName).length > 0) {
                         callback(event);
                     }
                 }, 0);
@@ -115,12 +110,7 @@ export class JSFlashBridge {
             return;
         }
 
-        setTimeout(() => {
-            if (this._callbacks.get(callbackID)) {
-                this._callbacks.remove(callbackID);
-                callback(err, result);
-            }
-        }, 0);
+        $asyncCallback.call(this, callbackID, err, result);
 
     }
 
@@ -171,6 +161,16 @@ export class JSFlashBridge {
             this._el.parentElement.removeChild(this._el);
         }
     }
+}
+
+function $asyncCallback(callbackID, err, result) {
+    setTimeout(() => {
+        let callback = this._callbacks.get(callbackID);
+        if (callback) {
+            this._callbacks.remove(callbackID);
+            callback(err, result);
+        }
+    }, 0);
 }
 
 Object.defineProperty(JSFlashBridge, 'VPAID_FLASH_HANDLER', {

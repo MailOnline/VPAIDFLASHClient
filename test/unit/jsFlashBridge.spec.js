@@ -5,7 +5,7 @@ let noop = require('../testHelper.js').noop;
 let after = require('../testHelper.js').after;
 
 describe('jsFlashBridge.js api', function()  {
-    let el;
+    let el, clock;
     const EL_ID = 'hello';
 
     beforeEach(function() {
@@ -13,6 +13,12 @@ describe('jsFlashBridge.js api', function()  {
         el.id = EL_ID;
 
         addFlashMethodsToEl(el, EL_ID);
+
+        clock = sinon.useFakeTimers();
+    });
+
+    afterEach(function () {
+        clock.restore();
     });
 
     it('must create in global a function in global scope', function () {
@@ -22,13 +28,6 @@ describe('jsFlashBridge.js api', function()  {
     it('must add instance to registry', function () {
         var instance = new JSFlashBridge(el, '', EL_ID, 10, 10, noop);
         assert.equal(instance, registry.getInstanceByID(EL_ID));
-    });
-
-    it('must destroy instance from registry', function () {
-        var instance = new JSFlashBridge(el, '', EL_ID, 10, 10, noop);
-        assert.equal(instance, registry.getInstanceByID(EL_ID));
-        instance.destroy();
-        assert.isUndefined(registry.getInstanceByID(EL_ID));
     });
 
     [
@@ -105,6 +104,8 @@ describe('jsFlashBridge.js api', function()  {
         instance.callFlashMethod(METHOD_NAME, [], callback1);
         instance.on('AdError', callback2);
         instance.callFlashMethod(METHOD_NAME, []);
+
+        clock.tick(100);
     });
 
     it('must register callback and call it', function (done) {
@@ -126,6 +127,8 @@ describe('jsFlashBridge.js api', function()  {
         assert.equal(instance._callbacks.size(), 0);
         instance.callFlashMethod(METHOD_NAME, [], callback);
         assert.equal(instance._callbacks.size(), 1);
+
+        clock.tick(100);
     });
 
     it('must implement _callCallback', function(done) {
@@ -139,6 +142,8 @@ describe('jsFlashBridge.js api', function()  {
         });
 
         instance.callFlashMethod(METHOD_NAME, [], noop);
+
+        clock.tick(100);
     });
 
     [
@@ -172,6 +177,8 @@ describe('jsFlashBridge.js api', function()  {
         });
 
         window[JSFlashBridge.VPAID_FLASH_HANDLER](EL_ID, 'event', EVENT_NAME, '', null, true);
+
+        clock.tick(100);
     });
 
     it('must implement triggered event should call all listeners', function(done) {
@@ -197,7 +204,45 @@ describe('jsFlashBridge.js api', function()  {
         });
 
         window[JSFlashBridge.VPAID_FLASH_HANDLER](EL_ID, 'event', EVENT_NAME, '', null, true);
+        clock.tick(100);
     });
 
+    describe('destroy', function () {
+
+        it('must destroy instance from registry', function () {
+            var instance = new JSFlashBridge(el, '', EL_ID, 10, 10, noop);
+            assert.equal(instance, registry.getInstanceByID(EL_ID));
+            instance.destroy();
+            assert.isUndefined(registry.getInstanceByID(EL_ID));
+        });
+
+        it('must avoid calling a callback if is destroyed', function() {
+            const METHOD_NAME = '123';
+            var instance = new JSFlashBridge(el, 'url', EL_ID, 15, 10, noop);
+            var callback = sinon.spy();
+
+            instance._callbacks.add(METHOD_NAME, callback);
+
+            window[JSFlashBridge.VPAID_FLASH_HANDLER](EL_ID, 'method', METHOD_NAME, '', null, true);
+            instance.destroy();
+
+            clock.tick(100);
+            assert(!callback.called);
+        });
+
+        it('must avoid triggering the eventlisteners if is destroyed', function() {
+            const EVENT_NAME = 'someEvent';
+            var instance = new JSFlashBridge(el, 'url', EL_ID, 15, 10, noop);
+            var callback = sinon.spy();
+
+            instance.on(EVENT_NAME, callback);
+
+            window[JSFlashBridge.VPAID_FLASH_HANDLER](EL_ID, 'event', EVENT_NAME, '', null, true);
+            instance.destroy();
+
+            clock.tick(100);
+            assert(!callback.called);
+        });
+    });
 });
 
