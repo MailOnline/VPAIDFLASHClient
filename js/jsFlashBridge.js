@@ -57,9 +57,12 @@ export class JSFlashBridge {
 
         } catch (e) {
             if (callback) {
-                this._callbacks.remove(callbackID);
-                setTimeout( () => {
-                    callback(e);
+                setTimeout(() => {
+                    console.log('helloooo');
+                    if (this._callbacks.get(callbackID)) {
+                        this._callbacks.remove(callbackID);
+                        callback(e);
+                    }
                 }, 0);
             } else {
 
@@ -86,13 +89,15 @@ export class JSFlashBridge {
     }
 
     _trigger(eventName, event) {
-        this._handlers.get(eventName).forEach(function (callback) {
+        this._handlers.get(eventName).forEach((callback) => {
             //clickThru has to be sync, if not will be block by the popupblocker
             if (eventName === 'AdClickThru') {
                 callback(event);
             } else {
-                setTimeout(function () {
-                    callback(event);
+                setTimeout(() => {
+                    if (this._handlers.get(eventName)) {
+                        callback(event);
+                    }
                 }, 0);
             }
         });
@@ -111,11 +116,13 @@ export class JSFlashBridge {
             return;
         }
 
-        setTimeout(function () {
-            callback(err, result);
+        setTimeout(() => {
+            if (this._callbacks.get(callbackID)) {
+                this._callbacks.remove(callbackID);
+                callback(err, result);
+            }
         }, 0);
 
-        this._callbacks.remove(callbackID);
     }
 
     _handShake(err, data) {
