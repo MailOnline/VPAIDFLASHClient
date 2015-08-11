@@ -229,6 +229,14 @@ describe('VPAIDFLASHClient <-> FlashVPAID.swf <-> VPAID_AD.swf', function()  {
             });
         });
 
+        it('must resize the ad', function(done) {
+            let vpaid = createLoadAndStartVPaid(function (adUnit) {
+                var callback = sinon.spy(function() {
+                    done();
+                });
+                adUnit.resizeAd(300, 200, 'normal', callback);
+            });
+        });
 
         [
             'getAdLinear',
