@@ -1,6 +1,6 @@
 {
   "name": "vpaid-flash-client",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "author": "Luis da Silva <luis.dasilva@mailonline.co.uk>",
   "homepage": "https://github.com/MailOnline/VPAIDFLASHClient",
   "main": [
