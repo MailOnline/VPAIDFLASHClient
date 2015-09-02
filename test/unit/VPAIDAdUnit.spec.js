@@ -32,12 +32,29 @@ describe('VPAIDAdUnit.js api', function() {
         assert(flashMethod.calledWith('handshakeVersion', ['1.1'], noop));
     });
 
-    it('must implement initAd', function () {
-        let flashMethod = sinon.stub(flash, 'callFlashMethod');
-        adUnit.initAd(100, 200, 'thumbnail', -1, '', '', noop);
-        assert(flashMethod.calledWith('initAd', [100, 200, 'thumbnail', -1, '', ''], noop));
-        assert.equal(el.getAttribute('width'), '100');
-        assert.equal(el.getAttribute('height'), '200');
+
+    describe('must implement initAd', function() {
+        it('should handle when is passed all the arguments', function () {
+            let flashMethod = sinon.stub(flash, 'callFlashMethod');
+            adUnit.initAd(100, 200, 'thumbnail', -1, {AdParameters: ''}, {flashVars: ''}, noop);
+            assert(flashMethod.calledWith('initAd', [100, 200, 'thumbnail', -1, '', ''], noop));
+            assert.equal(el.getAttribute('width'), '100');
+            assert.equal(el.getAttribute('height'), '200');
+        });
+
+        it('initAd must handle null/undefined/empty creativeData/environmentVars ', function () {
+            let flashMethod = sinon.stub(flash, 'callFlashMethod');
+
+            adUnit.initAd(100, 200, 'thumbnail', -1, {}, {}, noop);
+            assert(flashMethod.calledWith('initAd', [100, 200, 'thumbnail', -1, '', ''], noop));
+
+            adUnit.initAd(100, 200, 'thumbnail', -1, null, null, noop);
+            assert(flashMethod.calledWith('initAd', [100, 200, 'thumbnail', -1, '', ''], noop));
+
+            adUnit.initAd(100, 200, 'thumbnail', -1, undefined, undefined, noop);
+            assert(flashMethod.calledWith('initAd', [100, 200, 'thumbnail', -1, '', ''], noop));
+        });
+
     });
 
     it('must implement resizeAd', function () {
@@ -64,7 +81,6 @@ describe('VPAIDAdUnit.js api', function() {
         });
     });
 
-
     [
         'getAdLinear',
         'getAdWidth',
@@ -88,7 +104,7 @@ describe('VPAIDAdUnit.js api', function() {
         let flashMethod = sinon.stub(flash, 'callFlashMethod');
         adUnit.setAdVolume(.5, noop);
         assert(flashMethod.calledWith('setAdVolume', [.5], noop));
-    })
+    });
 
 });
 

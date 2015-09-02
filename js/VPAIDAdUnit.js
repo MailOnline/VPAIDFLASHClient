@@ -40,11 +40,13 @@ export class VPAIDAdUnit extends IVPAIDAdUnit {
     handshakeVersion(playerVPAIDVersion = '2.0', callback = undefined) {
         this._flash.callFlashMethod('handshakeVersion', [playerVPAIDVersion], callback);
     }
-    initAd (width, height, viewMode, desiredBitrate, creativeData = '', environmentVars = '', callback = undefined) {
+    initAd (width, height, viewMode, desiredBitrate, creativeData = {AdParameters: ''}, environmentVars = {flashVars: ''}, callback = undefined) {
         //resize element that has the flash object
         this._flash.setSize(width, height);
+        creativeData = creativeData || {AdParameters: ''};
+        environmentVars = environmentVars || {flashVars: ''};
 
-        this._flash.callFlashMethod('initAd', [this._flash.getWidth(), this._flash.getHeight(), viewMode, desiredBitrate, creativeData, environmentVars], callback);
+        this._flash.callFlashMethod('initAd', [this._flash.getWidth(), this._flash.getHeight(), viewMode, desiredBitrate, creativeData.AdParameters || '', environmentVars.flashVars || ''], callback);
     }
     resizeAd(width, height, viewMode, callback = undefined) {
         //resize element that has the flash object

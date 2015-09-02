@@ -28,10 +28,10 @@ var IVPAIDAdUnit = (function () {
     }, {
         key: 'initAd',
 
-        //width and height is not in the beginning because we will use the default width/height used in the constructor
+        //creativeData is an object to be consistent with VPAIDHTML
         value: function initAd(width, height, viewMode, desiredBitrate) {
-            var creativeData = arguments[4] === undefined ? '' : arguments[4];
-            var environmentVars = arguments[5] === undefined ? '' : arguments[5];
+            var creativeData = arguments[4] === undefined ? { AdParameters: '' } : arguments[4];
+            var environmentVars = arguments[5] === undefined ? { flashVars: '' } : arguments[5];
             var callback = arguments[6] === undefined ? undefined : arguments[6];
         }
     }, {
@@ -203,14 +203,16 @@ var VPAIDAdUnit = (function (_IVPAIDAdUnit) {
     }, {
         key: 'initAd',
         value: function initAd(width, height, viewMode, desiredBitrate) {
-            var creativeData = arguments[4] === undefined ? '' : arguments[4];
-            var environmentVars = arguments[5] === undefined ? '' : arguments[5];
+            var creativeData = arguments[4] === undefined ? { AdParameters: '' } : arguments[4];
+            var environmentVars = arguments[5] === undefined ? { flashVars: '' } : arguments[5];
             var callback = arguments[6] === undefined ? undefined : arguments[6];
 
             //resize element that has the flash object
             this._flash.setSize(width, height);
+            creativeData = creativeData || { AdParameters: '' };
+            environmentVars = environmentVars || { flashVars: '' };
 
-            this._flash.callFlashMethod('initAd', [this._flash.getWidth(), this._flash.getHeight(), viewMode, desiredBitrate, creativeData, environmentVars], callback);
+            this._flash.callFlashMethod('initAd', [this._flash.getWidth(), this._flash.getHeight(), viewMode, desiredBitrate, creativeData.AdParameters || '', environmentVars.flashVars || ''], callback);
         }
     }, {
         key: 'resizeAd',
@@ -763,16 +765,26 @@ Object.defineProperty(JSFlashBridge, 'VPAID_FLASH_HANDLER', {
     value: VPAID_FLASH_HANDLER
 });
 
-window[VPAID_FLASH_HANDLER] = function (flashID, type, event, callID, error, data) {
+/**
+ * External interface handler
+ *
+ * @param {string} flashID identifier of the flash who call this
+ * @param {string} typeID what type of message is, can be 'event' or 'callback'
+ * @param {string} typeName if the typeID is a event the typeName will be the eventName, if is a callback the typeID is the methodName that is related this callback
+ * @param {string} callbackID only applies when the typeID is 'callback', identifier of the callback to call
+ * @param {object} error error object
+ * @param {object} data
+ */
+window[VPAID_FLASH_HANDLER] = function (flashID, typeID, typeName, callbackID, error, data) {
     var instance = registry.getInstanceByID(flashID);
     if (!instance) return;
-    if (event === 'handShake') {
+    if (typeName === 'handShake') {
         instance._handShake(error, data);
     } else {
-        if (type !== 'event') {
-            instance._callCallback(event, callID, error, data);
+        if (typeID !== 'event') {
+            instance._callCallback(typeName, callbackID, error, data);
         } else {
-            instance._trigger(event, data);
+            instance._trigger(typeName, data);
         }
     }
 };
