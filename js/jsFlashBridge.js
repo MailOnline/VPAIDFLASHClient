@@ -179,16 +179,26 @@ Object.defineProperty(JSFlashBridge, 'VPAID_FLASH_HANDLER', {
     value: VPAID_FLASH_HANDLER
 });
 
-window[VPAID_FLASH_HANDLER] = (flashID, type, event, callID, error, data) => {
+/**
+ * External interface handler
+ *
+ * @param {string} flashID identifier of the flash who call this
+ * @param {string} typeID what type of message is, can be 'event' or 'callback'
+ * @param {string} typeName if the typeID is a event the typeName will be the eventName, if is a callback the typeID is the methodName that is related this callback
+ * @param {string} callbackID only applies when the typeID is 'callback', identifier of the callback to call
+ * @param {object} error error object
+ * @param {object} data
+ */
+window[VPAID_FLASH_HANDLER] = (flashID, typeID, typeName, callbackID, error, data) => {
     let instance = registry.getInstanceByID(flashID);
     if (!instance) return;
-    if (event === 'handShake') {
+    if (typeName === 'handShake') {
         instance._handShake(error, data);
     } else {
-        if (type !== 'event') {
-            instance._callCallback(event, callID, error, data);
+        if (typeID !== 'event') {
+            instance._callCallback(typeName, callbackID, error, data);
         } else {
-            instance._trigger(event, data);
+            instance._trigger(typeName, data);
         }
     }
 };
