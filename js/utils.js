@@ -27,10 +27,12 @@ export function callbackTimeout(timer, onSuccess, onTimeout) {
 }
 
 
-export function createElementWithID(parent, id) {
+export function createElementWithID(parent, id, cleanContent = true) {
     var nEl = document.createElement('div');
     nEl.id = id;
-    parent.innerHTML = '';
+    if (cleanContent) {
+        parent.innerHTML = '';
+    }
     parent.appendChild(nEl);
     return nEl;
 }

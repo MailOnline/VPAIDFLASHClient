@@ -19,7 +19,6 @@ module.exports = function (karma) {
     colors: true,
     exclude: [],
     frameworks: ['mocha', 'chai-sinon', 'browserify', 'source-map-support'],
-    plugins: ['karma-*'],
     preprocessors: {
         'js/**/*.js': ['browserify'],
         'test/**/*.js': ['browserify']
@@ -27,7 +26,7 @@ module.exports = function (karma) {
     browserify: {
         debug: true,
         transform: [
-            'babelify'
+            ["babelify", {"presets": ["es2015"]}]
         ]
     },
 
