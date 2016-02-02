@@ -73,7 +73,7 @@ gulp.task('test:ci', ['compile:flash'], function (done) {
             debug: true,
             transform: [
                 ['babelify', {"presets": ['es2015']}],
-                istanbul({instrumenterConfig: {embedSource: true}})
+                istanbul({instrumenterConfig: {embedSource: true}}) // temporary fix https://github.com/karma-runner/karma-coverage/issues/157#issuecomment-160555004
             ]
         },
         coverageReporter: {
