@@ -9,7 +9,7 @@ const MultipleValuesRegistry = require('./registry').MultipleValuesRegistry;
 class FlashTester {
     constructor(parent, swfConfig = {data: 'VPAIDFlash.swf', width: 800, height: 400}) {
         this.parentEl = createElementWithID(parent, FLASH_TEST_EL); // some browsers create global variables using the element id http://stackoverflow.com/questions/3434278/do-dom-tree-elements-with-ids-become-global-variables
-        // this.parentEl.style.display = 'none'; // hide test element, we need to test if the element being hidden will still work or not
+        this.parentEl.style.display = 'none'; // hide test element, we need to test if the element being hidden will still work or not
         var params = {};
         params.movie = swfConfig.data;
         params.FlashVars = `flashid=${FLASH_TEST_EL}&handler=${JSFlashBridge.VPAID_FLASH_HANDLER}`;
