@@ -9,4 +9,4 @@ flash/.actionScriptProperties
 flash/.project
 coverage
 vendor
-
+.\#*
