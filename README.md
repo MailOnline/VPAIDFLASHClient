@@ -4,6 +4,7 @@ VPAIDFLASHClient
 [![Code Climate](https://codeclimate.com/github/MailOnline/VPAIDFLASHClient/badges/gpa.svg)](https://codeclimate.com/github/MailOnline/VPAIDFLASHClient)
 [![Build Status](https://travis-ci.org/MailOnline/VPAIDFLASHClient.svg?branch=master)](https://travis-ci.org/MailOnline/VPAIDFLASHClient)
 [![devDependency Status](https://david-dm.org/Mailonline/VPAIDFLASHClient/dev-status.svg)](https://david-dm.org/Mailonline/VPAIDFLASHClient#info=devDependencies)
+[![Test Coverage](https://codeclimate.com/github/MailOnline/flashVPAID/badges/coverage.svg)](https://codeclimate.com/github/MailOnline/flashVPAID/coverage)
 
 About
 ===============
