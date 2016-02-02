@@ -30,7 +30,7 @@ class VPAIDFLASHClient {
         swfConfig.width = isPositiveInt(swfConfig.width, 800);
         swfConfig.height = isPositiveInt(swfConfig.height, 400);
 
-        createElementWithID(vpaidParentEl, this._flashID);
+        createElementWithID(vpaidParentEl, this._flashID, true);
 
         params.movie = swfConfig.data;
         params.FlashVars = `flashid=${this._flashID}&handler=${JSFlashBridge.VPAID_FLASH_HANDLER}&debug=${vpaidOptions.debug}&salign=${params.salign}`;

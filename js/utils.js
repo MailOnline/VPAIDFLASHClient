@@ -27,7 +27,7 @@ export function callbackTimeout(timer, onSuccess, onTimeout) {
 }
 
 
-export function createElementWithID(parent, id, cleanContent = true) {
+export function createElementWithID(parent, id, cleanContent = false) {
     var nEl = document.createElement('div');
     nEl.id = id;
     if (cleanContent) {
@@ -51,7 +51,7 @@ let endsWith = (function () {
         position -= searchString.length;
         var lastIndex = subjectString.indexOf(searchString, position);
         return lastIndex !== -1 && lastIndex === position;
-    }
+    };
 })();
 
 export function stringEndsWith(string, search) {
