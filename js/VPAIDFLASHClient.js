@@ -1,16 +1,19 @@
 'use strict';
 
-let JSFlashBridge = require('./jsFlashBridge').JSFlashBridge;
-let VPAIDAdUnit = require('./VPAIDAdUnit').VPAIDAdUnit;
+const JSFlashBridge = require('./jsFlashBridge').JSFlashBridge;
+const VPAIDAdUnit = require('./VPAIDAdUnit').VPAIDAdUnit;
 
-let noop = require('./utils').noop;
-let callbackTimeout = require('./utils').callbackTimeout;
-let isPositiveInt = require('./utils').isPositiveInt;
-let createElementWithID = require('./utils').createElementWithID;
-let uniqueVPAID = require('./utils').unique('vpaid');
+const noop = require('./utils').noop;
+const callbackTimeout = require('./utils').callbackTimeout;
+const isPositiveInt = require('./utils').isPositiveInt;
+const createElementWithID = require('./utils').createElementWithID;
+const uniqueVPAID = require('./utils').unique('vpaid');
+const createFlashTester = require('./flashTester.js').createFlashTester;
 
 const ERROR = 'error';
 const FLASH_VERSION = '10.1.0';
+
+let flashTester = {isSupported: ()=> true}; // if the runFlashTest is not run the flashTester will always return true
 
 class VPAIDFLASHClient {
     constructor (vpaidParentEl, callback, swfConfig = {data: 'VPAIDFlash.swf', width: 800, height: 400}, params = { wmode: 'transparent', salign: 'tl', align: 'left', allowScriptAccess: 'always', scale: 'noScale', allowFullScreen: 'true', quality: 'high'}, vpaidOptions = { debug: false, timeout: 10000 }) {
@@ -27,7 +30,7 @@ class VPAIDFLASHClient {
         swfConfig.width = isPositiveInt(swfConfig.width, 800);
         swfConfig.height = isPositiveInt(swfConfig.height, 400);
 
-        createElementWithID(vpaidParentEl, this._flashID);
+        createElementWithID(vpaidParentEl, this._flashID, true);
 
         params.movie = swfConfig.data;
         params.FlashVars = `flashid=${this._flashID}&handler=${JSFlashBridge.VPAID_FLASH_HANDLER}&debug=${vpaidOptions.debug}&salign=${params.salign}`;
@@ -47,7 +50,7 @@ class VPAIDFLASHClient {
                 $loadPendedAdUnit.call(this);
                 callback(err, data);
             }, () => {
-                callback( 'vpaid flash load timeout ' + vpaidOptions.timeout );
+                callback('vpaid flash load timeout ' + vpaidOptions.timeout);
             }
         );
 
@@ -130,16 +133,20 @@ class VPAIDFLASHClient {
 }
 
 setStaticProperty('isSupported', () => {
-    return VPAIDFLASHClient.hasExternalDependencies() && swfobject.hasFlashPlayerVersion(FLASH_VERSION);
+    return VPAIDFLASHClient.hasExternalDependencies() && swfobject.hasFlashPlayerVersion(FLASH_VERSION) && flashTester.isSupported();
 });
 
 setStaticProperty('hasExternalDependencies', () => {
     return !!window.swfobject;
 });
 
+setStaticProperty('runFlashTest', (swfConfig) => {
+    flashTester = createFlashTester(document.body, swfConfig);
+});
+
 function $throwIfDestroyed() {
     if(this._destroyed) {
-        throw new error('VPAIDFlashToJS is destroyed!');
+        throw new Error('VPAIDFlashToJS is destroyed!');
     }
 }
 
@@ -158,6 +165,4 @@ function setStaticProperty(propertyName, value) {
     });
 }
 
-window.VPAIDFLASHClient = VPAIDFLASHClient;
 module.exports = VPAIDFLASHClient;
-

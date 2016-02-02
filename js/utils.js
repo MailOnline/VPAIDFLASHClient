@@ -27,10 +27,12 @@ export function callbackTimeout(timer, onSuccess, onTimeout) {
 }
 
 
-export function createElementWithID(parent, id) {
+export function createElementWithID(parent, id, cleanContent = false) {
     var nEl = document.createElement('div');
     nEl.id = id;
-    parent.innerHTML = '';
+    if (cleanContent) {
+        parent.innerHTML = '';
+    }
     parent.appendChild(nEl);
     return nEl;
 }
@@ -49,7 +51,7 @@ let endsWith = (function () {
         position -= searchString.length;
         var lastIndex = subjectString.indexOf(searchString, position);
         return lastIndex !== -1 && lastIndex === position;
-    }
+    };
 })();
 
 export function stringEndsWith(string, search) {

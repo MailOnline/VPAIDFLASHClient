@@ -21,12 +21,26 @@ describe('utils.js api', function()  {
         assert.equal(utils.isPositiveInt(4, 8), 4);
     });
 
-    it('must implement createElementWithID', function() {
-        assert.isFunction(utils.createElementWithID, 'must be a function');
-        assert.instanceOf(utils.createElementWithID(document.createElement('div'), 'hello'), HTMLElement, 'must return a HTMLElement');
-        assert.equal(utils.createElementWithID(document.createElement('div'), 'hello').id, 'hello', 'must return a HTMLElement with the id used in the arguments');
-        let parentElement = document.createElement('div');
-        assert.equal(utils.createElementWithID(parentElement, 'hello').parentElement, parentElement, 'must return a HTMLElement that is a child of the element used in the arguments');
+    describe('createElementWithID', function() {
+        it('must be a function createElementWithID', function() {
+            assert.isFunction(utils.createElementWithID, 'must be a function');
+        });
+
+        it('muste create a element with an ID', function() {
+            assert.instanceOf(utils.createElementWithID(document.createElement('div'), 'hello'), HTMLElement, 'must return a HTMLElement');
+            assert.equal(utils.createElementWithID(document.createElement('div'), 'hello').id, 'hello', 'must return a HTMLElement with the id used in the arguments');
+            let parentElement = document.createElement('div');
+            assert.equal(utils.createElementWithID(parentElement, 'hello').parentElement, parentElement, 'must return a HTMLElement that is a child of the element used in the arguments');
+        });
+
+        it('must delete the content of the parentElement', function() {
+            let parentElement = document.createElement('div');
+            utils.createElementWithID(parentElement, 'hello1');
+            utils.createElementWithID(parentElement, 'hello2');
+            assert.equal(parentElement.children.length, 2);
+            utils.createElementWithID(parentElement, 'hello3', true);
+            assert.equal(parentElement.children.length, 1);
+        });
     });
 
     describe('callbackTimeout', function () {

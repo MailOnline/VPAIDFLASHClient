@@ -26,7 +26,8 @@ var flexSDK = './vendor/bin/mxmlc';
 var mainFlash = 'VPAIDFlash';
 
 //test
-var karma = require('karma').server;
+var KarmaServer = require('karma').Server;
+var istanbul = require('browserify-istanbul');
 
 var demoPath = './demo';
 var testPath = 'test/**/**.js';
@@ -65,18 +66,47 @@ function bundle() {
 gulp.task('browserify', bundle);
 
 gulp.task('test:ci', ['compile:flash'], function (done) {
-    karma.start({
+    new KarmaServer({
         configFile: __dirname + '/karma.conf.js',
+        reporters: ['spec', 'coverage'],
+        browserify: {
+            debug: true,
+            transform: [
+                ['babelify', {"presets": ['es2015']}],
+                istanbul({instrumenterConfig: {embedSource: true}})
+            ]
+        },
+        coverageReporter: {
+            reporters: [
+                {
+                    type: 'text',
+                    dir: 'coverage/',
+                    file: 'coverage.txt'
+                },
+                {
+                    type: 'html',
+                    dir: 'coverage/'
+                },
+                {
+                    type: 'lcovonly',
+                    dir: 'coverage/',
+                    subdir: '.'
+                },
+                {type: 'text-summary'}
+            ]
+        },
         browsers: ['Firefox']
-    }, done);
+    }, function (error) {
+        done(error);
+    }).start();
 });
 
 gulp.task('test:dev', function (done) {
-    karma.start({
+    new KarmaServer({
         configFile: __dirname + '/karma.conf.js'
-    }, function () {
-        done();
-    });
+    }, function (error) {
+        done(error);
+    }).start();
 });
 
 gulp.task('compile:flash', function () {

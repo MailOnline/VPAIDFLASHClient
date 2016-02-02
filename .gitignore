@@ -7,5 +7,6 @@ flash/bin
 flash/.settings
 flash/.actionScriptProperties
 flash/.project
+coverage
 vendor
-
+.\#*

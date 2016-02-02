@@ -3,11 +3,7 @@
   "version": "0.1.8",
   "author": "Luis da Silva <luis.dasilva@mailonline.co.uk>",
   "homepage": "https://github.com/MailOnline/VPAIDFLASHClient",
-  "main": [
-    "bin/VPAIDFLASHClient.js",
-    "bin/VPAIDFLASHClient.js.map",
-    "bin/VPAIDFlash.swf"
-  ],
+  "main": "src/VPAIDFLASHClient.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/MailOnline/VPAIDFLASHClient.git"
@@ -25,34 +21,46 @@
   },
   "license": "MIT",
   "devDependencies": {
-    "babelify": "^6.1.0",
+    "babel-preset-es2015": "^6.3.13",
+    "babelify": "^7.2.0",
     "browser-sync": "^2.7.1",
-    "browserify": "^10.1.3",
-    "chai": "2.3.0",
+    "browserify": "^13.0.0",
+    "browserify-istanbul": "^0.2.1",
+    "chai": "^3.4.1",
     "del": "^1.1.1",
-    "gulp": "^3.8.11",
+    "gulp": "^3.9.0",
     "gulp-shell": "^0.4.2",
-    "gulp-sourcemaps": "^1.5.2",
-    "gulp-util": "^3.0.4",
-    "karma": "^0.12.31",
-    "karma-browserify": "^4.2.1",
-    "karma-chai-sinon": "^0.1.4",
-    "karma-chrome-launcher": "^0.1.12",
+    "gulp-sourcemaps": "^1.6.0",
+    "gulp-util": "^3.0.5",
+    "karma": "^0.13.9",
+    "karma-browserify": "^4.2.2",
+    "karma-chai-sinon": "^0.1.5",
+    "karma-chrome-launcher": "^0.2.2",
+    "karma-coverage": "^0.5.3",
     "karma-firefox-launcher": "^0.1.6",
-    "karma-mocha": "^0.1.10",
-    "karma-source-map-support": "^1.0.0",
-    "karma-spec-reporter": "0.0.19",
+    "karma-mocha": "^0.2.1",
+    "karma-source-map-support": "^1.1.0",
+    "karma-spec-reporter": "^0.0.23",
     "lodash": "^3.8.0",
     "mocha": "^2.2.5",
+    "run-sequence": "^1.1.0",
     "sinon": "1.14.1",
-    "sinon-chai": "2.7.0",
+    "sinon-chai": "2.8.0",
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.1.0",
-    "watchify": "^3.2.1",
-    "run-sequence": "^1.1.0"
+    "watchify": "^3.2.1"
   },
   "browserify": {
-    "transform": ["babelify"]
+    "transform": [
+      [
+        "babelify",
+        {
+          "presets": [
+            "es2015"
+          ]
+        }
+      ]
+    ]
   },
   "scripts": {
     "start": "gulp serve",
