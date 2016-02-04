@@ -1,17 +1,17 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 'use strict';
 
-Object.defineProperty(exports, '__esModule', {
+//simple representation of the API
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
-
-//simple representation of the API
-
-var IVPAIDAdUnit = (function () {
+var IVPAIDAdUnit = exports.IVPAIDAdUnit = function () {
     function IVPAIDAdUnit() {
         _classCallCheck(this, IVPAIDAdUnit);
     }
@@ -22,62 +22,64 @@ var IVPAIDAdUnit = (function () {
         //all methods below
         //are async methods
         value: function handshakeVersion() {
-            var playerVPAIDVersion = arguments[0] === undefined ? '2.0' : arguments[0];
-            var callback = arguments[1] === undefined ? undefined : arguments[1];
+            var playerVPAIDVersion = arguments.length <= 0 || arguments[0] === undefined ? '2.0' : arguments[0];
+            var callback = arguments.length <= 1 || arguments[1] === undefined ? undefined : arguments[1];
         }
-    }, {
-        key: 'initAd',
 
         //creativeData is an object to be consistent with VPAIDHTML
+
+    }, {
+        key: 'initAd',
         value: function initAd(width, height, viewMode, desiredBitrate) {
-            var creativeData = arguments[4] === undefined ? { AdParameters: '' } : arguments[4];
-            var environmentVars = arguments[5] === undefined ? { flashVars: '' } : arguments[5];
-            var callback = arguments[6] === undefined ? undefined : arguments[6];
+            var creativeData = arguments.length <= 4 || arguments[4] === undefined ? { AdParameters: '' } : arguments[4];
+            var environmentVars = arguments.length <= 5 || arguments[5] === undefined ? { flashVars: '' } : arguments[5];
+            var callback = arguments.length <= 6 || arguments[6] === undefined ? undefined : arguments[6];
         }
     }, {
         key: 'resizeAd',
         value: function resizeAd(width, height, viewMode) {
-            var callback = arguments[3] === undefined ? undefined : arguments[3];
+            var callback = arguments.length <= 3 || arguments[3] === undefined ? undefined : arguments[3];
         }
     }, {
         key: 'startAd',
         value: function startAd() {
-            var callback = arguments[0] === undefined ? undefined : arguments[0];
+            var callback = arguments.length <= 0 || arguments[0] === undefined ? undefined : arguments[0];
         }
     }, {
         key: 'stopAd',
         value: function stopAd() {
-            var callback = arguments[0] === undefined ? undefined : arguments[0];
+            var callback = arguments.length <= 0 || arguments[0] === undefined ? undefined : arguments[0];
         }
     }, {
         key: 'pauseAd',
         value: function pauseAd() {
-            var callback = arguments[0] === undefined ? undefined : arguments[0];
+            var callback = arguments.length <= 0 || arguments[0] === undefined ? undefined : arguments[0];
         }
     }, {
         key: 'resumeAd',
         value: function resumeAd() {
-            var callback = arguments[0] === undefined ? undefined : arguments[0];
+            var callback = arguments.length <= 0 || arguments[0] === undefined ? undefined : arguments[0];
         }
     }, {
         key: 'expandAd',
         value: function expandAd() {
-            var callback = arguments[0] === undefined ? undefined : arguments[0];
+            var callback = arguments.length <= 0 || arguments[0] === undefined ? undefined : arguments[0];
         }
     }, {
         key: 'collapseAd',
         value: function collapseAd() {
-            var callback = arguments[0] === undefined ? undefined : arguments[0];
+            var callback = arguments.length <= 0 || arguments[0] === undefined ? undefined : arguments[0];
         }
     }, {
         key: 'skipAd',
         value: function skipAd() {
-            var callback = arguments[0] === undefined ? undefined : arguments[0];
+            var callback = arguments.length <= 0 || arguments[0] === undefined ? undefined : arguments[0];
         }
-    }, {
-        key: 'getAdLinear',
 
         //properties that will be treat as async methods
+
+    }, {
+        key: 'getAdLinear',
         value: function getAdLinear(callback) {}
     }, {
         key: 'getAdWidth',
@@ -100,7 +102,7 @@ var IVPAIDAdUnit = (function () {
     }, {
         key: 'setAdVolume',
         value: function setAdVolume(soundVolume) {
-            var callback = arguments[1] === undefined ? undefined : arguments[1];
+            var callback = arguments.length <= 1 || arguments[1] === undefined ? undefined : arguments[1];
         }
     }, {
         key: 'getAdVolume',
@@ -114,9 +116,7 @@ var IVPAIDAdUnit = (function () {
     }]);
 
     return IVPAIDAdUnit;
-})();
-
-exports.IVPAIDAdUnit = IVPAIDAdUnit;
+}();
 
 Object.defineProperty(IVPAIDAdUnit, 'EVENTS', {
     writable: false,
@@ -132,45 +132,47 @@ Object.defineProperty(IVPAIDAdUnit, 'EVENTS', {
 },{}],2:[function(require,module,exports){
 'use strict';
 
-Object.defineProperty(exports, '__esModule', {
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var _get = function get(_x15, _x16, _x17) { var _again = true; _function: while (_again) { var object = _x15, property = _x16, receiver = _x17; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x15 = parent; _x16 = property; _x17 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; }
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var IVPAIDAdUnit = require('./IVPAIDAdUnit').IVPAIDAdUnit;
 var ALL_VPAID_METHODS = Object.getOwnPropertyNames(IVPAIDAdUnit.prototype).filter(function (property) {
     return ['constructor'].indexOf(property) === -1;
 });
 
-var VPAIDAdUnit = (function (_IVPAIDAdUnit) {
+var VPAIDAdUnit = exports.VPAIDAdUnit = function (_IVPAIDAdUnit) {
+    _inherits(VPAIDAdUnit, _IVPAIDAdUnit);
+
     function VPAIDAdUnit(flash) {
         _classCallCheck(this, VPAIDAdUnit);
 
-        _get(Object.getPrototypeOf(VPAIDAdUnit.prototype), 'constructor', this).call(this);
-        this._destroyed = false;
-        this._flash = flash;
-    }
+        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(VPAIDAdUnit).call(this));
 
-    _inherits(VPAIDAdUnit, _IVPAIDAdUnit);
+        _this._destroyed = false;
+        _this._flash = flash;
+        return _this;
+    }
 
     _createClass(VPAIDAdUnit, [{
         key: '_destroy',
         value: function _destroy() {
-            var _this = this;
+            var _this2 = this;
 
             this._destroyed = true;
             ALL_VPAID_METHODS.forEach(function (methodName) {
-                _this._flash.removeCallbackByMethodName(methodName);
+                _this2._flash.removeCallbackByMethodName(methodName);
             });
             IVPAIDAdUnit.EVENTS.forEach(function (event) {
-                _this._flash.offEvent(event);
+                _this2._flash.offEvent(event);
             });
 
             this._flash = null;
@@ -190,22 +192,23 @@ var VPAIDAdUnit = (function (_IVPAIDAdUnit) {
         value: function off(eventName, callback) {
             this._flash.off(eventName, callback);
         }
-    }, {
-        key: 'handshakeVersion',
 
         //VPAID interface
+
+    }, {
+        key: 'handshakeVersion',
         value: function handshakeVersion() {
-            var playerVPAIDVersion = arguments[0] === undefined ? '2.0' : arguments[0];
-            var callback = arguments[1] === undefined ? undefined : arguments[1];
+            var playerVPAIDVersion = arguments.length <= 0 || arguments[0] === undefined ? '2.0' : arguments[0];
+            var callback = arguments.length <= 1 || arguments[1] === undefined ? undefined : arguments[1];
 
             this._flash.callFlashMethod('handshakeVersion', [playerVPAIDVersion], callback);
         }
     }, {
         key: 'initAd',
         value: function initAd(width, height, viewMode, desiredBitrate) {
-            var creativeData = arguments[4] === undefined ? { AdParameters: '' } : arguments[4];
-            var environmentVars = arguments[5] === undefined ? { flashVars: '' } : arguments[5];
-            var callback = arguments[6] === undefined ? undefined : arguments[6];
+            var creativeData = arguments.length <= 4 || arguments[4] === undefined ? { AdParameters: '' } : arguments[4];
+            var environmentVars = arguments.length <= 5 || arguments[5] === undefined ? { flashVars: '' } : arguments[5];
+            var callback = arguments.length <= 6 || arguments[6] === undefined ? undefined : arguments[6];
 
             //resize element that has the flash object
             this._flash.setSize(width, height);
@@ -217,7 +220,7 @@ var VPAIDAdUnit = (function (_IVPAIDAdUnit) {
     }, {
         key: 'resizeAd',
         value: function resizeAd(width, height, viewMode) {
-            var callback = arguments[3] === undefined ? undefined : arguments[3];
+            var callback = arguments.length <= 3 || arguments[3] === undefined ? undefined : arguments[3];
 
             //resize element that has the flash object
             this._flash.setSize(width, height);
@@ -228,56 +231,57 @@ var VPAIDAdUnit = (function (_IVPAIDAdUnit) {
     }, {
         key: 'startAd',
         value: function startAd() {
-            var callback = arguments[0] === undefined ? undefined : arguments[0];
+            var callback = arguments.length <= 0 || arguments[0] === undefined ? undefined : arguments[0];
 
             this._flash.callFlashMethod('startAd', [], callback);
         }
     }, {
         key: 'stopAd',
         value: function stopAd() {
-            var callback = arguments[0] === undefined ? undefined : arguments[0];
+            var callback = arguments.length <= 0 || arguments[0] === undefined ? undefined : arguments[0];
 
             this._flash.callFlashMethod('stopAd', [], callback);
         }
     }, {
         key: 'pauseAd',
         value: function pauseAd() {
-            var callback = arguments[0] === undefined ? undefined : arguments[0];
+            var callback = arguments.length <= 0 || arguments[0] === undefined ? undefined : arguments[0];
 
             this._flash.callFlashMethod('pauseAd', [], callback);
         }
     }, {
         key: 'resumeAd',
         value: function resumeAd() {
-            var callback = arguments[0] === undefined ? undefined : arguments[0];
+            var callback = arguments.length <= 0 || arguments[0] === undefined ? undefined : arguments[0];
 
             this._flash.callFlashMethod('resumeAd', [], callback);
         }
     }, {
         key: 'expandAd',
         value: function expandAd() {
-            var callback = arguments[0] === undefined ? undefined : arguments[0];
+            var callback = arguments.length <= 0 || arguments[0] === undefined ? undefined : arguments[0];
 
             this._flash.callFlashMethod('expandAd', [], callback);
         }
     }, {
         key: 'collapseAd',
         value: function collapseAd() {
-            var callback = arguments[0] === undefined ? undefined : arguments[0];
+            var callback = arguments.length <= 0 || arguments[0] === undefined ? undefined : arguments[0];
 
             this._flash.callFlashMethod('collapseAd', [], callback);
         }
     }, {
         key: 'skipAd',
         value: function skipAd() {
-            var callback = arguments[0] === undefined ? undefined : arguments[0];
+            var callback = arguments.length <= 0 || arguments[0] === undefined ? undefined : arguments[0];
 
             this._flash.callFlashMethod('skipAd', [], callback);
         }
-    }, {
-        key: 'getAdLinear',
 
         //properties that will be treat as async methods
+
+    }, {
+        key: 'getAdLinear',
         value: function getAdLinear(callback) {
             this._flash.callFlashMethod('getAdLinear', [], callback);
         }
@@ -314,7 +318,7 @@ var VPAIDAdUnit = (function (_IVPAIDAdUnit) {
     }, {
         key: 'setAdVolume',
         value: function setAdVolume(volume) {
-            var callback = arguments[1] === undefined ? undefined : arguments[1];
+            var callback = arguments.length <= 1 || arguments[1] === undefined ? undefined : arguments[1];
 
             this._flash.callFlashMethod('setAdVolume', [volume], callback);
         }
@@ -336,16 +340,14 @@ var VPAIDAdUnit = (function (_IVPAIDAdUnit) {
     }]);
 
     return VPAIDAdUnit;
-})(IVPAIDAdUnit);
-
-exports.VPAIDAdUnit = VPAIDAdUnit;
+}(IVPAIDAdUnit);
 
 },{"./IVPAIDAdUnit":1}],3:[function(require,module,exports){
 'use strict';
 
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var JSFlashBridge = require('./jsFlashBridge').JSFlashBridge;
 var VPAIDAdUnit = require('./VPAIDAdUnit').VPAIDAdUnit;
@@ -355,18 +357,23 @@ var callbackTimeout = require('./utils').callbackTimeout;
 var isPositiveInt = require('./utils').isPositiveInt;
 var createElementWithID = require('./utils').createElementWithID;
 var uniqueVPAID = require('./utils').unique('vpaid');
+var createFlashTester = require('./flashTester.js').createFlashTester;
 
 var ERROR = 'error';
 var FLASH_VERSION = '10.1.0';
 
-var VPAIDFLASHClient = (function () {
+var flashTester = { isSupported: function isSupported() {
+        return true;
+    } }; // if the runFlashTest is not run the flashTester will always return true
+
+var VPAIDFLASHClient = function () {
     function VPAIDFLASHClient(vpaidParentEl, callback) {
-        var swfConfig = arguments[2] === undefined ? { data: 'VPAIDFlash.swf', width: 800, height: 400 } : arguments[2];
+        var swfConfig = arguments.length <= 2 || arguments[2] === undefined ? { data: 'VPAIDFlash.swf', width: 800, height: 400 } : arguments[2];
 
         var _this = this;
 
-        var params = arguments[3] === undefined ? { wmode: 'transparent', salign: 'tl', align: 'left', allowScriptAccess: 'always', scale: 'noScale', allowFullScreen: 'true', quality: 'high' } : arguments[3];
-        var vpaidOptions = arguments[4] === undefined ? { debug: false, timeout: 10000 } : arguments[4];
+        var params = arguments.length <= 3 || arguments[3] === undefined ? { wmode: 'transparent', salign: 'tl', align: 'left', allowScriptAccess: 'always', scale: 'noScale', allowFullScreen: 'true', quality: 'high' } : arguments[3];
+        var vpaidOptions = arguments.length <= 4 || arguments[4] === undefined ? { debug: false, timeout: 10000 } : arguments[4];
 
         _classCallCheck(this, VPAIDFLASHClient);
 
@@ -382,7 +389,7 @@ var VPAIDFLASHClient = (function () {
         swfConfig.width = isPositiveInt(swfConfig.width, 800);
         swfConfig.height = isPositiveInt(swfConfig.height, 400);
 
-        createElementWithID(vpaidParentEl, this._flashID);
+        createElementWithID(vpaidParentEl, this._flashID, true);
 
         params.movie = swfConfig.data;
         params.FlashVars = 'flashid=' + this._flashID + '&handler=' + JSFlashBridge.VPAID_FLASH_HANDLER + '&debug=' + vpaidOptions.debug + '&salign=' + params.salign;
@@ -474,7 +481,7 @@ var VPAIDFLASHClient = (function () {
     }, {
         key: 'unloadAdUnit',
         value: function unloadAdUnit() {
-            var callback = arguments[0] === undefined ? undefined : arguments[0];
+            var callback = arguments.length <= 0 || arguments[0] === undefined ? undefined : arguments[0];
 
             $throwIfDestroyed.call(this);
 
@@ -496,19 +503,23 @@ var VPAIDFLASHClient = (function () {
     }]);
 
     return VPAIDFLASHClient;
-})();
+}();
 
 setStaticProperty('isSupported', function () {
-    return VPAIDFLASHClient.hasExternalDependencies() && swfobject.hasFlashPlayerVersion(FLASH_VERSION);
-});
+    return VPAIDFLASHClient.hasExternalDependencies() && swfobject.hasFlashPlayerVersion(FLASH_VERSION) && flashTester.isSupported();
+}, true);
 
 setStaticProperty('hasExternalDependencies', function () {
     return !!window.swfobject;
 });
 
+setStaticProperty('runFlashTest', function (swfConfig) {
+    flashTester = createFlashTester(document.body, swfConfig);
+});
+
 function $throwIfDestroyed() {
     if (this._destroyed) {
-        throw new error('VPAIDFlashToJS is destroyed!');
+        throw new Error('VPAIDFlashToJS is destroyed!');
     }
 }
 
@@ -520,26 +531,96 @@ function $loadPendedAdUnit() {
 }
 
 function setStaticProperty(propertyName, value) {
+    var writable = arguments.length <= 2 || arguments[2] === undefined ? false : arguments[2];
+
     Object.defineProperty(VPAIDFLASHClient, propertyName, {
-        writable: false,
+        writable: writable,
         configurable: false,
         value: value
     });
 }
 
-window.VPAIDFLASHClient = VPAIDFLASHClient;
 module.exports = VPAIDFLASHClient;
 
-},{"./VPAIDAdUnit":2,"./jsFlashBridge":4,"./utils":7}],4:[function(require,module,exports){
+},{"./VPAIDAdUnit":2,"./flashTester.js":4,"./jsFlashBridge":5,"./utils":8}],4:[function(require,module,exports){
 'use strict';
 
-Object.defineProperty(exports, '__esModule', {
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+var FLASH_TEST = 'vpaid_video_flash_tester';
+var FLASH_TEST_EL = 'vpaid_video_flash_tester_el';
+var JSFlashBridge = require('./jsFlashBridge').JSFlashBridge;
+var createElementWithID = require('./utils').createElementWithID;
+var MultipleValuesRegistry = require('./registry').MultipleValuesRegistry;
+
+var FlashTester = function () {
+    function FlashTester(parent) {
+        var _this = this;
+
+        var swfConfig = arguments.length <= 1 || arguments[1] === undefined ? { data: 'VPAIDFlash.swf', width: 800, height: 400 } : arguments[1];
+
+        _classCallCheck(this, FlashTester);
+
+        this.parentEl = createElementWithID(parent, FLASH_TEST_EL); // some browsers create global variables using the element id http://stackoverflow.com/questions/3434278/do-dom-tree-elements-with-ids-become-global-variables
+        this.parentEl.style.display = 'none'; // hide test element, we need to test if the element being hidden will still work or not
+        var params = {};
+        params.movie = swfConfig.data;
+        params.FlashVars = 'flashid=' + FLASH_TEST_EL + '&handler=' + JSFlashBridge.VPAID_FLASH_HANDLER;
+
+        this.el = swfobject.createSWF(swfConfig, params, FLASH_TEST_EL);
+        this._handlers = new MultipleValuesRegistry();
+        this._isSupported = false;
+        if (this.el) {
+            this._flash = new JSFlashBridge(this.el, swfConfig.data, FLASH_TEST_EL, 400, 400, function () {
+                var support = true;
+                _this._isSupported = support;
+                _this._handlers.get('change').forEach(function (callback) {
+                    setTimeout(function () {
+                        callback('change', support);
+                    }, 0);
+                });
+            });
+        }
+    }
+
+    _createClass(FlashTester, [{
+        key: 'isSupported',
+        value: function isSupported() {
+            return this._isSupported;
+        }
+    }, {
+        key: 'on',
+        value: function on(eventName, callback) {
+            this._handlers.add(eventName, callback);
+        }
+    }]);
+
+    return FlashTester;
+}();
+
+var createFlashTester = exports.createFlashTester = function createFlashTester(el, swfConfig) {
+    if (!window[FLASH_TEST]) {
+        window[FLASH_TEST] = new FlashTester(el, swfConfig);
+    }
+    return window[FLASH_TEST];
+};
+
+},{"./jsFlashBridge":5,"./registry":7,"./utils":8}],5:[function(require,module,exports){
+'use strict';
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var unique = require('./utils').unique;
 var isPositiveInt = require('./utils').isPositiveInt;
@@ -550,7 +631,7 @@ var registry = require('./jsFlashBridgeRegistry');
 var VPAID_FLASH_HANDLER = 'vpaid_video_flash_handler';
 var ERROR = 'AdError';
 
-var JSFlashBridge = (function () {
+var JSFlashBridge = exports.JSFlashBridge = function () {
     function JSFlashBridge(el, flashURL, flashID, width, height, loadHandShake) {
         _classCallCheck(this, JSFlashBridge);
 
@@ -591,8 +672,8 @@ var JSFlashBridge = (function () {
     }, {
         key: 'callFlashMethod',
         value: function callFlashMethod(methodName) {
-            var args = arguments[1] === undefined ? [] : arguments[1];
-            var callback = arguments[2] === undefined ? undefined : arguments[2];
+            var args = arguments.length <= 1 || arguments[1] === undefined ? [] : arguments[1];
+            var callback = arguments.length <= 2 || arguments[2] === undefined ? undefined : arguments[2];
 
             var callbackID = '';
             // if no callback, some methods the return is void so they don't need callback
@@ -680,10 +761,11 @@ var JSFlashBridge = (function () {
                 delete this._handShakeHandler;
             }
         }
-    }, {
-        key: 'getSize',
 
         //methods like properties specific to this implementation of VPAID
+
+    }, {
+        key: 'getSize',
         value: function getSize() {
             return { width: this._width, height: this._height };
         }
@@ -743,9 +825,7 @@ var JSFlashBridge = (function () {
     }]);
 
     return JSFlashBridge;
-})();
-
-exports.JSFlashBridge = JSFlashBridge;
+}();
 
 function $asyncCallback(callbackID, err, result) {
     var _this3 = this;
@@ -789,7 +869,7 @@ window[VPAID_FLASH_HANDLER] = function (flashID, typeID, typeName, callbackID, e
     }
 };
 
-},{"./jsFlashBridgeRegistry":5,"./registry":6,"./utils":7}],5:[function(require,module,exports){
+},{"./jsFlashBridgeRegistry":6,"./registry":7,"./utils":8}],6:[function(require,module,exports){
 'use strict';
 
 var SingleValueRegistry = require('./registry').SingleValueRegistry;
@@ -822,18 +902,18 @@ Object.defineProperty(JSFlashBridgeRegistry, 'removeInstanceByID', {
 
 module.exports = JSFlashBridgeRegistry;
 
-},{"./registry":6}],6:[function(require,module,exports){
+},{"./registry":7}],7:[function(require,module,exports){
 'use strict';
 
-Object.defineProperty(exports, '__esModule', {
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
-
-var MultipleValuesRegistry = (function () {
+var MultipleValuesRegistry = exports.MultipleValuesRegistry = function () {
     function MultipleValuesRegistry() {
         _classCallCheck(this, MultipleValuesRegistry);
 
@@ -917,11 +997,9 @@ var MultipleValuesRegistry = (function () {
     }]);
 
     return MultipleValuesRegistry;
-})();
+}();
 
-exports.MultipleValuesRegistry = MultipleValuesRegistry;
-
-var SingleValueRegistry = (function () {
+var SingleValueRegistry = exports.SingleValueRegistry = function () {
     function SingleValueRegistry() {
         _classCallCheck(this, SingleValueRegistry);
 
@@ -986,14 +1064,12 @@ var SingleValueRegistry = (function () {
     }]);
 
     return SingleValueRegistry;
-})();
+}();
 
-exports.SingleValueRegistry = SingleValueRegistry;
-
-},{}],7:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 'use strict';
 
-Object.defineProperty(exports, '__esModule', {
+Object.defineProperty(exports, "__esModule", {
     value: true
 });
 exports.unique = unique;
@@ -1002,7 +1078,6 @@ exports.callbackTimeout = callbackTimeout;
 exports.createElementWithID = createElementWithID;
 exports.isPositiveInt = isPositiveInt;
 exports.stringEndsWith = stringEndsWith;
-
 function unique(prefix) {
     var count = -1;
     return function (f) {
@@ -1027,9 +1102,13 @@ function callbackTimeout(timer, onSuccess, onTimeout) {
 }
 
 function createElementWithID(parent, id) {
+    var cleanContent = arguments.length <= 2 || arguments[2] === undefined ? false : arguments[2];
+
     var nEl = document.createElement('div');
     nEl.id = id;
-    parent.innerHTML = '';
+    if (cleanContent) {
+        parent.innerHTML = '';
+    }
     parent.appendChild(nEl);
     return nEl;
 }
@@ -1038,7 +1117,7 @@ function isPositiveInt(newVal, oldVal) {
     return !isNaN(parseFloat(newVal)) && isFinite(newVal) && newVal > 0 ? newVal : oldVal;
 }
 
-var endsWith = (function () {
+var endsWith = function () {
     if (String.prototype.endsWith) return String.prototype.endsWith;
     return function endsWith(searchString, position) {
         var subjectString = this.toString();
@@ -1049,7 +1128,7 @@ var endsWith = (function () {
         var lastIndex = subjectString.indexOf(searchString, position);
         return lastIndex !== -1 && lastIndex === position;
     };
-})();
+}();
 
 function stringEndsWith(string, search) {
     return endsWith.call(string, search);
