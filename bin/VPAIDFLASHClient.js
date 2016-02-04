@@ -556,7 +556,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 var FLASH_TEST = 'vpaid_video_flash_tester';
 var FLASH_TEST_EL = 'vpaid_video_flash_tester_el';
 var JSFlashBridge = require('./jsFlashBridge').JSFlashBridge;
-var createElementWithID = require('./utils').createElementWithID;
+var utils = require('./utils');
 var MultipleValuesRegistry = require('./registry').MultipleValuesRegistry;
 
 var FlashTester = function () {
@@ -567,8 +567,8 @@ var FlashTester = function () {
 
         _classCallCheck(this, FlashTester);
 
-        this.parentEl = createElementWithID(parent, FLASH_TEST_EL); // some browsers create global variables using the element id http://stackoverflow.com/questions/3434278/do-dom-tree-elements-with-ids-become-global-variables
-        this.parentEl.style.display = 'none'; // hide test element, we need to test if the element being hidden will still work or not
+        this.parentEl = utils.createElementWithID(parent, FLASH_TEST_EL); // some browsers create global variables using the element id http://stackoverflow.com/questions/3434278/do-dom-tree-elements-with-ids-become-global-variables
+        utils.hideFlashEl(this.parentEl);
         var params = {};
         params.movie = swfConfig.data;
         params.FlashVars = 'flashid=' + FLASH_TEST_EL + '&handler=' + JSFlashBridge.VPAID_FLASH_HANDLER;
@@ -577,6 +577,7 @@ var FlashTester = function () {
         this._handlers = new MultipleValuesRegistry();
         this._isSupported = false;
         if (this.el) {
+            utils.hideFlashEl(this.el);
             this._flash = new JSFlashBridge(this.el, swfConfig.data, FLASH_TEST_EL, 400, 400, function () {
                 var support = true;
                 _this._isSupported = support;
@@ -1078,6 +1079,7 @@ exports.callbackTimeout = callbackTimeout;
 exports.createElementWithID = createElementWithID;
 exports.isPositiveInt = isPositiveInt;
 exports.stringEndsWith = stringEndsWith;
+exports.hideFlashEl = hideFlashEl;
 function unique(prefix) {
     var count = -1;
     return function (f) {
@@ -1132,6 +1134,16 @@ var endsWith = function () {
 
 function stringEndsWith(string, search) {
     return endsWith.call(string, search);
+}
+
+function hideFlashEl(el) {
+    // can't use display none because will not run the flash
+    el.style.position = 'absolute';
+    el.style.left = '-1px';
+    el.style.top = '-1px';
+    el.style.width = '1px';
+    el.style.height = '1px';
+    el.style.visibility = 'hidden';
 }
 
 },{}]},{},[3])
