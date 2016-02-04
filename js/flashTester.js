@@ -3,13 +3,13 @@
 const FLASH_TEST = 'vpaid_video_flash_tester';
 const FLASH_TEST_EL = 'vpaid_video_flash_tester_el';
 const JSFlashBridge = require('./jsFlashBridge').JSFlashBridge;
-const createElementWithID = require('./utils').createElementWithID;
+const utils = require('./utils');
 const MultipleValuesRegistry = require('./registry').MultipleValuesRegistry;
 
 class FlashTester {
     constructor(parent, swfConfig = {data: 'VPAIDFlash.swf', width: 800, height: 400}) {
-        this.parentEl = createElementWithID(parent, FLASH_TEST_EL); // some browsers create global variables using the element id http://stackoverflow.com/questions/3434278/do-dom-tree-elements-with-ids-become-global-variables
-        this.parentEl.style.display = 'none'; // hide test element, we need to test if the element being hidden will still work or not
+        this.parentEl = utils.createElementWithID(parent, FLASH_TEST_EL); // some browsers create global variables using the element id http://stackoverflow.com/questions/3434278/do-dom-tree-elements-with-ids-become-global-variables
+        utils.hideFlashEl(this.parentEl);
         var params = {};
         params.movie = swfConfig.data;
         params.FlashVars = `flashid=${FLASH_TEST_EL}&handler=${JSFlashBridge.VPAID_FLASH_HANDLER}`;
@@ -18,6 +18,7 @@ class FlashTester {
         this._handlers = new MultipleValuesRegistry();
         this._isSupported = false;
         if (this.el) {
+            utils.hideFlashEl(this.el);
             this._flash = new JSFlashBridge(this.el, swfConfig.data, FLASH_TEST_EL, 400, 400, ()=> {
                 const support = true;
                 this._isSupported = support;

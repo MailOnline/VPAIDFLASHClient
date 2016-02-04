@@ -58,4 +58,12 @@ export function stringEndsWith(string, search) {
     return endsWith.call(string, search);
 }
 
-
+export function hideFlashEl(el) {
+    // can't use display none because will not run the flash
+    el.style.position = 'absolute';
+    el.style.left = '-1px';
+    el.style.top = '-1px';
+    el.style.width = '1px';
+    el.style.height = '1px';
+    el.style.visibility = 'hidden';
+}
