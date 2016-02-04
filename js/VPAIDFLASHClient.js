@@ -134,7 +134,7 @@ class VPAIDFLASHClient {
 
 setStaticProperty('isSupported', () => {
     return VPAIDFLASHClient.hasExternalDependencies() && swfobject.hasFlashPlayerVersion(FLASH_VERSION) && flashTester.isSupported();
-});
+}, true);
 
 setStaticProperty('hasExternalDependencies', () => {
     return !!window.swfobject;
@@ -157,9 +157,9 @@ function $loadPendedAdUnit() {
     }
 }
 
-function setStaticProperty(propertyName, value) {
+function setStaticProperty(propertyName, value, writable = false) {
     Object.defineProperty(VPAIDFLASHClient, propertyName, {
-        writable: false,
+        writable: writable,
         configurable: false,
         value: value
     });
