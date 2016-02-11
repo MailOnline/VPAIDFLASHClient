@@ -1137,13 +1137,12 @@ function stringEndsWith(string, search) {
 }
 
 function hideFlashEl(el) {
-    // can't use display none because will not run the flash
+    // can't use display none or visibility none because will block flash in some browsers
     el.style.position = 'absolute';
     el.style.left = '-1px';
     el.style.top = '-1px';
     el.style.width = '1px';
     el.style.height = '1px';
-    el.style.visibility = 'hidden';
 }
 
 },{}]},{},[3])
