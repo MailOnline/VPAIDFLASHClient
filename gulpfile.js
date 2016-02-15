@@ -1,7 +1,6 @@
 'use strict';
 
 var gulp = require('gulp');
-var del = require('del');
 var watchify = require('watchify');
 var gutil = require('gulp-util');
 var _ = require('lodash');
@@ -30,40 +29,48 @@ var KarmaServer = require('karma').Server;
 var istanbul = require('browserify-istanbul');
 
 var demoPath = './demo';
-var testPath = 'test/**/**.js';
+var devPath = './dev';
 var binPath = './bin';
-var mainJS = 'VPAIDFLASHClient.js';
+var testPath = 'test/**/**.js';
 
-var jsBuild = watchify(
-    browserify(
-        assign(
-            {},
-            watchify.args,
-            {
-                entries: ['./js/' + mainJS],
-                debug: true
-            }
+function buildJs(entry) {
+    var job = watchify(
+        browserify(
+            assign(
+                {},
+                watchify.args,
+                {
+                    entries: [entry],
+                    paths: ['bower_components'],
+                    debug: true
+                }
+            )
         )
-    )
-);
+    );
 
-//transform es6 to 5
-jsBuild.transform(babelify);
+    //transform es6 to 5
+    job.transform(babelify);
 
-jsBuild.on('log', gutil.log); // output build logs to terminal
+    job.on('log', gutil.log); // output build logs to terminal
+    return job;
+}
 
-function bundle() {
-    return jsBuild.bundle()
+function bundle(inputFile, destinationPath, outputFile) {
+    return buildJs(inputFile).bundle()
         .on('error', gutil.log.bind(gutil, 'Browserify error'))
-        .pipe(source(mainJS))
+        .pipe(source(outputFile))
         .pipe(buffer())
         .pipe(sourcemaps.init({loadMaps: true}))
         .pipe(sourcemaps.write('./'))
-        .pipe(gulp.dest(binPath))
+        .pipe(gulp.dest(destinationPath))
         .pipe(reload({stream: true, once: true}));
 }
 
-gulp.task('browserify', bundle);
+var buildDemo =  bundle.bind(null, 'demo/demo.js', devPath, 'index.js');
+var buildMain =  bundle.bind(null, 'js/VPAIDFLASHClient.js', binPath, 'VPAIDFLASHClient.js');
+
+gulp.task('browserifyDemo', buildDemo);
+gulp.task('browserify', buildMain);
 
 gulp.task('test:ci', ['compile:flash'], function (done) {
     new KarmaServer({
@@ -71,6 +78,7 @@ gulp.task('test:ci', ['compile:flash'], function (done) {
         reporters: ['spec', 'coverage'],
         browserify: {
             debug: true,
+            paths: ['bower_components'],
             transform: [
                 ['babelify', {"presets": ['es2015']}],
                 istanbul({instrumenterConfig: {embedSource: true}}) // temporary fix https://github.com/karma-runner/karma-coverage/issues/157#issuecomment-160555004
@@ -149,17 +157,18 @@ gulp.task('compileFlashAndTest', function(done) {
 
 //watch file changes
 gulp.task('watch:demo', function() {
-    jsBuild.on('update', bundle);
+    buildDemo().on('update', buildDemo);
     gulp.watch(['demo/*.html', 'demo/*.css'], reload);
     gulp.watch([binPath + '/*.js'], ['test:dev'], reload);
     gulp.watch([testPath], ['test:dev']);
     gulp.watch(['flash/src/**/*.as'], ['compileFlashAndTest'], reload);
+
 });
 
 
 //watch file changes
 gulp.task('watch:test', function() {
-    jsBuild.on('update', bundle);
+    buildMain().on('update', buildMain);
     gulp.watch([binPath + '/*.js'], ['test:dev']);
     gulp.watch([testPath], ['test:dev']);
     gulp.watch(['flash/src/**/*.as'], ['compileFlashAndTest'], reload);
@@ -167,13 +176,10 @@ gulp.task('watch:test', function() {
 
 
 //create the static server
-gulp.task('serve', ['browserify', 'compileFlashAndTest', 'watch:demo'], function () {
+gulp.task('serve', ['browserifyDemo', 'compileFlashAndTest', 'watch:demo'], function () {
     browserSync({
         server: {
-            baseDir: ['demo', binPath],
-            routes: {
-                '/swfobject.js':        'bower_components/swfobject/swfobject/src/swfobject.js'
-            }
+            baseDir: ['demo', binPath, 'dev']
         }
     });
 });

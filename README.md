@@ -42,9 +42,6 @@ JS
 The project uses:
   - [gulpjs](http://gulpjs.com/) to compile.
   - [babeljs](https://babeljs.io) to convert es6 to es5 js code.
-
-3rd party
----------
   - [swfobject googlecode](https://code.google.com/p/swfobject/) or [swfobject github](https://github.com/swfobject/swfobject)
 
 Flash

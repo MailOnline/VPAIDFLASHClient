@@ -1,5 +1,7 @@
 'use strict';
 
+const swfobject = require('swfobject');
+
 const JSFlashBridge = require('./jsFlashBridge').JSFlashBridge;
 const VPAIDAdUnit = require('./VPAIDAdUnit').VPAIDAdUnit;
 
@@ -18,9 +20,7 @@ let flashTester = {isSupported: ()=> true}; // if the runFlashTest is not run th
 class VPAIDFLASHClient {
     constructor (vpaidParentEl, callback, swfConfig = {data: 'VPAIDFlash.swf', width: 800, height: 400}, params = { wmode: 'transparent', salign: 'tl', align: 'left', allowScriptAccess: 'always', scale: 'noScale', allowFullScreen: 'true', quality: 'high'}, vpaidOptions = { debug: false, timeout: 10000 }) {
 
-        if (!VPAIDFLASHClient.hasExternalDependencies()) {
-            return onError('no swfobject in global scope. check: https://github.com/swfobject/swfobject or https://code.google.com/p/swfobject/');
-        }
+        var me = this;
 
         this._vpaidParentEl = vpaidParentEl;
         this._flashID = uniqueVPAID();
@@ -60,7 +60,7 @@ class VPAIDFLASHClient {
             setTimeout(() => {
                 callback(new Error(error));
             }, 0);
-            return this;
+            return me;
         }
 
     }
@@ -133,12 +133,8 @@ class VPAIDFLASHClient {
 }
 
 setStaticProperty('isSupported', () => {
-    return VPAIDFLASHClient.hasExternalDependencies() && swfobject.hasFlashPlayerVersion(FLASH_VERSION) && flashTester.isSupported();
+    return swfobject.hasFlashPlayerVersion(FLASH_VERSION) && flashTester.isSupported();
 }, true);
-
-setStaticProperty('hasExternalDependencies', () => {
-    return !!window.swfobject;
-});
 
 setStaticProperty('runFlashTest', (swfConfig) => {
     flashTester = createFlashTester(document.body, swfConfig);
@@ -164,5 +160,7 @@ function setStaticProperty(propertyName, value, writable = false) {
         value: value
     });
 }
+
+VPAIDFLASHClient.swfobject = swfobject;
 
 module.exports = VPAIDFLASHClient;

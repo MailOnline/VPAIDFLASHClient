@@ -1,5 +1,7 @@
 'use strict';
 
+const swfobject = require('swfobject');
+
 const FLASH_TEST = 'vpaid_video_flash_tester';
 const FLASH_TEST_EL = 'vpaid_video_flash_tester_el';
 const JSFlashBridge = require('./jsFlashBridge').JSFlashBridge;

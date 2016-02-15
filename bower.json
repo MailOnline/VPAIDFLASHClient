@@ -19,7 +19,7 @@
     "demo"
   ],
   "dependencies": {
-    "swfobject": "2.2"
+    "swfobject": "MailOnline/swfobject"
   },
   "homepage": "https://github.com/MailOnline/VPAIDFLASHClient",
   "keywords": [
