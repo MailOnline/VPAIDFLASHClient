@@ -27,21 +27,20 @@
     "browserify": "^13.0.0",
     "browserify-istanbul": "^0.2.1",
     "chai": "^3.4.1",
-    "del": "^1.1.1",
     "gulp": "^3.9.0",
-    "gulp-shell": "^0.4.2",
+    "gulp-shell": "^0.5.2",
     "gulp-sourcemaps": "^1.6.0",
     "gulp-util": "^3.0.5",
     "karma": "^0.13.9",
-    "karma-browserify": "^4.2.2",
+    "karma-browserify": "^5.0.1",
     "karma-chai-sinon": "^0.1.5",
     "karma-chrome-launcher": "^0.2.2",
     "karma-coverage": "^0.5.3",
     "karma-firefox-launcher": "^0.1.6",
     "karma-mocha": "^0.2.1",
     "karma-source-map-support": "^1.1.0",
-    "karma-spec-reporter": "^0.0.23",
-    "lodash": "^3.8.0",
+    "karma-spec-reporter": "^0.0.24",
+    "lodash": "^4.3.0",
     "mocha": "^2.2.5",
     "run-sequence": "^1.1.0",
     "sinon": "1.14.1",
@@ -65,6 +64,6 @@
   "scripts": {
     "start": "gulp serve",
     "test": "gulp test:ci",
-    "postinstall": "bower install | ./flexSDK.sh"
+    "postinstall": "echo 'bower install...';bower install;echo 'FlexSDK install...'; ./flexSDK.sh"
   }
 }

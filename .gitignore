@@ -10,3 +10,4 @@ flash/.project
 coverage
 vendor
 .\#*
+dev/

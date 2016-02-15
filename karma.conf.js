@@ -9,7 +9,6 @@ module.exports = function (karma) {
      * This is the list of file patterns to load into the browser during testing.
      */
     files: [
-        'bower_components/swfobject/swfobject/src/swfobject.js',
         'js/**/*.js',
         'test/unit/*.js',
         'test/integration/*.js',
@@ -25,6 +24,7 @@ module.exports = function (karma) {
     },
     browserify: {
         debug: true,
+        paths: ['bower_components'],
         transform: [
             ["babelify", {"presets": ["es2015"]}]
         ]

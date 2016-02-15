@@ -12,8 +12,8 @@ describe('VPAIDFLASHClient.js api', function()  {
     var clock;
 
     beforeEach(function() {
-        sinon.stub(swfobject, 'hasFlashPlayerVersion').returns(true);
-        swfObjectCallback = sinon.stub(swfobject, 'createSWF', function (config, params, flashID) {
+        sinon.stub(VPAIDFLASHClient.swfobject, 'hasFlashPlayerVersion').returns(true);
+        swfObjectCallback = sinon.stub(VPAIDFLASHClient.swfobject, 'createSWF', function (config, params, flashID) {
             var el = document.getElementById(flashID);
 
             //we need to simulate all the methods created by Flash ExternalInterface
@@ -37,8 +37,8 @@ describe('VPAIDFLASHClient.js api', function()  {
     });
 
     afterEach(function () {
-        swfobject.hasFlashPlayerVersion.restore();
-        swfobject.createSWF.restore();
+        VPAIDFLASHClient.swfobject.hasFlashPlayerVersion.restore();
+        VPAIDFLASHClient.swfobject.createSWF.restore();
 
 
         document.body.removeChild(flashWrapper1);
@@ -48,46 +48,15 @@ describe('VPAIDFLASHClient.js api', function()  {
     });
 
     describe('swfobject', function() {
-        describe('when no swfobject', function () {
-            beforeEach(function () {
-                window.temp = window.swfobject;
-                window.swfobject = null;
-            });
-            afterEach(function () {
-                window.swfobject = window.temp;
-                delete window.temp;
-            });
-
-            it('hasExternalDependencies should return false', function () {
-                assert(!VPAIDFLASHClient.hasExternalDependencies());
-            });
-
-            it('isSupported should return false', function () {
-                assert(!VPAIDFLASHClient.isSupported());
-            });
-
-            it('must handle gracefully', function () {
-                let flashVPAID = new VPAIDFLASHClient(flashWrapper1, function (err, result) {
-                    assert.match(err.message, /^no swfobject/, 'message should be no swfobject...');
-                    flashVPAID.destroy();
-                });
-
-                clock.tick(100);
-            });
-        });
-
-        it('hasExternalDependencies should return true', function () {
-            assert(VPAIDFLASHClient.hasExternalDependencies());
-        });
 
         it('isSupported should return true', function () {
             assert(VPAIDFLASHClient.isSupported());
         });
 
         it('must handle gracefully when no supported flash', function () {
-            swfobject.hasFlashPlayerVersion.restore();
+            VPAIDFLASHClient.swfobject.hasFlashPlayerVersion.restore();
 
-            sinon.stub(swfobject, 'hasFlashPlayerVersion', function () {
+            sinon.stub(VPAIDFLASHClient.swfobject, 'hasFlashPlayerVersion', function () {
                 return false;
             });
 
@@ -100,9 +69,9 @@ describe('VPAIDFLASHClient.js api', function()  {
         });
 
         it('must handle gracefully when createSWF fails', function () {
-            swfobject.createSWF.restore();
+            VPAIDFLASHClient.swfobject.createSWF.restore();
 
-            sinon.stub(swfobject, 'createSWF', function () {
+            sinon.stub(VPAIDFLASHClient.swfobject, 'createSWF', function () {
                 return;
             });
 
@@ -264,12 +233,12 @@ describe('VPAIDFLASHClient.js api', function()  {
 
                 sinon.stub(flashVPAID.el, 'getAdVolume', function (argsData) {
                     let callBackID = argsData[0];
-                    window[VPAID_FLASH_HANDLER](flashVPAID.getFlashID(), 'method', 'getAdVolume', callBackID, null, .8);
+                    window[VPAID_FLASH_HANDLER](flashVPAID.getFlashID(), 'method', 'getAdVolume', callBackID, null, 0.8);
                 });
 
                 let callback = sinon.spy(function () {
                     assert(callback.calledOnce);
-                    assert(callback.calledWith(null, .8));
+                    assert(callback.calledWith(null, 0.8));
                 });
 
                 adUnit.getAdVolume(callback);
@@ -294,10 +263,10 @@ describe('VPAIDFLASHClient.js api', function()  {
 
                 var callback = sinon.spy(function () {
                     assert(callback.calledOnce, 'was called only once');
-                    assert(callback.calledWith(null, .5), 'was called with null, and .5');
+                    assert(callback.calledWith(null, 0.5), 'was called with null, and .5');
                 });
 
-                adUnit.setAdVolume(.5, callback);
+                adUnit.setAdVolume(0.5, callback);
 
                 clock.tick(100);
             });

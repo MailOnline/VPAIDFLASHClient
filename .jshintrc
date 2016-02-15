@@ -1,8 +1,11 @@
 {
     "esnext": true,
-    "browserify": true,
     "browser": true,
+  	"browserify": true,
+  	"devel": true,
     "globals": {
         "swfobject": true
-    }
+    },
+    "unused": true,
+    "undef": true
 }
