@@ -15,13 +15,14 @@ class FlashTester {
         var params = {};
         params.movie = swfConfig.data;
         params.FlashVars = `flashid=${FLASH_TEST_EL}&handler=${JSFlashBridge.VPAID_FLASH_HANDLER}`;
+        params.allowScriptAccess = 'always';
 
         this.el = swfobject.createSWF(swfConfig, params, FLASH_TEST_EL);
         this._handlers = new MultipleValuesRegistry();
         this._isSupported = false;
         if (this.el) {
             utils.hideFlashEl(this.el);
-            this._flash = new JSFlashBridge(this.el, swfConfig.data, FLASH_TEST_EL, 400, 400, ()=> {
+            this._flash = new JSFlashBridge(this.el, swfConfig.data, FLASH_TEST_EL, swfConfig.width, swfConfig.height, ()=> {
                 const support = true;
                 this._isSupported = support;
                 this._handlers.get('change').forEach((callback) => {
