@@ -162,7 +162,6 @@ gulp.task('watch:demo', function() {
     gulp.watch([binPath + '/*.js'], ['test:dev'], reload);
     gulp.watch([testPath], ['test:dev']);
     gulp.watch(['flash/src/**/*.as'], ['compileFlashAndTest'], reload);
-
 });
 
 
