@@ -44,7 +44,7 @@
     "mocha": "^2.2.5",
     "mversion": "^1.10.1",
     "run-sequence": "^1.1.0",
-    "sinon": "1.14.1",
+    "sinon": "1.17.7",
     "sinon-chai": "2.8.0",
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.1.0",
